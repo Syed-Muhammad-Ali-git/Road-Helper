@@ -1,0 +1,131 @@
+📄 ROAD HELPER – Project Description (Text File Content)
+
+Project Name: Road Helper
+
+Project Overview:
+Road Helper aik web-based application hai jo road par paish aane wali roz-marra ki emergency problems ko foran hal karne ke liye banayi ja rahi hai. Is web ka maqsad drivers aur certified helpers ko aik hi platform par connect karna hai takay kisi bhi mushkil situation mein user ko jaldi madad mil sakay.
+
+
+❓ Problem Statement
+
+Aksar log jab road par safar kar rahe hotay hain to unhein mukhtalif problems ka samna karna parta hai, jaise:
+
+Car ya bike ka puncture ho jana
+
+Petrol khatam ho jana
+
+Battery charge khatam hona
+
+Car ya bike ka achanak band ho jana
+
+In situations mein logon ko yeh nahi pata hota ke kaun madad kare, kahan se madad mile, ya kitni der lagegi. Isi problem ka solution Road Helper provide karta hai.
+
+
+✅ Proposed Solution
+
+Road Helper aik aisi web application hai jahan:
+
+Customer sirf apna mobile number daal kar web use kar sakta hai
+
+Customer apni problem select karta hai
+
+Nearby certified helpers map par show hotay hain
+
+Helpers ki services aur prices pehle se visible hoti hain
+
+Customer apni zarurat ke mutabiq helper select karta hai
+
+Is tarah customer ko quick, safe aur reliable help milti hai.
+
+
+For Development or Designing importand----------------------------------------------------------------------------------------
+
+👥 User Roles / Panels
+
+1️⃣ Customer Side
+
+Sirf mobile number se access
+
+Apni problem select karta hai (puncture, petrol, battery etc.)
+
+Apni current location map par share karta hai
+
+Nearby helpers aur unki prices dekh sakta hai
+
+Request send karta hai
+
+
+2️⃣ Helper Panel
+
+Proper registration system hota hai
+
+Helper apni personal details aur service type add karta hai
+
+Admin se approval ke baad helper active hota hai
+
+Map par available requests dekhta hai
+
+Request accept karke customer ki madad karta hai
+
+
+3️⃣ Admin Panel
+
+Secure admin login
+
+Customers aur helpers ka record
+
+Helpers ko approve ya block karne ka option
+
+Requests ka complete tracking system
+
+System ko monitor aur control karta hai
+
+
+🗺️ Map & Pricing System
+
+Customer aur helper ki location Google Map par show hoti hai
+
+Helper ki service price pehle se visible hoti hai
+
+Customer ko transparency milti hai (no hidden charges)
+
+
+
+🔄 Website Working Flow (Simple Flow)
+
+Customer web open karta hai
+
+Mobile number enter karta hai
+
+Apni problem select karta hai
+
+Location share karta hai
+
+Nearby helpers map par show hotay hain
+
+Customer helper select karta hai
+
+Helper request accept karta hai
+
+Problem solve hoti hai
+
+Request complete ho jati hai
+
+
+🎯 Project Objective
+
+Road Helper ka main objective yeh hai ke:
+
+Road emergencies ko fast aur easy banana
+
+Drivers ko trusted helpers se connect karna
+
+Time, tension aur confusion ko kam karna
+
+Real-life problems ka digital solution provide karna
+
+
+
+🚀 Conclusion
+
+Road Helper aik practical aur real-world problem solving project hai jo modern web technologies ke zariye road par paish aane wali mushkilat ka foran hal provide karta hai. Yeh project future mein aik full commercial service bhi ban sakta hai.
