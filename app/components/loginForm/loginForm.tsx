@@ -48,6 +48,7 @@ const LoginForm: React.FC = () => {
   });
 
   const handleLogin = (values: LoginSchemaType) => {
+    console.log("Login Values:", values);
     localStorage.setItem("loginData", JSON.stringify(values));
     toast.success("Login successful!");
 
