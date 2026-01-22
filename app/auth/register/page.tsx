@@ -5,27 +5,28 @@ import {
     TextInput,
     PasswordInput,
     Button,
-    Paper,
     Title,
     Text,
     Container,
     Group,
     Anchor,
     Stack,
-    SegmentedControl,
     Box,
     Image,
+    LoadingOverlay,
+    SegmentedControl,
     Select
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "@/lib/firebase/config";
-import { doc, setDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { registerUserAction } from "@/redux/actions/auth-action";
+import { motion, AnimatePresence } from "framer-motion";
 
 const registerSchema = z.object({
     fullName: z.string().min(2, "Name is too short"),
@@ -34,11 +35,18 @@ const registerSchema = z.object({
     phone: z.string().min(10, "Invalid phone number"),
     role: z.enum(["client", "helper"]),
     serviceType: z.string().optional(),
+}).refine((data) => {
+    if (data.role === "helper" && !data.serviceType) return false;
+    return true;
+}, {
+    message: "Service type is required for helpers",
+    path: ["serviceType"]
 });
 
 export default function RegisterPage() {
     const router = useRouter();
-    const [role, setRole] = useState("client");
+    const dispatch: AppDispatch = useDispatch();
+    const { loading } = useSelector((state: RootState) => state.auth);
 
     const form = useForm({
         initialValues: {
@@ -46,7 +54,7 @@ export default function RegisterPage() {
             email: "",
             password: "",
             phone: "",
-            role: "client",
+            role: "client" as "client" | "helper",
             serviceType: "",
         },
         validate: zodResolver(registerSchema),
@@ -54,72 +62,50 @@ export default function RegisterPage() {
 
     const handleSubmit = async (values: typeof form.values) => {
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
-            const user = userCredential.user;
-
-            const collection = values.role === "client" ? "users" : "helpers";
-            const data: any = {
-                uid: user.uid,
-                fullName: values.fullName,
-                email: values.email,
-                phone: values.phone,
-                role: values.role,
-                createdAt: new Date().toISOString(),
-            };
-
-            if (values.role === "helper") {
-                data.serviceType = values.serviceType;
-                data.isOnline = false;
-                data.rating = 5.0;
-                data.totalJobs = 0;
-                data.isVerified = false;
-            }
-
-            await setDoc(doc(db, collection, user.uid), data);
-
+            await dispatch(registerUserAction(values));
             toast.success("Account created successfully!");
-            setTimeout(() => {
-                router.push(values.role === "client" ? "/client/dashboard" : "/helper/dashboard");
-            }, 2000);
-        } catch (error: any) {
-            toast.error(error.message || "Failed to register");
+            router.replace("/");
+        } catch (err: any) {
+            toast.error(err.message || "Registration failed");
         }
     };
 
     return (
-        <Box className="min-h-screen flex bg-[#F8FAFC]">
-            {/* Left Form Side */}
-            <Box className="flex-1 flex items-center justify-center p-8 bg-white lg:rounded-r-[40px] shadow-2xl z-20">
+        <Box className="min-h-screen flex bg-slate-50">
+            <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                className="flex-1 flex items-center justify-center p-8 bg-white lg:rounded-r-[60px] shadow-2xl z-20 relative order-2 lg:order-1"
+            >
+                <LoadingOverlay visible={loading} zIndex={1000} overlayProps={{ blur: 2 }} loaderProps={{ variant: 'bars' }} />
+
                 <Container size={450} className="w-full">
                     <Box className="mb-8">
-                        <Image src="/assets/images/logo.jpg" alt="Road Helper Logo" w={120} mb="md" />
-                        <Title order={2} className="text-3xl font-bold text-slate-800">Create Account</Title>
-                        <Text c="dimmed" size="sm" mt={5}>
+                        <Title order={2} className="text-4xl font-black text-slate-800 tracking-tight">Register</Title>
+                        <Text c="dimmed" size="md" mt={5}>
                             Already have an account?{' '}
-                            <Anchor size="sm" component={Link} href="/auth/login" className="font-semibold text-blue-600">
+                            <Anchor size="md" component={Link} href="/auth/login" className="font-bold text-blue-600">
                                 Login here
                             </Anchor>
                         </Text>
                     </Box>
 
                     <Box className="mb-8">
-                        <Text size="sm" fw={500} mb={8} c="slate.7">Register as:</Text>
+                        <Text size="sm" fw={700} mb={8} c="slate.8" tt="uppercase">Register as:</Text>
                         <SegmentedControl
                             fullWidth
                             size="md"
                             value={form.values.role}
-                            onChange={(value) => {
-                                setRole(value);
-                                form.setFieldValue("role", value as "client" | "helper");
-                            }}
+                            onChange={(value) => form.setFieldValue("role", value as any)}
                             data={[
-                                { label: 'Client (Need Help)', value: 'client' },
+                                { label: 'Client (User)', value: 'client' },
                                 { label: 'Helper (Provider)', value: 'helper' },
                             ]}
                             classNames={{
                                 root: "bg-slate-100 p-1 rounded-xl",
-                                indicator: "bg-white shadow-sm rounded-lg",
-                                label: "font-semibold"
+                                indicator: "bg-white shadow-md rounded-lg",
+                                label: "font-bold"
                             }}
                         />
                     </Box>
@@ -130,85 +116,95 @@ export default function RegisterPage() {
                                 label="Full Name"
                                 placeholder="John Doe"
                                 required
+                                size="md"
+                                radius="md"
                                 {...form.getInputProps("fullName")}
-                                classNames={{ input: "h-12 rounded-lg", label: "mb-1 font-medium" }}
                             />
 
-                            <TextInput
-                                label="Email Address"
-                                placeholder="john@example.com"
-                                required
-                                {...form.getInputProps("email")}
-                                classNames={{ input: "h-12 rounded-lg", label: "mb-1 font-medium" }}
-                            />
-
-                            <TextInput
-                                label="Phone Number"
-                                placeholder="+1234567890"
-                                required
-                                {...form.getInputProps("phone")}
-                                classNames={{ input: "h-12 rounded-lg", label: "mb-1 font-medium" }}
-                            />
-
-                            {form.values.role === "helper" && (
-                                <Select
-                                    label="Primary Service"
-                                    placeholder="Select service type"
+                            <Group grow>
+                                <TextInput
+                                    label="Email"
+                                    placeholder="john@example.com"
                                     required
-                                    data={[
-                                        { value: "bike_mechanic", label: "Bike Mechanic" },
-                                        { value: "car_mechanic", label: "Car Mechanic" },
-                                        { value: "fuel_delivery", label: "Fuel Delivery" },
-                                        { value: "towing", label: "Towing Service" },
-                                    ]}
-                                    {...form.getInputProps("serviceType")}
-                                    classNames={{ input: "h-12 rounded-lg", label: "mb-1 font-medium" }}
+                                    size="md"
+                                    radius="md"
+                                    {...form.getInputProps("email")}
                                 />
-                            )}
+                                <TextInput
+                                    label="Phone"
+                                    placeholder="+1234567890"
+                                    required
+                                    size="md"
+                                    radius="md"
+                                    {...form.getInputProps("phone")}
+                                />
+                            </Group>
+
+                            <AnimatePresence mode="wait">
+                                {form.values.role === "helper" && (
+                                    <motion.div
+                                        key="helper-fields"
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                    >
+                                        <Select
+                                            label="Primary Service Type"
+                                            placeholder="Choose your expertise"
+                                            required
+                                            size="md"
+                                            radius="md"
+                                            data={[
+                                                { value: "bike_mechanic", label: "Bike Mechanic" },
+                                                { value: "car_mechanic", label: "Car Mechanic" },
+                                                { value: "fuel_delivery", label: "Fuel Delivery" },
+                                                { value: "towing", label: "Towing Service" },
+                                            ]}
+                                            {...form.getInputProps("serviceType")}
+                                        />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
 
                             <PasswordInput
                                 label="Password"
                                 placeholder="Min 6 characters"
                                 required
+                                size="md"
+                                radius="md"
                                 {...form.getInputProps("password")}
-                                classNames={{ input: "h-12 rounded-lg", label: "mb-1 font-medium" }}
                             />
 
                             <Button
                                 type="submit"
                                 fullWidth
                                 size="lg"
-                                className="bg-blue-600 hover:bg-blue-700 rounded-lg h-12 mt-6 shadow-md transition-all active:scale-95"
+                                radius="md"
+                                className="bg-blue-600 hover:bg-blue-700 h-14 mt-6 shadow-lg transition-all"
                             >
-                                Register Now
+                                Create Account
                             </Button>
                         </Stack>
                     </form>
                 </Container>
-            </Box>
+            </motion.div>
 
-            {/* Right Decoration Side */}
-            <Box className="hidden lg:flex flex-1 relative overflow-hidden bg-[#1E293B] items-center justify-center p-12">
+            <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                className="hidden lg:flex flex-1 relative overflow-hidden bg-[#1E293B] items-center justify-center p-12 order-1 lg:order-2"
+            >
                 <Box className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-                    <Image src="/assets/images/ui-design.jpg" alt="Background" h="100%" w="100%" fit="cover" />
+                    <Image src="/assets/images/logo.jpg" alt="Background" h="100%" w="100%" fit="cover" />
                 </Box>
                 <Stack align="center" gap="xl" className="z-10 text-white text-center">
-                    <Title order={1} className="text-5xl font-bold tracking-tight">Become a Hero</Title>
+                    <Title order={1} className="text-6xl font-black tracking-tight leading-tight">Join the <br /> <span className="text-red-500">HEROES</span></Title>
                     <Text className="text-xl text-slate-300 max-w-md">
-                        Help people on the move and earn while you grow your service business.
+                        Whether you need help or want to provide it, Road Helper is your platform for reliability.
                     </Text>
-                    <Box className="grid grid-cols-2 gap-4 mt-8">
-                        <Paper p="md" radius="lg" bg="rgba(255,255,255,0.05)" className="border border-white/10 backdrop-blur-md">
-                            <Text fw={700} size="xl" c="white">10k+</Text>
-                            <Text size="xs" c="slate.4">Active Users</Text>
-                        </Paper>
-                        <Paper p="md" radius="lg" bg="rgba(255,255,255,0.05)" className="border border-white/10 backdrop-blur-md">
-                            <Text fw={700} size="xl" c="white">500+</Text>
-                            <Text size="xs" c="slate.4">Top Helpers</Text>
-                        </Paper>
-                    </Box>
                 </Stack>
-            </Box>
+            </motion.div>
         </Box>
     );
 }

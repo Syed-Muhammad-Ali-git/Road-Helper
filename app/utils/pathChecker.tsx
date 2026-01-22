@@ -3,7 +3,7 @@
 /* ---------------- IMPORTS ---------------- */
 import React, { memo } from "react";
 import { protectedRoutes } from "./routes";
-import { Box, Text } from "@mantine/core";
+
 
 /* ---------------- INTERFACES ---------------- */
 interface PathCheckerProps {
@@ -13,6 +13,10 @@ interface PathCheckerProps {
 }
 
 /* ---------------- COMPONENT ---------------- */
+// I'll move Header/Sidebar to components/layout for better org or just point correctly
+import AppHeader from "@/components/header/header";
+import AppSidebar from "@/components/sidebar/sidebar";
+
 const PathChecker = memo(({ pathName, open, setOpen }: PathCheckerProps) => {
     const show = protectedRoutes.includes(pathName) || pathName === "/";
 
@@ -20,10 +24,9 @@ const PathChecker = memo(({ pathName, open, setOpen }: PathCheckerProps) => {
 
     return (
         <>
-            {/* Placeholder for Header and Sidebar - Can be replaced with actual components later */}
-            <Box p="md" bg="blue.1">
-                <Text fw={700}>Road Helper Header & Sidebar Placeholder</Text>
-            </Box>
+            <AppHeader opened={open} toggle={() => setOpen(!open)} />
+            {/* Sidebar visibility is handled in ClientLayout via CSS/Mantine-AppShell traits, 
+          but usually PathChecker renders it if requested. */}
         </>
     );
 });
