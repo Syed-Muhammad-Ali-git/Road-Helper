@@ -53,32 +53,11 @@ const Header: React.FC<HeaderProps> = ({ sidebarOpen = false }) => {
 
   return (
     <div
-      className="h-16 fixed top-0 right-0 z-50 bg-white flex items-center justify-between px-4 transition-all duration-200"
+      className="h-16 fixed top-0 right-0 z-50 bg-white flex items-center justify-end px-4 transition-all duration-200"
       style={{
         left: sidebarOpen ? drawerWidth : collapsedWidth,
       }}
     >
-      {/* ---------------- SEARCH BAR ---------------- */}
-      <Group className="flex-1 ml-auto">
-        <TextInput
-          placeholder="Search organizations or users..."
-          leftSection={
-            <Image
-              src={searchLogo}
-              alt="search"
-              className="filter-search-icon"
-            />
-          }
-          leftSectionWidth={30}
-          className="w-full max-w-45 sm:max-w-60 md:max-w-75 lg:max-w-90"
-          styles={{
-            input: {
-              color: "#4B5565",
-            },
-          }}
-        />
-      </Group>
-
       {/* ---------------- RIGHT CONTROLS ---------------- */}
       <Group gap={12}>
         {/* ---------------- HELP BUTTON ---------------- */}
