@@ -1,8 +1,8 @@
 /* ---------------- IMPORTS ---------------- */
 import React from "react";
 import { protectedRoutes } from "./routes";
-import SideBar from "../components/sidebar/sidebar";
-import Header from "../components/header/header";
+import HelperSideBar from "../components/helperSidebar/sidebar";
+import HelperHeader from "../components/helperHeader/header";
 
 /* ---------------- INTERFACES ---------------- */
 interface PathCheckerProps {
@@ -21,8 +21,8 @@ const PathChecker = ({ pathName, open, setOpen }: PathCheckerProps) => {
   // ----- RENDER HEADER AND SIDEBAR FOR PROTECTED ROUTES -----
   return (
     <>
-      <Header sidebarOpen={open} />
-      <SideBar open={open} setOpen={setOpen} />
+      <HelperHeader sidebarOpen={open} />
+      <HelperSideBar open={open} setOpen={setOpen} />
     </>
   );
 };

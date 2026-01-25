@@ -22,7 +22,7 @@ import auditLogo from "../../assets/images/audit.png";
 import dashboardLogo from "../../assets/images/dashboard.png";
 import settingsLogo from "../../assets/images/settings.png";
 import Image from "next/image";
-import type { SideBarProps, SidebarItem } from "../../types/index.ts";
+import type { SideBarProps, SidebarItem } from "../../types";
 
 /* ---------------- STYLES ---------------- */
 const drawerWidth = 260;
@@ -85,7 +85,7 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 /* ---------------- COMPONENT ---------------- */
-const SideBar = ({ open, setOpen }: SideBarProps) => {
+const HelperSideBar = ({ open, setOpen }: SideBarProps) => {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -247,4 +247,4 @@ const SideBar = ({ open, setOpen }: SideBarProps) => {
   );
 };
 
-export default SideBar;
+export default HelperSideBar;

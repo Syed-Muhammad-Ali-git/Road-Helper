@@ -3,9 +3,8 @@
 /* ---------------- IMPORTS ---------------- */
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Group, TextInput, Avatar, Menu } from "@mantine/core";
+import { Group, Avatar, Menu } from "@mantine/core";
 import Image from "next/image";
-import searchLogo from "../../assets/images/searchLogo.png";
 import helpLogo from "../../assets/images/helpLogo.png";
 import signoutLogo from "../../assets/images/signout.png";
 import myAccountLogo from "../../assets/images/myAccount.png";
@@ -16,7 +15,7 @@ interface HeaderProps {
 }
 
 /* ---------------- COMPONENT ---------------- */
-const Header: React.FC<HeaderProps> = ({ sidebarOpen = false }) => {
+const HelperHeader: React.FC<HeaderProps> = ({ sidebarOpen = false }) => {
   const router = useRouter();
   const [profile, setProfile] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>("");
@@ -137,4 +136,4 @@ const Header: React.FC<HeaderProps> = ({ sidebarOpen = false }) => {
   );
 };
 
-export default Header;
+export default HelperHeader;
