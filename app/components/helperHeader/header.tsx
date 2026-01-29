@@ -109,7 +109,7 @@ const HelperHeader: React.FC<HeaderProps> = ({ sidebarOpen = false }) => {
             {/* ---------------- MENU ITEMS ---------------- */}
             <div className="border border-[#EEF2F6]"></div>
             <Menu.Item
-              onClick={() => router.push("/myAccount")}
+              onClick={() => router.push("/helper/profile")}
               color="#697586"
               style={{ fontWeight: "400", padding: "10px" }}
             >
@@ -118,7 +118,7 @@ const HelperHeader: React.FC<HeaderProps> = ({ sidebarOpen = false }) => {
                 alt="my account"
                 className="inline-block"
               />
-              &nbsp; My Account
+              &nbsp; My Profile
             </Menu.Item>
             <div className="border border-[#EEF2F6]"></div>
             <Menu.Item

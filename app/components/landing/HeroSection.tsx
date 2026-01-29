@@ -10,7 +10,7 @@ export function HeroSection() {
   return (
     <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden bg-white">
       {/* Background Elements */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-red-50 to-transparent opacity-50 -z-10 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-linear-to-l from-red-50 to-transparent opacity-50 -z-10 pointer-events-none" />
 
       <Container size="xl">
         <Grid gutter={60} align="center">
@@ -106,7 +106,7 @@ export function HeroSection() {
               transition={{ duration: 0.7, delay: 0.2 }}
               className="relative z-10"
             >
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-gray-200/50 bg-white border border-gray-100/50 aspect-[4/3]">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-gray-200/50 bg-white border border-gray-100/50 aspect-4/3">
                 <Image
                   src="/assets/images/hero-illustration.png"
                   alt="Roadside Assistance"

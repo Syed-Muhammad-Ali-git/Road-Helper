@@ -58,11 +58,13 @@ export default function RegisterPage() {
   });
 
   const handleCustomerSubmit = async (values: typeof customerForm.values) => {
+    console.log(values);
     toast.success("Account created! Redirecting...");
     router.replace("/customer/dashboard");
   };
 
   const handleHelperSubmit = async (values: typeof helperForm.values) => {
+    console.log(values);
     toast.success("Application submitted! Redirecting...");
     router.replace("/helper/dashboard");
   };
@@ -103,7 +105,7 @@ export default function RegisterPage() {
                 value={registerType}
                 onChange={setRegisterType}
                 data={[
-                  { label: "For Drivers", value: "customer" },
+                  { label: "For Customers", value: "customer" },
                   { label: "For Helpers", value: "helper" },
                 ]}
                 classNames={{
@@ -279,7 +281,7 @@ export default function RegisterPage() {
           className="object-cover opacity-80"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-black/90 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-brand-black/90 to-transparent" />
 
         <div className="absolute bottom-0 left-0 p-16 text-white z-10">
           <div className="mb-6 w-16 h-16 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20">

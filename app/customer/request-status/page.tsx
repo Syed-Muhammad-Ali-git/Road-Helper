@@ -11,84 +11,71 @@ import {
   Button,
   Badge,
   Loader,
-  ThemeIcon,
   Avatar,
-  Divider,
   Timeline,
-  rem,
   Rating,
 } from "@mantine/core";
 import {
-  IconMapPin,
   IconUser,
   IconPhone,
   IconCircleCheck,
   IconClock,
   IconSearch,
-  IconCheck,
-  IconStar,
   IconArrowLeft,
 } from "@tabler/icons-react";
-import {
-  onSnapshot,
-  updateDoc,
-  doc,
-  serverTimestamp,
-} from "firebase/firestore";
-import { db } from "@/lib/firebase/config";
 import { useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import Link from "next/link";
 
+/* ---------------- MOCK DATA ---------------- */
+
+const MOCK_REQUEST = {
+  id: "REQ-123",
+  serviceType: "car_battery",
+  status: "completed", // pending | accepted | in_progress | completed
+  helperName: "Ahmed Khan",
+  helperPhone: "0301XXXXXXX",
+  rating: null,
+  createdAt: new Date(),
+};
+
 function RequestStatusContent() {
   const searchParams = useSearchParams();
   const requestId = searchParams.get("id");
+
   const [request, setRequest] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [rating, setRating] = useState(0);
 
+  /* ---------------- FAKE FETCH ---------------- */
   useEffect(() => {
-    if (!requestId) {
+    setTimeout(() => {
+      if (!requestId) {
+        setRequest(null);
+      } else {
+        setRequest(MOCK_REQUEST);
+      }
       setLoading(false);
-      return;
-    }
-
-    const unsubscribe = onSnapshot(
-      doc(db, "serviceRequests", requestId),
-      (docSnap) => {
-        if (docSnap.exists()) {
-          setRequest({ id: docSnap.id, ...docSnap.data() });
-        } else {
-          setRequest(null);
-        }
-        setLoading(false);
-      },
-    );
-
-    return () => unsubscribe();
+    }, 800);
   }, [requestId]);
 
   const submitRating = async () => {
-    if (!requestId || rating === 0) return;
-    try {
-      await updateDoc(doc(db, "serviceRequests", requestId), {
-        rating: rating,
-        ratedAt: serverTimestamp(),
-      });
-      // Also update helper rating in a real app (omitted for brevity but mentioned)
-      toast.success("Thank you for your feedback!");
-    } catch (error) {
-      console.log("Error: ", error);
-      toast.error("Failed to submit rating.");
-    }
+    if (rating === 0) return;
+
+    toast.success("Thank you for your feedback!");
+    setRequest((prev: any) => ({
+      ...prev,
+      rating,
+    }));
   };
 
-  if (loading)
+  if (loading) {
     return (
       <Box className="p-8 text-center">
         <Loader size="xl" />
       </Box>
     );
+  }
 
   if (!request) {
     return (
@@ -128,130 +115,55 @@ function RequestStatusContent() {
           >
             Dashboard
           </Button>
-          <Title order={1} className="text-3xl font-bold">
-            Request Status
-          </Title>
+          <Title order={1}>Request Status</Title>
         </Group>
 
-        <Paper
-          p="xl"
-          radius="xl"
-          withBorder
-          className="relative overflow-hidden"
-        >
-          <Box className="absolute top-0 right-0 p-6">
-            <Badge
-              size="xl"
-              color={
-                request.status === "completed"
-                  ? "green"
-                  : request.status === "pending"
-                    ? "orange"
-                    : "blue"
-              }
-              variant="filled"
-            >
-              {request.status?.replace("_", " ").toUpperCase()}
-            </Badge>
-          </Box>
+        <Paper p="xl" radius="xl" withBorder>
+          <Badge size="xl" mb="md">
+            {request.status.replace("_", " ").toUpperCase()}
+          </Badge>
 
-          <Stack gap="xl">
-            <Box>
-              <Text fw={700} size="sm" c="dimmed" mb={4}>
-                SERVICE TYPE
-              </Text>
-              <Title order={3}>
-                {request.serviceType?.replace("_", " ").toUpperCase()}
-              </Title>
-            </Box>
+          <Timeline active={getActiveStep()} bulletSize={40} lineWidth={3}>
+            <Timeline.Item bullet={<IconSearch />} title="Finding Helper" />
+            <Timeline.Item bullet={<IconUser />} title="Helper Assigned" />
+            <Timeline.Item bullet={<IconClock />} title="Service in Progress" />
+            <Timeline.Item bullet={<IconCircleCheck />} title="Job Completed" />
+          </Timeline>
 
-            <Timeline active={getActiveStep()} bulletSize={40} lineWidth={3}>
-              <Timeline.Item
-                bullet={<IconSearch size={22} />}
-                title="Finding Helper"
-              >
-                <Text size="sm" c="dimmed">
-                  Your request is visible to nearby verified helpers.
-                </Text>
-                <Text size="xs" mt={4}>
-                  {request.createdAt?.toDate?.().toLocaleTimeString()}
-                </Text>
-              </Timeline.Item>
+          {request.status === "completed" && !request.rating && (
+            <Paper mt="xl" p="lg" radius="lg" withBorder>
+              <Stack align="center">
+                <Text fw={700}>How was the service?</Text>
+                <Rating value={rating} onChange={setRating} size="xl" />
+                <Button onClick={submitRating} disabled={rating === 0}>
+                  Submit Rating
+                </Button>
+              </Stack>
+            </Paper>
+          )}
 
-              <Timeline.Item
-                bullet={<IconUser size={22} />}
-                title="Helper Assigned"
-              >
-                <Text size="sm" c="dimmed">
-                  {request.helperName
-                    ? `${request.helperName} has accepted your request!`
-                    : "Waiting for a helper to accept..."}
-                </Text>
-              </Timeline.Item>
-
-              <Timeline.Item
-                bullet={<IconClock size={22} />}
-                title="Service in Progress"
-              >
-                <Text size="sm" c="dimmed">
-                  Helper is on the way or working on your vehicle.
-                </Text>
-              </Timeline.Item>
-
-              <Timeline.Item
-                bullet={<IconCircleCheck size={22} />}
-                title="Job Completed"
-              >
-                <Text size="sm" c="dimmed">
-                  Service has been delivered successfully.
-                </Text>
-              </Timeline.Item>
-            </Timeline>
-
-            {request.status === "completed" && !request.rating && (
-              <Paper p="lg" radius="lg" bg="blue.0" withBorder>
-                <Stack align="center" gap="sm">
-                  <Text fw={700}>How was the service?</Text>
-                  <Rating value={rating} onChange={setRating} size="xl" />
-                  <Button
-                    variant="filled"
-                    color="blue"
-                    onClick={submitRating}
-                    disabled={rating === 0}
-                  >
-                    Submit Rating
-                  </Button>
-                </Stack>
-              </Paper>
-            )}
-
-            {request.helperName && (
-              <Paper p="lg" radius="lg" withBorder>
-                <Group justify="space-between">
-                  <Group>
-                    <Avatar size="lg" radius="xl" color="blue">
-                      {request.helperName.charAt(0)}
-                    </Avatar>
-                    <Box>
-                      <Text fw={700}>{request.helperName}</Text>
-                      <Text size="xs" c="dimmed">
-                        Assigned Helper
-                      </Text>
-                    </Box>
-                  </Group>
-                  <Button
-                    variant="light"
-                    color="green"
-                    leftSection={<IconPhone size={18} />}
-                    component="a"
-                    href={`tel:${request.helperPhone}`}
-                  >
-                    Contact Helper
-                  </Button>
+          {request.helperName && (
+            <Paper mt="xl" p="lg" radius="lg" withBorder>
+              <Group justify="space-between">
+                <Group>
+                  <Avatar size="lg">{request.helperName.charAt(0)}</Avatar>
+                  <Box>
+                    <Text fw={700}>{request.helperName}</Text>
+                    <Text size="xs" c="dimmed">
+                      Assigned Helper
+                    </Text>
+                  </Box>
                 </Group>
-              </Paper>
-            )}
-          </Stack>
+                <Button
+                  component="a"
+                  href={`tel:${request.helperPhone}`}
+                  leftSection={<IconPhone size={18} />}
+                >
+                  Call
+                </Button>
+              </Group>
+            </Paper>
+          )}
         </Paper>
       </Stack>
     </Box>

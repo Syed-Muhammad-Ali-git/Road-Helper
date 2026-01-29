@@ -69,9 +69,9 @@ export default function LoginPage() {
           className="object-cover opacity-80"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-black/90 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-brand-black/90 to-transparent" />
 
-        <div className="absolute bottom-0 left-0 p-16 text-white z-10">
+        <div className="absolute bottom-16 left-0 p-16 text-white z-10">
           <div className="mb-6 w-16 h-16 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20">
             <Image
               src="/assets/images/logo.jpg"
@@ -128,7 +128,7 @@ export default function LoginPage() {
                 value={loginType}
                 onChange={setLoginType}
                 data={[
-                  { label: "For Drivers", value: "customer" },
+                  { label: "For Customers", value: "customer" },
                   { label: "For Helpers", value: "helper" },
                 ]}
                 classNames={{
@@ -171,6 +171,15 @@ export default function LoginPage() {
                     >
                       Continue
                     </Button>
+                    <Text size="sm" ta="center" className="text-gray-500 mt-2">
+                      If You are new First Signup to continue{" "}
+                      <Link
+                        href="/register?type=customer"
+                        className="text-brand-red font-bold hover:underline"
+                      >
+                        Signup here
+                      </Link>
+                    </Text>
                   </Stack>
                 </motion.form>
               ) : (

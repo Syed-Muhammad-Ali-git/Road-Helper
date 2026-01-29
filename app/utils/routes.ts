@@ -6,7 +6,8 @@ const customerRoutes = [
   "/customer/history",
   "/customer/profile",
   "/customer/request-help",
-  "/customer/request-status",
+  "/customer/request-status/REQ-123",
+  
 ];
 
 /**

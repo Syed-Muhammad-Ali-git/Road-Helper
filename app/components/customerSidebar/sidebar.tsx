@@ -106,7 +106,7 @@ const CustomerSideBar = ({ open, setOpen }: SideBarProps) => {
     {
       text: "Request Status",
       icon: <Image src={auditLogo} alt="" />,
-      path: "/customer/request-status",
+      path: "/customer/request-status/REQ-123",
     },
     {
       text: "History",
@@ -175,12 +175,10 @@ const CustomerSideBar = ({ open, setOpen }: SideBarProps) => {
         <DrawerHeader>
           {open && (
             <>
-              <Avatar src="/logo.png" />
-              <Stack>
-                <Typography sx={{ color: "#EEF2F6", ml: -8 }}>
-                  Road Helper
-                </Typography>
-                <Typography fontSize="10px" sx={{ ml: -8 }}>
+              <Avatar src="/logo.png" w={60} mt={5} />
+              <Stack sx={{ ml: -3 }}>
+                <Typography sx={{ color: "#EEF2F6" }}>Road Helper</Typography>
+                <Typography fontSize="10px" sx={{}}>
                   Helping You On The Go
                 </Typography>
               </Stack>
