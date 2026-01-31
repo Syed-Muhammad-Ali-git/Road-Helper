@@ -116,6 +116,7 @@ export function FeaturesSection() {
 
         {/* HOW IT WORKS */}
         <motion.div
+          id="how-it-works"
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}

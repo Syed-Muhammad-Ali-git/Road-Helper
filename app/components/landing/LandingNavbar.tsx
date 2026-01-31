@@ -16,13 +16,22 @@ export function LandingNavbar() {
     setScrolled(latest > 50);
   });
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5, ease: "circOut" }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "glass-dark py-4" : "bg-transparent py-6"
+        scrolled
+          ? "glass-dark py-4 border-b border-white/10"
+          : "bg-transparent py-6"
       }`}
     >
       <Container size="xl" className="flex items-center justify-between">
@@ -43,16 +52,27 @@ export function LandingNavbar() {
 
         {/* DESKTOP MENU */}
         <Group visibleFrom="sm" gap="xl" className="hidden md:flex">
-          {["How it works", "Trust & Safety", "Services"].map((item) => (
-            <Link
-              key={item}
-              href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-              className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors"
-            >
-              <span className="relative z-10">{item}</span>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-red transition-all duration-300 hover:w-full group-hover:w-full"></span>
-            </Link>
-          ))}
+          <button
+            onClick={() => scrollToSection("features")}
+            className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors cursor-pointer bg-transparent border-none"
+          >
+            <span className="relative z-10">Features</span>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-red transition-all duration-300 hover:w-full"></span>
+          </button>
+          <button
+            onClick={() => scrollToSection("how-it-works")}
+            className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors cursor-pointer bg-transparent border-none"
+          >
+            <span className="relative z-10">How it Works</span>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-red transition-all duration-300 hover:w-full"></span>
+          </button>
+          <Link
+            href="/about"
+            className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors no-underline"
+          >
+            <span className="relative z-10">About</span>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-red transition-all duration-300 hover:w-full"></span>
+          </Link>
         </Group>
 
         {/* AUTH BUTTONS */}
@@ -68,7 +88,7 @@ export function LandingNavbar() {
           </Link>
           <Link href="/register">
             <Button
-              className="bg-brand-red hover:bg-brand-dark-red text-white transition-all shadow-lg shadow-red-900/20 hover:shadow-red-600/40"
+              className="bg-brand-red hover:bg-brand-dark-red text-white transition-all shadow-lg shadow-red-900/20 hover:shadow-red-600/40 hover:scale-105 active:scale-95"
               radius="xl"
               size="sm"
               rightSection={<IconChevronRight size={16} />}

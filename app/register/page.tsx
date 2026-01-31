@@ -75,14 +75,14 @@ function RegisterPageContent() {
   };
 
   return (
-    <div className="min-h-screen flex bg-white font-satoshi">
+    <div className="min-h-screen flex bg-brand-black font-satoshi">
       {/* Left Side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white relative">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-brand-black relative">
         <Link
           href="/"
-          className="absolute top-8 left-8 text-sm font-bold text-brand-charcoal hover:text-brand-red transition-colors"
+          className="absolute top-8 left-8 text-sm font-bold text-gray-400 hover:text-brand-red transition-colors"
         >
-          Back to Home
+          ← Back to Home
         </Link>
 
         <div className="w-full max-w-md">
@@ -92,16 +92,16 @@ function RegisterPageContent() {
             transition={{ duration: 0.6 }}
           >
             <div className="text-center mb-8">
-              <Title className="font-manrope text-4xl font-bold text-brand-black mb-2">
+              <Title className="font-manrope text-4xl font-bold text-white mb-2">
                 Create Account
               </Title>
-              <Text className="text-gray-500">Join Road Helper today.</Text>
+              <Text className="text-gray-400">Join Road Helper today.</Text>
             </div>
 
             <Paper
               p="md"
               radius="lg"
-              className="bg-gray-50 border border-gray-100 mb-8"
+              className="glass-dark border border-white/10 mb-8"
             >
               <SegmentedControl
                 fullWidth
@@ -115,9 +115,9 @@ function RegisterPageContent() {
                 ]}
                 classNames={{
                   root: "bg-transparent",
-                  indicator: "bg-white shadow-md",
+                  indicator: "bg-brand-red shadow-md",
                   label:
-                    "text-gray-600 data-[active=true]:text-brand-black font-semibold",
+                    "text-gray-400 data-[active=true]:text-white font-semibold",
                 }}
               />
             </Paper>
@@ -140,7 +140,8 @@ function RegisterPageContent() {
                       radius="md"
                       classNames={{
                         input:
-                          "focus:border-brand-red focus:ring-1 focus:ring-brand-red",
+                          "bg-white/5 border-white/10 text-white focus:border-brand-red focus:ring-1 focus:ring-brand-red placeholder:text-gray-600",
+                        label: "text-gray-300 mb-1",
                       }}
                       {...customerForm.getInputProps("fullName")}
                     />
@@ -151,7 +152,8 @@ function RegisterPageContent() {
                       radius="md"
                       classNames={{
                         input:
-                          "focus:border-brand-red focus:ring-1 focus:ring-brand-red",
+                          "bg-white/5 border-white/10 text-white focus:border-brand-red focus:ring-1 focus:ring-brand-red placeholder:text-gray-600",
+                        label: "text-gray-300 mb-1",
                       }}
                       {...customerForm.getInputProps("phone")}
                     />
@@ -169,7 +171,8 @@ function RegisterPageContent() {
                       label="Or continue with"
                       labelPosition="center"
                       my="sm"
-                      color="gray.7"
+                      color="gray.8"
+                      classNames={{ label: "text-gray-400" }}
                     />
 
                     <Button
@@ -178,12 +181,12 @@ function RegisterPageContent() {
                       radius="md"
                       fullWidth
                       leftSection={<IconBrandGoogle size={20} />}
-                      className="bg-white text-black hover:bg-gray-100 transition-colors h-14 font-manrope font-bold text-lg border-gray-300"
+                      className="bg-white/5 text-white hover:bg-white/10 border-white/10 transition-colors h-14 font-manrope font-bold text-lg"
                       onClick={() => toast.info("Google Sign Up coming soon!")}
                     >
                       Sign up with Google
                     </Button>
-                    <Text size="sm" ta="center" className="text-gray-500 mt-2">
+                    <Text size="sm" ta="center" className="text-gray-400 mt-2">
                       Already have an account?{" "}
                       <Link
                         href="/login"
@@ -211,7 +214,8 @@ function RegisterPageContent() {
                       radius="md"
                       classNames={{
                         input:
-                          "focus:border-brand-red focus:ring-1 focus:ring-brand-red",
+                          "bg-white/5 border-white/10 text-white focus:border-brand-red focus:ring-1 focus:ring-brand-red placeholder:text-gray-600",
+                        label: "text-gray-300 mb-1",
                       }}
                       {...helperForm.getInputProps("fullName")}
                     />
@@ -222,7 +226,8 @@ function RegisterPageContent() {
                       radius="md"
                       classNames={{
                         input:
-                          "focus:border-brand-red focus:ring-1 focus:ring-brand-red",
+                          "bg-white/5 border-white/10 text-white focus:border-brand-red focus:ring-1 focus:ring-brand-red placeholder:text-gray-600",
+                        label: "text-gray-300 mb-1",
                       }}
                       {...helperForm.getInputProps("email")}
                     />
@@ -233,7 +238,8 @@ function RegisterPageContent() {
                       radius="md"
                       classNames={{
                         input:
-                          "focus:border-brand-red focus:ring-1 focus:ring-brand-red",
+                          "bg-white/5 border-white/10 text-white focus:border-brand-red focus:ring-1 focus:ring-brand-red placeholder:text-gray-600",
+                        label: "text-gray-300 mb-1",
                       }}
                       {...helperForm.getInputProps("phone")}
                     />
@@ -250,7 +256,8 @@ function RegisterPageContent() {
                       ]}
                       classNames={{
                         input:
-                          "bg-brand-charcoal border-gray-700 text-white focus:border-brand-red focus:ring-1 focus:ring-brand-red",
+                          "bg-white/5 border-white/10 text-white focus:border-brand-red focus:ring-1 focus:ring-brand-red placeholder:text-gray-600",
+                        label: "text-gray-300 mb-1",
                         dropdown: "bg-brand-charcoal border-gray-700",
                         option:
                           "hover:bg-brand-black text-gray-300 hover:text-white",
@@ -264,7 +271,9 @@ function RegisterPageContent() {
                       radius="md"
                       classNames={{
                         input:
-                          "focus:border-brand-red focus:ring-1 focus:ring-brand-red",
+                          "bg-white/5 border-white/10 text-white focus:border-brand-red focus:ring-1 focus:ring-brand-red placeholder:text-gray-600",
+                        label: "text-gray-300 mb-1",
+                        innerInput: "placeholder:text-gray-600",
                       }}
                       {...helperForm.getInputProps("password")}
                     />
@@ -282,7 +291,8 @@ function RegisterPageContent() {
                       label="Or continue with"
                       labelPosition="center"
                       my="sm"
-                      color="gray.7"
+                      color="gray.8"
+                      classNames={{ label: "text-gray-400" }}
                     />
 
                     <Button
@@ -291,12 +301,12 @@ function RegisterPageContent() {
                       radius="md"
                       fullWidth
                       leftSection={<IconBrandGoogle size={20} />}
-                      className="bg-white text-black hover:bg-gray-100 transition-colors h-14 font-manrope font-bold text-lg border-gray-300"
+                      className="bg-white/5 text-white hover:bg-white/10 border-white/10 transition-colors h-14 font-manrope font-bold text-lg"
                       onClick={() => toast.info("Google Sign Up coming soon!")}
                     >
                       Sign up with Google
                     </Button>
-                    <Text size="sm" ta="center" className="text-gray-500 mt-2">
+                    <Text size="sm" ta="center" className="text-gray-400 mt-2">
                       Already have an account?{" "}
                       <Link
                         href="/login"

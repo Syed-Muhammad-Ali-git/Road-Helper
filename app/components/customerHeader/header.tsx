@@ -52,7 +52,7 @@ const CustomerHeader: React.FC<HeaderProps> = ({ sidebarOpen = false }) => {
 
   return (
     <div
-      className="h-16 fixed top-0 right-0 z-50 bg-white flex items-center justify-end px-4 transition-all duration-200"
+      className="h-16 fixed top-0 right-0 z-50 glass-dark border-b border-white/10 flex items-center justify-end px-6 transition-all duration-200"
       style={{
         left: sidebarOpen ? drawerWidth : collapsedWidth,
       }}
@@ -60,73 +60,86 @@ const CustomerHeader: React.FC<HeaderProps> = ({ sidebarOpen = false }) => {
       {/* ---------------- RIGHT CONTROLS ---------------- */}
       <Group gap={12}>
         {/* ---------------- HELP BUTTON ---------------- */}
-        <Image
-          src={helpLogo}
-          alt="help"
-          width={30}
-          height={30}
-          className="border border-[#EEF2F6] p-1.5 rounded-md cursor-pointer"
-        />
+        <div className="p-2 rounded-lg glass hover:bg-white/10 cursor-pointer transition-all">
+          <Image
+            src={helpLogo}
+            alt="help"
+            width={24}
+            height={24}
+            className="opacity-80 hover:opacity-100 transition-opacity"
+          />
+        </div>
 
         {/* ---------------- PROFILE DROPDOWN ---------------- */}
         <Menu
-          shadow="md"
-          width={200}
-          radius={10}
-          position="bottom-start"
+          shadow="xl"
+          width={240}
+          radius={12}
+          position="bottom-end"
           opened={isDropdownOpen}
           onChange={setIsDropdownOpen}
+          classNames={{
+            dropdown: "glass-dark border border-white/10",
+          }}
         >
           <Menu.Target>
             <Avatar
               src={profile || undefined}
               alt="profile"
               radius="xl"
-              className="cursor-pointer"
+              size="md"
+              className="cursor-pointer ring-2 ring-brand-red/20 hover:ring-brand-red/40 transition-all"
               onClick={() => setIsDropdownOpen((o) => !o)}
             />
           </Menu.Target>
 
           <Menu.Dropdown>
             {/* ---------------- USER INFO ---------------- */}
-            <div className="flex items-center gap-3 p-3">
+            <div className="flex items-center gap-3 p-4 border-b border-white/10">
               <Avatar
                 src={profile || undefined}
                 alt="profile"
                 radius="xl"
-                size="md"
+                size="lg"
+                className="ring-2 ring-brand-red/30"
               />
               <div>
-                <div className="font-semibold text-sm">
+                <div className="font-bold text-sm text-white">
                   {userName || "User"}
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-400">
                   {userEmail || "email@example.com"}
                 </div>
               </div>
             </div>
 
             {/* ---------------- MENU ITEMS ---------------- */}
-            <div className="border border-[#EEF2F6]"></div>
             <Menu.Item
               onClick={() => router.push("/customer/profile")}
-              color="#697586"
-              style={{ fontWeight: "400", padding: "10px" }}
+              className="text-gray-300 hover:text-white hover:bg-white/5 transition-all my-1"
+              style={{ fontWeight: "500", padding: "12px 16px" }}
             >
               <Image
                 src={myAccountLogo}
                 alt="my account"
-                className="inline-block"
+                className="inline-block opacity-80"
+                width={18}
+                height={18}
               />
               &nbsp; My Profile
             </Menu.Item>
-            <div className="border border-[#EEF2F6]"></div>
             <Menu.Item
               onClick={handleSignOut}
-              color="#697586"
-              style={{ fontWeight: "400", padding: "10px" }}
+              className="text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all my-1"
+              style={{ fontWeight: "500", padding: "12px 16px" }}
             >
-              <Image src={signoutLogo} alt="signout" className="inline-block" />
+              <Image
+                src={signoutLogo}
+                alt="signout"
+                className="inline-block opacity-80"
+                width={18}
+                height={18}
+              />
               &nbsp; Sign Out
             </Menu.Item>
           </Menu.Dropdown>

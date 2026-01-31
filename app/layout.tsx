@@ -67,7 +67,7 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
         <link rel="icon" href="/favicon.ico" />
         <ColorSchemeScript />
       </head>
-      <body className="bg-gray-50 text-gray-900">
+      <body className="bg-brand-black text-white">
         <MantineProvider
           defaultColorScheme="dark"
           theme={{
