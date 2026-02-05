@@ -120,6 +120,8 @@ const HelperSideBar = ({ open, setOpen }: SideBarProps) => {
     },
   ];
 
+  
+
   const renderMenu = (items: SidebarItem[]) =>
     items.map((item) => {
       let isActive = pathname === item.path;
