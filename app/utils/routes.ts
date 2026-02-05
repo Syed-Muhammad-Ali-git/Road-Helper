@@ -25,6 +25,7 @@ const adminRoutes = [
   "/admin/requests",
   "/admin/users",
   "/admin/settings",
+  "/admin/status",
 ];
 
 /**
