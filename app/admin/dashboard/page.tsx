@@ -1,8 +1,8 @@
 "use client";
 
-import React, { Suspense } from "react";
+import React from "react";
 import { useSearchParams } from "next/navigation";
-import { Box, Loader } from "@mantine/core";
+import { Box } from "@mantine/core";
 
 // Tabs
 import OverviewTab from "./tabs/Overview";
@@ -11,7 +11,7 @@ import RequestsTab from "./tabs/Requests";
 import StatusTab from "./tabs/Status";
 import SettingsTab from "./tabs/Settings";
 
-function DashboardContent() {
+export default function AdminDashboard() {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
 
@@ -34,19 +34,5 @@ function DashboardContent() {
     <Box className="p-4 md:p-8 min-h-screen font-satoshi bg-brand-black text-white">
       {renderTab()}
     </Box>
-  );
-}
-
-export default function AdminDashboard() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center min-h-screen bg-brand-black">
-          <Loader color="red" type="bars" />
-        </div>
-      }
-    >
-      <DashboardContent />
-    </Suspense>
   );
 }

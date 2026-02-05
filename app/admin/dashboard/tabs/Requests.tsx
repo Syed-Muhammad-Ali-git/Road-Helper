@@ -122,9 +122,8 @@ export default function RequestsTab() {
             </Table.Thead>
             <Table.Tbody>
               {requests.map((req, i) => (
-                <Table.Tr
+                <motion.tr
                   key={req.id}
-                  component={motion.tr}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.1 }}
@@ -184,7 +183,7 @@ export default function RequestsTab() {
                       </ActionIcon>
                     </Tooltip>
                   </Table.Td>
-                </Table.Tr>
+                </motion.tr>
               ))}
             </Table.Tbody>
           </Table>

@@ -148,7 +148,7 @@ export default function AdminLogin() {
             </Group>
           </Paper>
 
-          <Text align="center" size="xs" className="text-gray-600 mt-8">
+          <Text ta="center" size="xs" className="text-gray-600 mt-8">
             &copy; {new Date().getFullYear()} Road Helper. Secure Admin
             Environment.
           </Text>
