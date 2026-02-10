@@ -12,6 +12,7 @@ import CustomerSideBar from "@/components/customerSidebar/sidebar";
 import CustomerHeader from "@/components/customerHeader/header";
 import AdminSideBar from "@/components/adminSidebar/sidebar";
 import AdminHeader from "@/components/adminHeader/header";
+import { getCookie } from "cookies-next";
 
 /* ---------------- INTERFACES ---------------- */
 interface PathCheckerProps {
@@ -23,26 +24,45 @@ interface PathCheckerProps {
 /* ---------------- COMPONENT ---------------- */
 const PathChecker = ({ pathName, open, setOpen }: PathCheckerProps) => {
   // ----- CHECK IF THE CURRENT PATH IS A PROTECTED ROUTE -----
-  const show = useMemo(() => protectedRoutes.includes(pathName), [pathName]);
+  const show = useMemo(() => {
+    if (protectedRoutes.includes(pathName)) return true;
+    // Dynamic and nested routes
+    if (pathName.startsWith("/customer")) return true;
+    if (pathName.startsWith("/helper")) return true;
+    if (pathName.startsWith("/admin")) return true;
+    if (pathName.startsWith("/journey/")) return true;
+    return false;
+  }, [pathName]);
 
   // ----- DETERMINE ROUTE TYPE -----
   const isCustomerRoute = useMemo(
-    () => customerRoutes.includes(pathName),
+    () => customerRoutes.includes(pathName) || pathName.startsWith("/customer"),
     [pathName],
   );
   const isHelperRoute = useMemo(
-    () => helperRoutes.includes(pathName),
+    () => helperRoutes.includes(pathName) || pathName.startsWith("/helper"),
     [pathName],
   );
   const isAdminRoute = useMemo(
-    () => adminRoutes.includes(pathName),
+    () => adminRoutes.includes(pathName) || pathName.startsWith("/admin"),
     [pathName],
   );
+  const isJourneyRoute = useMemo(() => pathName.startsWith("/journey/"), [pathName]);
 
   // ----- RENDER NOTHING IF THE ROUTE IS NOT PROTECTED -----
   if (!show) return null;
 
   // ----- RENDER HEADER AND SIDEBAR BASED ON ROUTE TYPE -----
+  if (isJourneyRoute) {
+    const role = (getCookie("role") as string | undefined) ?? "";
+    if (role === "admin") {
+      return <AdminHeader sidebarOpen={open} setSidebarOpen={setOpen} />;
+    }
+    if (role === "helper") {
+      return <HelperHeader sidebarOpen={open} setSidebarOpen={setOpen} />;
+    }
+    return <CustomerHeader sidebarOpen={open} setSidebarOpen={setOpen} />;
+  }
   if (isCustomerRoute) {
     return (
       <>

@@ -9,14 +9,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { showSuccess, showError } from "@/lib/sweetalert";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "@/lib/firebase/config";
-import { setCookie } from "cookies-next";
+import {
+  AuthRuleError,
+  signupWithEmail,
+  loginWithGoogle,
+} from "@/lib/services/authService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { MultiSelect, Modal, Button as MantineButton } from "@mantine/core";
+import { MultiSelect } from "@mantine/core";
 import {
   Phone,
   Mail,
@@ -92,30 +94,48 @@ function RegisterPageContent() {
   });
   const watchHelperServices = watchHelper("services") ?? [];
 
-  const [showPlansModal, setShowPlansModal] = useState(false);
+  const handleGoogleSignup = async () => {
+    setIsLoading(true);
+    try {
+      await loginWithGoogle({ role: registerType });
+      await showSuccess("Welcome to RoadHelper!", "Signed in with Google.");
+      router.push(
+        registerType === "helper"
+          ? "/subscriptions?role=helper&next=/helper/dashboard"
+          : "/subscriptions?role=customer&next=/customer/dashboard",
+      );
+    } catch (err: unknown) {
+      const msg =
+        err instanceof AuthRuleError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Google sign-up failed";
+      await showError("Google Sign-up Failed", msg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const onCustomerSubmit = async (data: z.infer<typeof customerSchema>) => {
     setIsLoading(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        data.email,
-        data.password,
-      );
-      const token = await userCredential.user.getIdToken();
-      await updateProfile(userCredential.user, { displayName: data.fullName });
-      setCookie("role", "customer", {
-        maxAge: 60 * 60 * 24 * 7,
-        path: "/",
-      });
-      setCookie("token", token, {
-        maxAge: 60 * 60 * 24 * 7,
-        path: "/",
+      await signupWithEmail({
+        role: "customer",
+        email: data.email,
+        password: data.password,
+        displayName: data.fullName,
+        phone: data.phone,
       });
       await showSuccess("Account created successfully!");
-      router.push("/customer/dashboard");
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Registration failed";
+      router.push("/subscriptions?role=customer&next=/customer/dashboard");
+    } catch (err: unknown) {
+      const msg =
+        err instanceof AuthRuleError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Registration failed";
       await showError("Registration Failed", msg);
     } finally {
       setIsLoading(false);
@@ -125,21 +145,22 @@ function RegisterPageContent() {
   const onHelperSubmit = async (data: z.infer<typeof helperSchema>) => {
     setIsLoading(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        data.email,
-        data.password,
-      );
-      const token = await userCredential.user.getIdToken();
-      await updateProfile(userCredential.user, { displayName: data.fullName });
-      setCookie("role", "helper", { maxAge: 60 * 60 * 24 * 7, path: "/" });
-      setCookie("token", token, {
-        maxAge: 60 * 60 * 24 * 7,
-        path: "/",
+      await signupWithEmail({
+        role: "helper",
+        email: data.email,
+        password: data.password,
+        displayName: data.fullName,
+        phone: data.phone,
       });
-      setShowPlansModal(true);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Registration failed";
+      await showSuccess("Application submitted successfully!");
+      router.push("/subscriptions?role=helper&next=/helper/dashboard");
+    } catch (err: unknown) {
+      const msg =
+        err instanceof AuthRuleError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Registration failed";
       await showError("Registration Failed", msg);
     } finally {
       setIsLoading(false);
@@ -216,7 +237,7 @@ function RegisterPageContent() {
 
       {/* Left Side - Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative z-10 bg-black/30 backdrop-blur-sm">
-        <Link href="/" className="absolute top-8 left-8 group">
+        <Link href="/" className="absolute top-4 left-4 sm:top-8 sm:left-8 group z-20">
           <motion.div
             whileHover={{ scale: 1.05, x: -5 }}
             className="flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brand-red transition-all"
@@ -357,7 +378,7 @@ function RegisterPageContent() {
                     delay={0.5}
                   />
                 </form>
-                <CTA delay={0.6} type="customer" />
+                <CTA delay={0.6} type="customer" onGoogle={handleGoogleSignup} isLoading={isLoading} />
               </motion.div>
             ) : (
               <motion.div
@@ -425,7 +446,7 @@ function RegisterPageContent() {
                     delay={0.4}
                   />
                 </form>
-                <CTA delay={0.5} type="helper" />
+                <CTA delay={0.5} type="helper" onGoogle={handleGoogleSignup} isLoading={isLoading} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -526,49 +547,6 @@ function RegisterPageContent() {
         </motion.div>
       </motion.div>
 
-      {/* Plans Modal - shown after helper signup */}
-      <Modal
-        opened={showPlansModal}
-        onClose={() => {}}
-        title={
-          <span className="text-xl font-bold text-white">Your Helper Plan</span>
-        }
-        centered
-        size="lg"
-        classNames={{
-          header: "bg-[#0a0a0a] border-b border-white/10",
-          body: "bg-[#0a0a0a] text-white",
-          content: "bg-[#0a0a0a] border border-white/10",
-        }}
-        withCloseButton={false}
-        closeOnClickOutside={false}
-      >
-        <div className="space-y-6">
-          <p className="text-gray-300">
-            Welcome! You&apos;re on the <strong className="text-brand-red">Free Plan</strong>.
-          </p>
-          <div className="p-6 rounded-2xl bg-white/5 border border-brand-red/30">
-            <h3 className="font-bold text-lg mb-2">Free Plan includes:</h3>
-            <ul className="list-disc list-inside space-y-1 text-gray-300">
-              <li><strong className="text-white">10 rides</strong> included</li>
-              <li>After the limit, payment will be required</li>
-              <li>Payment methods: JazzCash, EasyPaisa, Bank Account</li>
-            </ul>
-          </div>
-          <MantineButton
-            fullWidth
-            size="lg"
-            className="bg-brand-red hover:bg-brand-dark-red"
-            onClick={() => {
-              setShowPlansModal(false);
-              showSuccess("Application submitted successfully!");
-              router.push("/helper/dashboard");
-            }}
-          >
-            Get Started
-          </MantineButton>
-        </div>
-      </Modal>
     </div>
   );
 }
@@ -778,9 +756,11 @@ const SubmitButton = ({ isLoading, text, delay }: SubmitButtonProps) => (
 interface CTAProps {
   delay: number;
   type: "customer" | "helper";
+  onGoogle: () => void;
+  isLoading: boolean;
 }
 
-const CTA = ({ delay, type }: CTAProps) => (
+const CTA = ({ delay, type, onGoogle, isLoading }: CTAProps) => (
   <motion.div
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
@@ -799,6 +779,8 @@ const CTA = ({ delay, type }: CTAProps) => (
     <Button
       type="button"
       variant="outline"
+      onClick={onGoogle}
+      disabled={isLoading}
       className="w-full h-14 bg-white/[0.03] border-2 border-white/5 hover:bg-white/10 hover:border-white/20 text-white rounded-xl font-bold flex items-center justify-center gap-3 transition-all active:scale-[0.98] group"
     >
       <svg

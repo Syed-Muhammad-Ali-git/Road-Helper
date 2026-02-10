@@ -34,6 +34,8 @@ import Link from "next/link";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import LiveMap from "@/components/map/LiveMap";
+import { useLiveLocation } from "@/hooks/useLiveLocation";
 
 // Background assets (using standard paths)
 const mapBg = "/assets/images/backgrounds/map-bg.svg";
@@ -43,27 +45,19 @@ const avatar6 = "/assets/images/avatars/avatar-6.jpg";
 
 const serviceCategories = [
   {
-    title: "Car Mechanic",
+    title: "Mobile Mechanic",
     icon: IconCar,
     color: "blue",
-    desc: "Breakdown, tire change, jump start",
-    id: "car_mechanic",
+    desc: "Breakdown, tire change, diagnostics",
+    id: "mechanic",
     gradient: "from-blue-600/20 to-indigo-600/20",
-  },
-  {
-    title: "Bike Mechanic",
-    icon: IconBike,
-    color: "orange",
-    desc: "Puncture repair, chain help, etc.",
-    id: "bike_mechanic",
-    gradient: "from-orange-600/20 to-yellow-600/20",
   },
   {
     title: "Fuel Delivery",
     icon: IconDroplet,
     color: "red",
     desc: "Ran out of gas? We'll bring fuel.",
-    id: "fuel_delivery",
+    id: "fuel",
     gradient: "from-red-600/20 to-rose-600/20",
   },
   {
@@ -71,7 +65,7 @@ const serviceCategories = [
     icon: IconTruck,
     color: "grape",
     desc: "Safe towing to nearest garage.",
-    id: "towing",
+    id: "tow",
     gradient: "from-purple-600/20 to-pink-600/20",
   },
 ];
@@ -96,6 +90,7 @@ const itemVariants: any = {
 const ClientDashboard = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [userName, setUserName] = useState("User");
+  const live = useLiveLocation();
 
   useEffect(() => {
     setIsLoaded(true);
@@ -218,22 +213,15 @@ const ClientDashboard = () => {
               radius="32px"
               className="relative overflow-hidden h-[350px] md:h-[450px] border border-white/10 glass-dark shadow-2xl group"
             >
-              <div className="absolute inset-0 bg-[#0f0f0f]">
-                <div className="absolute inset-0 opacity-20 grayscale hover:grayscale-0 transition-all duration-1000">
-                  <Image src={mapBg} alt="Map" fill className="object-cover" />
-                </div>
-
-                {/* Pulse Effect */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                  <div className="relative flex h-16 w-16 items-center justify-center">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-20"></span>
-                    <span className="animate-pulse absolute inline-flex h-3/4 w-3/4 rounded-full bg-blue-500/30"></span>
-                    <div className="relative inline-flex rounded-2xl h-12 w-12 bg-blue-600 border-4 border-[#0f0f0f] shadow-2xl items-center justify-center text-white scale-110">
-                      <IconCurrentLocation size={24} />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <LiveMap
+                customer={
+                  live.coords
+                    ? { lat: live.coords.lat, lng: live.coords.lng, label: "You" }
+                    : null
+                }
+                helper={null}
+                className="absolute inset-0"
+              />
 
               {/* Map Controls */}
               <div className="absolute bottom-8 left-8 right-8 p-6 glass-dark rounded-[24px] border border-white/20 flex flex-col md:flex-row items-center justify-between z-20 gap-4">
@@ -243,20 +231,21 @@ const ClientDashboard = () => {
                   </div>
                   <div>
                     <Text className="font-bold text-white text-lg leading-tight">
-                      Current Location
+                      Live Location
                     </Text>
                     <Text className="text-sm text-gray-400">
-                      242 Park Avenue, New York, NY
+                      {live.coords
+                        ? `${live.coords.lat.toFixed(5)}, ${live.coords.lng.toFixed(5)}`
+                        : "Turn on GPS to share your location"}
                     </Text>
                   </div>
                 </div>
                 <Button
                   className="bg-white text-black hover:bg-gray-200 rounded-xl px-8 h-12 font-bold transition-all w-full md:w-auto"
-                  component={Link}
-                  href="/customer/request-help"
+                  onClick={() => live.requestPermission()}
                   rightSection={<IconArrowRight size={18} />}
                 >
-                  Request Rescue
+                  Enable GPS
                 </Button>
               </div>
             </Paper>

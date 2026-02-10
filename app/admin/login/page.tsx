@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,9 +9,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion } from "framer-motion";
 import { showSuccess, showError } from "@/lib/sweetalert";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase/config";
-import { setCookie } from "cookies-next";
+import {
+  AuthRuleError,
+  loginWithEmail,
+} from "@/lib/services/authService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,39 +36,37 @@ const loginSchema = z.object({
 export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (data: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        data.email,
-        data.password
-      );
-      const token = await userCredential.user.getIdToken();
-      setCookie("role", "admin", { maxAge: 60 * 60 * 24 * 7, path: "/" });
-      setCookie("token", token, { maxAge: 60 * 60 * 24 * 7, path: "/" });
+      await loginWithEmail({
+        role: "admin",
+        email: data.email,
+        password: data.password,
+      });
       await showSuccess("Access Granted", "Welcome, Administrator.");
       router.push("/admin/dashboard");
     } catch (error: unknown) {
       console.error(error);
+      const msg =
+        error instanceof AuthRuleError
+          ? error.message
+          : error instanceof Error
+            ? error.message
+            : "Invalid credentials or unauthorized access.";
       await showError(
         "Access Denied",
-        "Invalid credentials or unauthorized access."
+        msg
       );
     } finally {
       setIsLoading(false);
@@ -150,7 +149,7 @@ export default function AdminLoginPage() {
             </h1>
             <p className="text-gray-400 text-xl max-w-md leading-relaxed font-medium">
               Enterprise-grade infrastructure management and real-time
-              operational oversight for the world's most reliable rescue
+              operational oversight for the world&apos;s most reliable rescue
               network.
             </p>
           </motion.div>
@@ -314,7 +313,7 @@ export default function AdminLoginPage() {
               Don&apos;t have an admin account?{" "}
               <Link
                 href="/admin/signup"
-                className="text-brand-red font-bold hover:text-brand-red/80 transition-colors"
+                className="text-brand-red font-bold hover:text-white transition-colors underline underline-offset-4 decoration-brand-red/60 hover:decoration-white"
               >
                 Create Admin ID
               </Link>

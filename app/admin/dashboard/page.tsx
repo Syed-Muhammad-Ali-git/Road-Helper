@@ -27,7 +27,7 @@ import {
   IconCrown,
   IconSparkles,
 } from "@tabler/icons-react";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import {
   AreaChart,
   Area,
@@ -134,7 +134,7 @@ const recentRequests = [
 
 const mapBg = "/assets/images/backgrounds/map-bg.svg";
 
-const containerVariants: any = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -142,7 +142,7 @@ const containerVariants: any = {
   },
 };
 
-const itemVariants: any = {
+const itemVariants: Variants = {
   hidden: { y: 20, opacity: 0 },
   visible: {
     y: 0,
@@ -153,20 +153,25 @@ const itemVariants: any = {
 
 const AdminDashboard = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [particles, setParticles] = useState<
+    Array<{ x: string; y_target: string; duration: number }>
+  >([]);
 
   useEffect(() => {
     setIsLoaded(true);
   }, []);
 
-  const particles = useMemo(
-    () =>
-      [...Array(20)].map((_, i) => ({
-        x: Math.random() * 100 + "%",
-        y_target: Math.random() * 100 + "%",
+  useEffect(() => {
+    if (!isLoaded) return;
+    // Generate once to keep render pure/idempotent
+    setParticles(
+      [...Array(20)].map(() => ({
+        x: `${Math.random() * 100}%`,
+        y_target: `${Math.random() * 100}%`,
         duration: Math.random() * 15 + 10,
       })),
-    []
-  );
+    );
+  }, [isLoaded]);
 
   const totalCommission = useMemo(
     () => recentRequests.reduce((sum, r) => sum + r.amount * 0.2, 0),
@@ -251,7 +256,7 @@ const AdminDashboard = () => {
       </div>
 
       <motion.div
-        variants={containerVariants as any}
+        variants={containerVariants}
         initial="hidden"
         animate="visible"
         className="relative z-10 max-w-7xl mx-auto"
@@ -260,7 +265,7 @@ const AdminDashboard = () => {
         <Group justify="space-between" mb={40} align="flex-end">
           <Box>
             <motion.div
-              variants={itemVariants as any}
+              variants={itemVariants}
               className="flex items-center gap-2 mb-2"
             >
               <IconCrown size={16} className="text-brand-red" />
@@ -281,7 +286,7 @@ const AdminDashboard = () => {
               Real-time data visualization and operational controls.
             </Text>
           </Box>
-          <motion.div variants={itemVariants as any}>
+          <motion.div variants={itemVariants}>
             <Button
               variant="default"
               className="bg-white/5 text-white border-white/10 hover:bg-white/10 h-14 rounded-2xl px-8 transition-all font-bold shadow-2xl group"
@@ -301,7 +306,7 @@ const AdminDashboard = () => {
         {/* Stats Grid */}
         <SimpleGrid cols={{ base: 1, md: 4 }} spacing={20} mb={40}>
           {stats.map((stat) => (
-            <motion.div key={stat.title} variants={itemVariants as any}>
+            <motion.div key={stat.title} variants={itemVariants}>
               <Paper
                 p={30}
                 radius="32px"
@@ -368,7 +373,7 @@ const AdminDashboard = () => {
         {/* Charts & Map Grid */}
         <SimpleGrid cols={{ base: 1, lg: 3 }} spacing={24} mb={40}>
           {/* Revenue Chart */}
-          <motion.div variants={itemVariants as any} className="lg:col-span-2">
+          <motion.div variants={itemVariants} className="lg:col-span-2">
             <Paper
               p={40}
               radius="32px"
@@ -440,7 +445,7 @@ const AdminDashboard = () => {
                       axisLine={false}
                       tickLine={false}
                       dx={-15}
-                      tickFormatter={(val) => `$${val}`}
+                      tickFormatter={(val) => `PKR ${val}`}
                     />
                     <RechartsTooltip
                       contentStyle={{
@@ -528,7 +533,7 @@ const AdminDashboard = () => {
           </motion.div>
 
           {/* Map Snapshot */}
-          <motion.div variants={itemVariants as any}>
+          <motion.div variants={itemVariants}>
             <Paper
               radius="32px"
               className="glass-dark border border-white/5 h-full relative overflow-hidden flex flex-col shadow-2xl"
@@ -590,7 +595,7 @@ const AdminDashboard = () => {
         </SimpleGrid>
 
         {/* Requests Table */}
-        <motion.div variants={itemVariants as any}>
+        <motion.div variants={itemVariants}>
           <Paper
             p={40}
             radius="32px"
@@ -668,7 +673,7 @@ const AdminDashboard = () => {
                           >
                             {req.user[0]}
                           </Avatar>
-                          <Text fw={700} className="text-sm">
+                          <Text fw={700} className="text-sm whitespace-nowrap">
                             {req.user}
                           </Text>
                         </Group>

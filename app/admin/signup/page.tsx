@@ -29,9 +29,20 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { showSuccess, showError } from "@/lib/sweetalert";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "@/lib/firebase/config";
 import { cn } from "@/lib/utils";
+import {
+  AuthRuleError,
+  signupWithEmail,
+} from "@/lib/services/authService";
+
+interface AdminSignupValues {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  adminCode: string;
+}
 
 const AdminSignup = () => {
   const [isClient, setIsClient] = useState(false);
@@ -41,7 +52,7 @@ const AdminSignup = () => {
     setIsClient(true);
   }, []);
 
-  const form = useForm({
+  const form = useForm<AdminSignupValues>({
     initialValues: {
       firstName: "",
       lastName: "",
@@ -51,14 +62,14 @@ const AdminSignup = () => {
       adminCode: "",
     },
     validate: {
-      firstName: (val) => (val.length < 2 ? "Too short" : null),
-      lastName: (val) => (val.length < 2 ? "Too short" : null),
-      email: (val) => (/^\S+@\S+$/.test(val) ? null : "Invalid email"),
-      password: (val) =>
+      firstName: (val: string) => (val.length < 2 ? "Too short" : null),
+      lastName: (val: string) => (val.length < 2 ? "Too short" : null),
+      email: (val: string) => (/^\S+@\S+$/.test(val) ? null : "Invalid email"),
+      password: (val: string) =>
         val.length < 6 ? "Password must include at least 6 characters" : null,
-      confirmPassword: (val, values) =>
+      confirmPassword: (val: string, values: AdminSignupValues) =>
         val !== values.password ? "Passwords do not match" : null,
-      adminCode: (val) => (val.length < 4 ? "Invalid Admin Code" : null),
+      adminCode: (val: string) => (val.length < 4 ? "Invalid Admin Code" : null),
     },
   });
 
@@ -72,16 +83,16 @@ const AdminSignup = () => {
               key={i}
               className="absolute w-1.5 h-1.5 bg-brand-red/20 rounded-full"
               initial={{
-                x: Math.random() * 100 + "%",
-                y: Math.random() * 100 + "%",
+                x: `${(i * 37) % 100}%`,
+                y: `${(i * 53) % 100}%`,
               }}
               animate={{
-                y: [null, Math.random() * 100 + "%"],
-                x: [null, Math.random() * 100 + "%"],
+                y: [null, `${(i * 19 + 21) % 100}%`],
+                x: [null, `${(i * 29 + 11) % 100}%`],
                 opacity: [0.1, 0.4, 0.1],
               }}
               transition={{
-                duration: Math.random() * 15 + 10,
+                duration: (i % 10) + 10,
                 repeat: Infinity,
                 ease: "linear",
               }}
@@ -180,28 +191,21 @@ const AdminSignup = () => {
           <form
             onSubmit={form.onSubmit(async (data) => {
               try {
-                const userCredential = await createUserWithEmailAndPassword(
-                  auth,
-                  data.email,
-                  data.password,
-                );
-                const token = await userCredential.user.getIdToken();
-                await updateProfile(userCredential.user, {
+                await signupWithEmail({
+                  role: "admin",
+                  email: data.email,
+                  password: data.password,
                   displayName: `${data.firstName} ${data.lastName}`,
-                });
-
-                setCookie("role", "admin", {
-                  maxAge: 60 * 60 * 24 * 7,
-                  path: "/",
-                });
-                setCookie("token", token, {
-                  maxAge: 60 * 60 * 24 * 7,
-                  path: "/",
                 });
                 await showSuccess("Admin profile established");
                 router.push("/admin/dashboard");
               } catch (err: unknown) {
-                const msg = err instanceof Error ? err.message : "Signup failed";
+                const msg =
+                  err instanceof AuthRuleError
+                    ? err.message
+                    : err instanceof Error
+                      ? err.message
+                      : "Signup failed";
                 await showError("Signup Failed", msg);
               }
             })}

@@ -6,10 +6,12 @@ import { Button, Group, Container } from "@mantine/core";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { useState, useCallback, memo } from "react";
 import { IconChevronRight } from "@tabler/icons-react";
+import { usePathname } from "next/navigation";
 
 const LandingNavbarComponent = () => {
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScrolled(latest > 50);
@@ -35,7 +37,16 @@ const LandingNavbarComponent = () => {
     >
       <Container size="xl" className="flex items-center justify-between">
         {/* LOGO */}
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link
+          href="/"
+          onClick={(e) => {
+            if (pathname === "/") {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+          className="flex items-center gap-3 group"
+        >
           <div className="relative h-10 w-10 overflow-hidden rounded-xl shadow-lg shadow-red-500/20 transition-transform group-hover:scale-110 bg-white p-1">
             <Image
               src="/assets/images/logo.png"

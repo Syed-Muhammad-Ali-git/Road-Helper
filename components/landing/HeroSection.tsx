@@ -131,7 +131,7 @@ const HeroSectionComponent = () => {
                   initial={{ y: 40, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.6 }}
-                  className="absolute bottom-6 left-0 right-6 glass-dark p-4 rounded-2xl flex items-center gap-4 border border-white/10"
+                  className="absolute bottom-6 left-0 right-6 glass-dark p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center gap-4 border border-white/10"
                 >
                   <div className="w-12 h-12 rounded-full bg-brand-red/20 flex items-center justify-center text-brand-red">
                     <IconMapPin size={24} />
@@ -148,7 +148,7 @@ const HeroSectionComponent = () => {
                     size="xs"
                     color="red"
                     radius="xl"
-                    className="ml-auto bg-brand-red hover:bg-brand-dark-red"
+                    className="sm:ml-auto bg-brand-red hover:bg-brand-dark-red w-full sm:w-auto max-[450px]:mt-2"
                   >
                     Track
                   </Button>

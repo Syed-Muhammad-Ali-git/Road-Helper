@@ -58,8 +58,8 @@ const HelperDashboard = () => {
       fullName: helperName,
       totalJobs: 12,
       rating: 4.9,
-      todaysEarnings: 150,
-      pendingPayment: 30,
+      todaysEarnings: 15000,
+      pendingPayment: 3000,
       paymentDue: true,
     }),
     [helperName],
@@ -241,7 +241,7 @@ const HelperDashboard = () => {
                     order={1}
                     className="font-manrope text-7xl font-black tracking-tighter mb-4 italic italic"
                   >
-                    ${userData.todaysEarnings}
+                    PKR {userData.todaysEarnings.toLocaleString("en-PK")}
                   </Title>
                   <Group gap="xs">
                     <div className="px-3 py-1 bg-green-500/20 text-green-400 text-[10px] font-bold rounded-full border border-green-500/30">
@@ -335,7 +335,7 @@ const HelperDashboard = () => {
                   </div>
                   <div>
                     <Text className="text-white font-extrabold text-xl tracking-tight">
-                      System Fee Overdue: ${userData.pendingPayment}
+                      System Fee Overdue: PKR {userData.pendingPayment.toLocaleString("en-PK")}
                     </Text>
                     <Text className="text-gray-400 font-medium">
                       To maintain your priority status, please settle the
@@ -556,7 +556,7 @@ const HelperDashboard = () => {
                     </ThemeIcon>
                     <div>
                       <Text className="text-white font-black text-xl">
-                        ${payment.amount}
+                        PKR {(payment.amount * 100).toLocaleString("en-PK")}
                       </Text>
                       <Text className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-0.5">
                         {payment.date}

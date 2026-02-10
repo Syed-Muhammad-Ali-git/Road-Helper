@@ -7,6 +7,7 @@ const customerRoutes = [
   "/customer/profile",
   "/customer/request-help",
   "/customer/request-status",
+  "/journey", // dynamic children handled in pathChecker
 ];
 
 /**
@@ -18,6 +19,7 @@ const helperRoutes = [
   "/helper/profile",
   "/helper/requests",
   "/helper/active-job",
+  "/journey", // dynamic children handled in pathChecker
 ];
 
 const adminRoutes = [
@@ -26,6 +28,7 @@ const adminRoutes = [
   "/admin/users",
   "/admin/settings",
   "/admin/status",
+  "/admin/profile",
 ];
 
 /**

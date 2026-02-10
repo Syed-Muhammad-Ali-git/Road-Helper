@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Title,
   Text,
@@ -24,6 +24,8 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { auth } from "@/lib/firebase/config";
+import { subscribeCustomerRequests } from "@/lib/services/requestService";
 
 /* ---------------- TYPES ---------------- */
 
@@ -33,50 +35,56 @@ interface Request {
   status: string;
   helperName: string | null;
   location: string;
-  createdAt: Date;
+  createdAt?: any;
 }
-
-/* ---------------- MOCK DATA ---------------- */
-
-const MOCK_REQUESTS: Request[] = [
-  {
-    id: "REQ-123",
-    serviceType: "car_battery",
-    status: "completed",
-    helperName: "Ahmed Khan",
-    location: "Gulberg III, Lahore",
-    createdAt: new Date(),
-  },
-  {
-    id: "REQ-124",
-    serviceType: "tire_change",
-    status: "in_progress",
-    helperName: "Bilal Ahmed",
-    location: "DHA Phase 6, Lahore",
-    createdAt: new Date(),
-  },
-  {
-    id: "REQ-125",
-    serviceType: "jump_start",
-    status: "pending",
-    helperName: null,
-    location: "Model Town, Lahore",
-    createdAt: new Date(),
-  },
-];
 
 /* ---------------- COMPONENT ---------------- */
 
 export default function RequestStatusList() {
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
+  const [uid, setUid] = useState<string | null>(null);
 
-  /* ---------------- FAKE FETCH ---------------- */
   useEffect(() => {
-    setTimeout(() => {
-      setRequests(MOCK_REQUESTS);
-      setLoading(false);
-    }, 800);
+    const unsub = auth.onAuthStateChanged((u) => setUid(u?.uid ?? null));
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    if (!uid) return;
+    const unsub = subscribeCustomerRequests({
+      customerId: uid,
+      cb: (reqs) => {
+        setRequests(
+          reqs.map((r: any) => ({
+            id: r.id,
+            serviceType: r.serviceType,
+            status: r.status,
+            helperName: r.helperName ?? null,
+            location: r.location?.address ?? "Live location",
+            createdAt: r.createdAt,
+          })),
+        );
+        setLoading(false);
+      },
+    });
+    return () => unsub();
+  }, [uid]);
+
+  const toDateLabel = useMemo(() => {
+    return (createdAt: any) => {
+      const d =
+        createdAt?.toDate?.() instanceof Date
+          ? createdAt.toDate()
+          : createdAt instanceof Date
+            ? createdAt
+            : null;
+      if (!d) return "Just now";
+      return `${d.toLocaleDateString()} at ${d.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}`;
+    };
   }, []);
 
   if (loading) {
@@ -175,11 +183,7 @@ export default function RequestStatusList() {
                         <Group gap={6} mt={2}>
                           <IconClock size={14} className="text-gray-500" />
                           <Text size="xs" className="text-gray-500">
-                            {request.createdAt.toLocaleDateString()} at{" "}
-                            {request.createdAt.toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+                          {toDateLabel(request.createdAt)}
                           </Text>
                         </Group>
                       </Box>
@@ -217,11 +221,11 @@ export default function RequestStatusList() {
                         gradient={{ from: "red", to: "orange", deg: 90 }}
                         leftSection={<IconEye size={16} />}
                         component={Link}
-                        href={`/customer/request-status/${request.id}`}
+                        href={`/journey/${request.id}`}
                         size="sm"
                         className="mt-2 w-full md:w-auto shadow-md hover:shadow-xl transition-shadow"
                       >
-                        View Details
+                        Live View
                       </Button>
                     </Stack>
                   </Group>

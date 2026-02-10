@@ -28,7 +28,7 @@ import {
   IconArrowRight,
   IconCrown,
 } from "@tabler/icons-react";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import {
   AreaChart,
   Area,
@@ -150,7 +150,7 @@ const OverviewTab = () => {
     [totalCommission, paidCommission],
   );
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
@@ -170,7 +170,7 @@ const OverviewTab = () => {
       {/* Stats Grid */}
       <SimpleGrid cols={{ base: 1, md: 4 }} spacing={20} mb={40}>
         {stats.map((stat) => (
-          <motion.div key={stat.title} variants={itemVariants as any}>
+          <motion.div key={stat.title} variants={itemVariants}>
             <Paper
               p={30}
               radius="32px"
@@ -234,7 +234,7 @@ const OverviewTab = () => {
       {/* Charts & Map Grid */}
       <SimpleGrid cols={{ base: 1, lg: 3 }} spacing={24} mb={40}>
         {/* Revenue Chart */}
-        <motion.div variants={itemVariants as any} className="lg:col-span-2">
+        <motion.div variants={itemVariants} className="lg:col-span-2">
           <Paper
             p={40}
             radius="32px"
@@ -387,7 +387,7 @@ const OverviewTab = () => {
         </motion.div>
 
         {/* Map Snapshot */}
-        <motion.div variants={itemVariants as any}>
+        <motion.div variants={itemVariants}>
           <Paper
             radius="32px"
             className="glass-dark border border-white/5 h-full relative overflow-hidden flex flex-col shadow-2xl"
@@ -448,7 +448,7 @@ const OverviewTab = () => {
       </SimpleGrid>
 
       {/* Requests Table */}
-      <motion.div variants={itemVariants as any}>
+      <motion.div variants={itemVariants}>
         <Paper
           p={40}
           radius="32px"

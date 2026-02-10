@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useEffect, useMemo, useState, Suspense } from "react";
 import {
   Title,
   Text,
@@ -24,11 +24,18 @@ import {
   IconMessage2,
   IconCheck,
   IconCircleCheck,
+  IconCurrentLocation,
 } from "@tabler/icons-react";
 import { useForm } from "@mantine/form";
 import z from "zod";
 import { showSuccess, showError } from "@/lib/sweetalert";
 import { zodResolver } from "mantine-form-zod-resolver";
+import { auth } from "@/lib/firebase/config";
+import { useRouter } from "next/navigation";
+import { useLiveLocation } from "@/hooks/useLiveLocation";
+import LiveMap from "@/components/map/LiveMap";
+import { createRideRequest, subscribeRideRequest } from "@/lib/services/requestService";
+import type { ServiceType } from "@/app/types";
 
 const requestHelpSchema = z.object({
   serviceType: z.string().min(1, "Service type is required"),
@@ -40,6 +47,15 @@ const requestHelpSchema = z.object({
 function RequestHelpContent() {
   const [active, setActive] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [requestId, setRequestId] = useState<string | null>(null);
+  const [requestStatus, setRequestStatus] = useState<string | null>(null);
+  const [uid, setUid] = useState<string | null>(null);
+  const router = useRouter();
+  const live = useLiveLocation();
+  useEffect(() => {
+    const unsub = auth.onAuthStateChanged((u) => setUid(u?.uid ?? null));
+    return () => unsub();
+  }, []);
 
   const form = useForm({
     initialValues: {
@@ -58,18 +74,56 @@ function RequestHelpContent() {
     if (!form.validate().hasErrors) {
       setLoading(true);
       const values = form.values;
-      console.log("Request Help Form Submitted:", values);
+      try {
+        const uid = auth.currentUser?.uid;
+        if (!uid) {
+          await showError("Not signed in", "Please log in to send a request.");
+          setLoading(false);
+          return;
+        }
 
-      // Simulate API call - TODO: Replace with Firebase
-      setTimeout(async () => {
-        setActive(3); // Complete step
+        const serviceType = values.serviceType as ServiceType;
+        const location = live.coords
+          ? { lat: live.coords.lat, lng: live.coords.lng, address: values.location }
+          : { lat: 24.8607, lng: 67.0011, address: values.location };
+
+        const id = await createRideRequest({
+          customerId: uid,
+          serviceType,
+          location,
+          vehicleDetails: values.vehicleDetails,
+          issueDescription: values.issueDescription,
+        });
+        setRequestId(id);
+        setRequestStatus("pending");
+        setActive(3);
+        await showSuccess(
+          "Request sent",
+          "We’re notifying nearby helpers. Keep this screen open for live updates.",
+        );
+      } catch (err: unknown) {
+        const msg =
+          err instanceof Error ? err.message : "Unable to create request.";
+        await showError("Request Failed", msg);
+      } finally {
         setLoading(false);
-        await showSuccess("Request submitted successfully!");
-      }, 1000);
+      }
     } else {
       await showError("Validation Error", "Please fill in all required fields correctly.");
     }
   };
+
+  useEffect(() => {
+    if (!requestId) return;
+    const unsub = subscribeRideRequest(requestId, (req) => {
+      if (!req) return;
+      setRequestStatus((req as any).status ?? null);
+      if ((req as any).status === "accepted" && (req as any).helperId) {
+        router.push(`/journey/${requestId}`);
+      }
+    });
+    return () => unsub();
+  }, [requestId, router]);
 
   return (
     <Box className="p-4 md:p-8 max-w-4xl mx-auto">
@@ -88,10 +142,11 @@ function RequestHelpContent() {
                 placeholder="Select service"
                 required
                 data={[
-                  { value: "bike_mechanic", label: "Bike Mechanic" },
-                  { value: "car_mechanic", label: "Car Mechanic" },
-                  { value: "fuel_delivery", label: "Fuel Delivery" },
-                  { value: "towing", label: "Towing Service" },
+                  { value: "mechanic", label: "🔧 Mobile Mechanic" },
+                  { value: "tow", label: "🚗 Towing Truck" },
+                  { value: "fuel", label: "⛽ Fuel Delivery" },
+                  { value: "battery", label: "🔋 Battery Jump" },
+                  { value: "lockout", label: "🔑 Lockout Service" },
                 ]}
                 {...form.getInputProps("serviceType")}
               />
@@ -99,8 +154,26 @@ function RequestHelpContent() {
                 label="Current Location"
                 required
                 leftSection={<IconMapPin size={18} />}
+                rightSection={
+                  <Button
+                    variant="subtle"
+                    size="xs"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      live.requestPermission();
+                    }}
+                    leftSection={<IconCurrentLocation size={14} />}
+                  >
+                    Use GPS
+                  </Button>
+                }
                 {...form.getInputProps("location")}
               />
+              {live.error && (
+                <Text size="xs" c="dimmed">
+                  Location: {live.error}
+                </Text>
+              )}
             </Stack>
           </Stepper.Step>
 
@@ -158,25 +231,64 @@ function RequestHelpContent() {
 
           {/* DONE */}
           <Stepper.Completed>
-            <Stack align="center" gap="md" className="text-center py-8">
-              <ThemeIcon size="xl" radius="xl" color="green" variant="light">
-                <IconCircleCheck size={32} />
-              </ThemeIcon>
-              <Title order={3}>Request Submitted!</Title>
-              <Text c="dimmed">
-                Your request has been submitted successfully.
-              </Text>
-              <Button
-                variant="light"
-                color="blue"
-                onClick={() => {
-                  setActive(0);
-                  form.reset();
-                }}
-                className="mt-4"
-              >
-                Make Another Request
-              </Button>
+            <Stack gap="md" className="py-6">
+              <Group justify="space-between" align="center">
+                <Group>
+                  <ThemeIcon size="xl" radius="xl" color="green" variant="light">
+                    <IconCircleCheck size={32} />
+                  </ThemeIcon>
+                  <Box>
+                    <Title order={3}>Request Sent</Title>
+                    <Text c="dimmed">
+                      Status:{" "}
+                      <strong>
+                        {(requestStatus ?? "pending").replace("_", " ")}
+                      </strong>
+                    </Text>
+                  </Box>
+                </Group>
+                <Button
+                  variant="light"
+                  color="blue"
+                  onClick={() => requestId && router.push(`/journey/${requestId}`)}
+                  disabled={!requestId}
+                >
+                  Open Live View
+                </Button>
+              </Group>
+
+              <Paper p="md" radius="xl" className="bg-black/20 border border-white/10">
+                <Text fw={700} className="text-white mb-1">
+                  Request sent, waiting for helper
+                </Text>
+                <Text size="sm" c="dimmed">
+                  Keep this page open. When a helper accepts, we’ll take you to the live journey screen automatically.
+                </Text>
+              </Paper>
+
+              <LiveMap
+                customer={
+                  live.coords
+                    ? { lat: live.coords.lat, lng: live.coords.lng, label: "You" }
+                    : null
+                }
+                helper={null}
+              />
+
+              <Group justify="center">
+                <Button
+                  variant="light"
+                  color="gray"
+                  onClick={() => {
+                    setActive(0);
+                    setRequestId(null);
+                    setRequestStatus(null);
+                    form.reset();
+                  }}
+                >
+                  Make Another Request
+                </Button>
+              </Group>
             </Stack>
           </Stepper.Completed>
         </Stepper>
@@ -191,7 +303,12 @@ function RequestHelpContent() {
             {active < 2 ? (
               <Button onClick={nextStep}>Next</Button>
             ) : (
-              <Button loading={loading} onClick={handleSubmit} type="submit">
+              <Button
+                loading={loading}
+                onClick={handleSubmit}
+                type="submit"
+                disabled={!uid}
+              >
                 Send Request
               </Button>
             )}

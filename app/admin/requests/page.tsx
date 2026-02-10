@@ -16,7 +16,7 @@ import {
   ScrollArea,
   Button,
 } from "@mantine/core";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
   IconEye,
   IconMapPin,
@@ -171,12 +171,12 @@ const RequestsPage = () => {
     await showSuccess("Export Complete", "Operational log exported successfully.");
   }, [filteredRequests, activeTab]);
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { y: 20, opacity: 0 },
     visible: { y: 0, opacity: 1 },
   };
@@ -198,7 +198,7 @@ const RequestsPage = () => {
       </div>
 
       <motion.div
-        variants={containerVariants as any}
+        variants={containerVariants}
         initial="hidden"
         animate="visible"
         className="relative z-10 max-w-7xl mx-auto"
@@ -207,7 +207,7 @@ const RequestsPage = () => {
         <Group justify="space-between" mb={45} align="flex-end">
           <Box>
             <motion.div
-              variants={itemVariants as any}
+              variants={itemVariants}
               className="flex items-center gap-2 mb-2"
             >
               <IconTruck size={16} className="text-brand-red" />
@@ -228,7 +228,7 @@ const RequestsPage = () => {
               Live deployment monitoring & history
             </Text>
           </Box>
-          <motion.div variants={itemVariants as any}>
+          <motion.div variants={itemVariants}>
             <Button
               className="bg-brand-red hover:bg-brand-dark-red text-white h-14 rounded-2xl px-8 transition-all font-black shadow-2xl shadow-brand-red/20 group"
               leftSection={
@@ -246,7 +246,7 @@ const RequestsPage = () => {
 
         {/* Filters and Search */}
         <motion.div
-          variants={itemVariants as any}
+          variants={itemVariants}
           className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10"
         >
           <Paper
@@ -305,7 +305,7 @@ const RequestsPage = () => {
         </motion.div>
 
         {/* Data Registry */}
-        <motion.div variants={itemVariants as any}>
+        <motion.div variants={itemVariants}>
           <Paper
             radius="32px"
             className="glass-dark border border-white/10 overflow-hidden shadow-2xl relative min-h-[500px]"

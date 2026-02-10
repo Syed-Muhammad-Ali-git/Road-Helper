@@ -1,6 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { AppDispatch } from "../index";
 import type { UserRole } from "@/app/types";
+import {
+  loginWithEmail as serviceLoginWithEmail,
+  loginWithGoogle as serviceLoginWithGoogle,
+  clearSession,
+} from "@/lib/services/authService";
 
 export interface AuthState {
   user: {
@@ -66,19 +71,15 @@ const setAuthCookies = (token: string, role: UserRole) => {
 export const loginWithEmail =
   (email: string, password: string, role: UserRole) =>
   async (dispatch: AppDispatch): Promise<{ success: boolean; error?: string }> => {
-    const { signInWithEmailAndPassword } = await import("firebase/auth");
-    const { auth } = await import("@/lib/firebase/config");
     dispatch(setLoading(true));
     dispatch(setError(null));
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const token = await userCredential.user.getIdToken();
-      setAuthCookies(token, role);
+      const { user, token } = await serviceLoginWithEmail({ role, email, password });
       dispatch(setUser({
-        uid: userCredential.user.uid,
-        email: userCredential.user.email ?? null,
-        displayName: userCredential.user.displayName ?? null,
-        photoURL: userCredential.user.photoURL ?? null,
+        uid: user.uid,
+        email: user.email ?? null,
+        displayName: user.displayName ?? null,
+        photoURL: user.photoURL ?? null,
         role,
       }));
       dispatch(setToken(token));
@@ -95,20 +96,15 @@ export const loginWithEmail =
 export const loginWithGoogle =
   (role: UserRole) =>
   async (dispatch: AppDispatch): Promise<{ success: boolean; error?: string }> => {
-    const { signInWithPopup, GoogleAuthProvider } = await import("firebase/auth");
-    const { auth } = await import("@/lib/firebase/config");
     dispatch(setLoading(true));
     dispatch(setError(null));
     try {
-      const provider = new GoogleAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
-      const token = await userCredential.user.getIdToken();
-      setAuthCookies(token, role);
+      const { user, token } = await serviceLoginWithGoogle({ role });
       dispatch(setUser({
-        uid: userCredential.user.uid,
-        email: userCredential.user.email ?? null,
-        displayName: userCredential.user.displayName ?? null,
-        photoURL: userCredential.user.photoURL ?? null,
+        uid: user.uid,
+        email: user.email ?? null,
+        displayName: user.displayName ?? null,
+        photoURL: user.photoURL ?? null,
         role,
       }));
       dispatch(setToken(token));
@@ -125,11 +121,9 @@ export const loginWithGoogle =
 export const logoutUser =
   () =>
   async (dispatch: AppDispatch): Promise<void> => {
-    const { signOut } = await import("firebase/auth");
-    const { auth } = await import("@/lib/firebase/config");
     const { clearAuthStorage } = await import("@/lib/auth-utils");
     try {
-      await signOut(auth);
+      await clearSession();
     } finally {
       clearAuthStorage();
       dispatch(logout());

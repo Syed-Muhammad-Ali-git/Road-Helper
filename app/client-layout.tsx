@@ -35,7 +35,11 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
   const showSidebar =
     helperRoutes.includes(pathname) ||
     customerRoutes.includes(pathname) ||
-    adminRoutes.includes(pathname);
+    adminRoutes.includes(pathname) ||
+    pathname.startsWith("/helper") ||
+    pathname.startsWith("/customer") ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/journey/");
 
   const isAdmin = pathname?.includes("/admin");
 

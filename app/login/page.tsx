@@ -9,9 +9,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { showSuccess, showError } from "@/lib/sweetalert";
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { auth } from "@/lib/firebase/config";
-import { setCookie } from "cookies-next";
+import {
+  AuthRuleError,
+  loginWithEmail,
+  loginWithGoogle,
+} from "@/lib/services/authService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,6 +36,8 @@ const loginSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
+type LoginFormValues = z.infer<typeof loginSchema>;
+
 export default function LoginPage() {
   const [loginType, setLoginType] = useState<"customer" | "helper">("customer");
   const [isLoading, setIsLoading] = useState(false);
@@ -49,50 +53,36 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = useCallback(
-    async (data: any) => {
+    async (data: LoginFormValues) => {
       setIsLoading(true);
       try {
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
-          data.email,
-          data.password,
-        );
-        const token = await userCredential.user.getIdToken();
-
+        await loginWithEmail({
+          role: loginType,
+          email: data.email,
+          password: data.password,
+        });
         await showSuccess(
           "Welcome back!",
           loginType === "customer" ? "User" : "Partner"
         );
 
-        if (loginType === "customer") {
-          setCookie("role", "customer", {
-            maxAge: 60 * 60 * 24 * 7,
-            path: "/",
-          });
-          setCookie("token", token, {
-            maxAge: 60 * 60 * 24 * 7,
-            path: "/",
-          });
-          router.push("/customer/dashboard");
-        } else {
-          setCookie("role", "helper", {
-            maxAge: 60 * 60 * 24 * 7,
-            path: "/",
-          });
-          setCookie("token", token, {
-            maxAge: 60 * 60 * 24 * 7,
-            path: "/",
-          });
-          router.push("/helper/dashboard");
-        }
-      } catch (error: any) {
+        router.push(
+          loginType === "customer" ? "/customer/dashboard" : "/helper/dashboard",
+        );
+      } catch (error: unknown) {
         console.error(error);
-        await showError("Login Failed", "Invalid email or password.");
+        const message =
+          error instanceof AuthRuleError
+            ? error.message
+            : error instanceof Error
+              ? error.message
+              : "Login failed. Please try again.";
+        await showError("Login Failed", message);
       } finally {
         setIsLoading(false);
       }
@@ -107,22 +97,18 @@ export default function LoginPage() {
   const handleGoogleLogin = useCallback(async () => {
     setIsLoading(true);
     try {
-      const provider = new GoogleAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
-      const token = await userCredential.user.getIdToken();
-      if (loginType === "customer") {
-        setCookie("role", "customer", { maxAge: 60 * 60 * 24 * 7, path: "/" });
-        setCookie("token", token, { maxAge: 60 * 60 * 24 * 7, path: "/" });
-        await showSuccess("Welcome back!", "Signed in with Google.");
-        router.push("/customer/dashboard");
-      } else {
-        setCookie("role", "helper", { maxAge: 60 * 60 * 24 * 7, path: "/" });
-        setCookie("token", token, { maxAge: 60 * 60 * 24 * 7, path: "/" });
-        await showSuccess("Welcome back!", "Signed in with Google.");
-        router.push("/helper/dashboard");
-      }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Google sign-in failed";
+      await loginWithGoogle({ role: loginType });
+      await showSuccess("Welcome back!", "Signed in with Google.");
+      router.push(
+        loginType === "customer" ? "/customer/dashboard" : "/helper/dashboard",
+      );
+    } catch (err: unknown) {
+      const msg =
+        err instanceof AuthRuleError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Google sign-in failed";
       await showError("Google Sign-in Failed", msg);
     } finally {
       setIsLoading(false);
@@ -292,7 +278,7 @@ export default function LoginPage() {
 
       {/* Right Side - Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative z-10">
-        <Link href="/" className="absolute top-8 right-8 group">
+        <Link href="/" className="absolute top-4 right-4 sm:top-8 sm:right-8 group z-20">
           <motion.div
             whileHover={{ scale: 1.05, x: 5 }}
             className="flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brand-red transition-all cursor-pointer"

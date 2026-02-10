@@ -7,6 +7,8 @@ import Image from "next/image";
 import { IconMenu2 } from "@tabler/icons-react";
 import { useMediaQuery } from "@mantine/hooks";
 import { clearAuthStorage } from "@/lib/auth-utils";
+import { auth } from "@/lib/firebase/config";
+import { getUserByUid } from "@/lib/services/userService";
 
 interface AdminHeaderProps {
   sidebarOpen?: boolean;
@@ -29,16 +31,18 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
   const collapsedWidth = 70;
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const loginDataRaw = localStorage.getItem("loginData");
-    if (!loginDataRaw) return;
-    try {
-      const loginData = JSON.parse(loginDataRaw);
-      if (loginData.fullName) setAdminName(loginData.fullName);
-      if (loginData.email) setAdminEmail(loginData.email);
-    } catch {
-      // ignore parse error
-    }
+    let alive = true;
+    const unsub = auth.onAuthStateChanged(async (u) => {
+      if (!u || !alive) return;
+      const p = await getUserByUid(u.uid);
+      if (!alive) return;
+      setAdminName(p?.displayName ?? u.displayName ?? "Admin");
+      setAdminEmail(p?.email ?? u.email ?? "");
+    });
+    return () => {
+      alive = false;
+      unsub();
+    };
   }, []);
 
   const handleSignOut = () => {
@@ -142,7 +146,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
             </div>
 
             <Menu.Item
-              onClick={() => router.push("/admin/dashboard")}
+              onClick={() => router.push("/admin/profile")}
               className="text-gray-300 hover:text-white hover:bg-white/5 transition-all my-1"
               leftSection={
                 <Image
@@ -155,7 +159,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
               }
               style={{ fontWeight: 500, padding: "12px 16px" }}
             >
-              Overview
+              My Profile
             </Menu.Item>
             <Menu.Item
               onClick={handleSignOut}

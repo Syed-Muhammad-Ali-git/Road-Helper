@@ -73,6 +73,23 @@ const SharedSidebarComponent = ({
     }
   }, [setOpen, isDesktop]);
 
+  const handleLogoClick = useCallback(
+    (e: React.MouseEvent) => {
+      // Always return user to the very top
+      if (pathname === "/") {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+      // Navigate home, then scroll top
+      e.preventDefault();
+      router.push("/");
+      setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
+      handleClose();
+    },
+    [handleClose, pathname, router],
+  );
+
   return (
     <>
       {/* Backdrop - Only on Mobile */}
@@ -101,22 +118,21 @@ const SharedSidebarComponent = ({
       >
         {/* Header */}
         <div className="h-20 flex items-center justify-between px-6 border-b border-white/5 min-w-[280px]">
-          <div className="flex items-center gap-3">
-            <div className="relative w-8 h-8 bg-white rounded-lg p-1 shrink-0">
-              <Image
-                src={logoSrc}
-                alt="Logo"
-                fill
-                className="object-contain"
-              />
+          <Link
+            href="/"
+            onClick={handleLogoClick}
+            className="flex items-center gap-3 no-underline group"
+          >
+            <div className="relative w-8 h-8 bg-white rounded-lg p-1 shrink-0 group-hover:scale-105 transition-transform">
+              <Image src={logoSrc} alt="Logo" fill className="object-contain" />
             </div>
             <motion.h1
               animate={{ opacity: open ? 1 : 0, x: open ? 0 : -20 }}
-              className="font-manrope font-bold text-xl text-white tracking-tight whitespace-nowrap"
+              className="font-manrope font-bold text-xl text-white tracking-tight whitespace-nowrap group-hover:text-brand-red transition-colors"
             >
               {title}
             </motion.h1>
-          </div>
+          </Link>
           {!isDesktop && (
             <Button
               variant="ghost"
@@ -140,12 +156,15 @@ const SharedSidebarComponent = ({
                 href={item.path}
                 onClick={handleClose}
                 className={cn(
-                  "flex items-center gap-4 px-3.5 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden",
+                  "flex items-center gap-4 px-3.5 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden border",
                   isActive
-                    ? "bg-brand-red text-white shadow-lg shadow-brand-red/20"
-                    : "text-gray-400 hover:text-white hover:bg-white/5",
+                    ? "bg-brand-red/15 border-brand-red/40 text-white shadow-lg shadow-brand-red/10"
+                    : "border-transparent text-gray-400 hover:text-white hover:bg-white/5 hover:border-white/10",
                 )}
               >
+                {isActive && (
+                  <span className="absolute left-0 top-0 bottom-0 w-1 bg-brand-red rounded-r-full" />
+                )}
                 <item.icon
                   size={22}
                   className={cn(

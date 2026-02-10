@@ -8,6 +8,9 @@ import Image from "next/image";
 import { IconMenu2 } from "@tabler/icons-react";
 import { useMediaQuery } from "@mantine/hooks";
 import { clearAuthStorage } from "@/lib/auth-utils";
+import { auth } from "@/lib/firebase/config";
+import { getUserByUid } from "@/lib/services/userService";
+import { getCookie } from "cookies-next";
 
 /* ---------------- INTERFACES ---------------- */
 interface HeaderProps {
@@ -31,25 +34,19 @@ const HelperHeader: React.FC<HeaderProps> = ({
 
   // ---------------- LOAD USER DATA FROM LOCAL STORAGE ----------------
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const loginDataRaw = localStorage.getItem("loginData");
-      if (loginDataRaw) {
-        try {
-          const loginData = JSON.parse(loginDataRaw);
-          if (loginData.profileImage) {
-            setProfile(loginData.profileImage);
-          }
-          if (loginData.fullName) {
-            setUserName(loginData.fullName);
-          }
-          if (loginData.email) {
-            setUserEmail(loginData.email);
-          }
-        } catch {
-          // ignore parse error
-        }
-      }
-    }
+    let alive = true;
+    const unsub = auth.onAuthStateChanged(async (u) => {
+      if (!u || !alive) return;
+      setProfile(u.photoURL ?? null);
+      const p = await getUserByUid(u.uid);
+      if (!alive) return;
+      setUserName(p?.displayName ?? u.displayName ?? "User");
+      setUserEmail(p?.email ?? u.email ?? "");
+    });
+    return () => {
+      alive = false;
+      unsub();
+    };
   }, []);
 
   const drawerWidth = 280;
@@ -164,7 +161,7 @@ const HelperHeader: React.FC<HeaderProps> = ({
                   color="orange"
                   className="mt-1"
                 >
-                  Active Pro
+                  {(getCookie("role") as string | undefined)?.toUpperCase?.() ?? "HELPER"}
                 </Badge>
               </div>
             </div>

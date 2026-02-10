@@ -1,23 +1,7 @@
-import { LandingNavbar } from "@/components/landing/LandingNavbar";
-import { HeroSection } from "@/components/landing/HeroSection";
-import { FeaturesSection } from "@/components/landing/FeaturesSection";
-import { HowItWorks } from "@/components/landing/HowItWorks";
-import { StatsSection } from "@/components/landing/StatsSection";
-import { CTASection } from "@/components/landing/CTASection";
-import { LandingFooter } from "@/components/landing/LandingFooter";
+import LandingHomeClient from "@/components/landing/LandingHomeClient";
 
 const Home = () => {
-  return (
-    <main className="min-h-screen bg-brand-black text-white font-satoshi">
-      <LandingNavbar />
-      <HeroSection />
-      <StatsSection />
-      <HowItWorks />
-      <FeaturesSection />
-      <CTASection />
-      <LandingFooter />
-    </main>
-  );
+  return <LandingHomeClient />;
 };
 
 export default Home;

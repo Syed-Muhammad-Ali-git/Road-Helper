@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Title,
   Text,
@@ -20,44 +20,42 @@ import {
   IconCheck,
   IconPhone,
   IconBrandWhatsapp,
+  IconCurrentLocation,
 } from "@tabler/icons-react";
-import { showSuccess } from "@/lib/sweetalert";
-import { motion } from "framer-motion";
+import { showError, showSuccess } from "@/lib/sweetalert";
+import { motion, type Variants } from "framer-motion";
+import { auth } from "@/lib/firebase/config";
+import { useRouter } from "next/navigation";
+import { useLiveLocation } from "@/hooks/useLiveLocation";
+import {
+  acceptRideRequest,
+  subscribePendingRequests,
+} from "@/lib/services/requestService";
+import type { RideRequestDoc } from "@/types";
 
 export default function NearbyRequestsUI() {
-  // Mock helper info
-  const userData = {
-    fullName: "Ali Khan",
-    serviceType: "car_mechanic",
-    isOnline: true,
-  };
+  const router = useRouter();
+  const live = useLiveLocation();
+  const [requests, setRequests] = useState<Array<{ id: string } & RideRequestDoc>>(
+    [],
+  );
+  const [acceptingId, setAcceptingId] = useState<string | null>(null);
 
-  // Hardcoded requests
-  const requests = [
-    {
-      id: "1",
-      customerName: "Ahmed Raza",
-      vehicleDetails: "Toyota Corolla White (XYZ-123)",
-      location: "Gulshan-e-Iqbal, Karachi",
-      issueDescription: "Car won't start, engine makes clicking sound",
-      createdAt: new Date(),
-    },
-    {
-      id: "2",
-      customerName: "Sara Khan",
-      vehicleDetails: "Honda Civic Red (ABC-456)",
-      location: "Clifton, Karachi",
-      issueDescription: "Flat tire, need urgent help to replace it",
-      createdAt: new Date(),
-    },
-  ];
+  const isOnline = useMemo(() => !!live.coords, [live.coords]);
 
-  const containerVariants = {
+  useEffect(() => {
+    const unsub = subscribePendingRequests({
+      cb: (reqs) => setRequests(reqs),
+    });
+    return () => unsub();
+  }, []);
+
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { y: 20, opacity: 0 },
     visible: { y: 0, opacity: 1 },
   };
@@ -65,11 +63,11 @@ export default function NearbyRequestsUI() {
   return (
     <Box className="p-4 md:p-8 font-satoshi min-h-screen bg-transparent">
       <motion.div
-        variants={containerVariants as any}
+        variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <motion.div variants={itemVariants as any}>
+        <motion.div variants={itemVariants}>
           <Box mb="xl">
             <Text className="text-gray-400 font-medium mb-1 uppercase tracking-wider text-xs">
               Job Requests
@@ -86,8 +84,36 @@ export default function NearbyRequestsUI() {
           </Box>
         </motion.div>
 
-        {requests.length === 0 ? (
+        {!isOnline && (
           <motion.div variants={itemVariants as any}>
+            <Paper
+              p="md"
+              radius="xl"
+              className="glass-dark border border-white/10 mb-6"
+            >
+              <Group justify="space-between" align="center">
+                <Box>
+                  <Text fw={700} className="text-white">
+                    Enable live location to accept jobs
+                  </Text>
+                  <Text size="sm" className="text-gray-400">
+                    We use your GPS to show nearby requests and calculate ETA.
+                  </Text>
+                </Box>
+                <Button
+                  className="bg-brand-red hover:bg-brand-dark-red rounded-xl"
+                  leftSection={<IconCurrentLocation size={18} />}
+                  onClick={() => live.requestPermission()}
+                >
+                  Turn On GPS
+                </Button>
+              </Group>
+            </Paper>
+          </motion.div>
+        )}
+
+        {requests.length === 0 ? (
+          <motion.div variants={itemVariants}>
             <Paper
               p="xl"
               radius="xl"
@@ -106,7 +132,7 @@ export default function NearbyRequestsUI() {
                 </Text>
                 <Text size="sm" className="text-gray-400">
                   Jobs matching your service (
-                  {userData.serviceType.replace("_", " ")}) will appear here.
+                  live) will appear here.
                 </Text>
               </Stack>
             </Paper>
@@ -116,7 +142,7 @@ export default function NearbyRequestsUI() {
             {requests.map((req, idx) => (
               <motion.div
                 key={req.id}
-                variants={itemVariants as any}
+                variants={itemVariants}
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
@@ -148,14 +174,14 @@ export default function NearbyRequestsUI() {
                         size="lg"
                         className="ring-2 ring-blue-500/30"
                       >
-                        {req.customerName.charAt(0)}
+                        {(req.customerName ?? "C").toString().charAt(0)}
                       </Avatar>
                       <Box>
                         <Text fw={700} className="text-white text-lg">
-                          {req.customerName}
+                          {req.customerName ?? "Customer"}
                         </Text>
                         <Text size="sm" className="text-gray-400">
-                          {req.vehicleDetails}
+                          {req.vehicleDetails ?? "Vehicle details not provided"}
                         </Text>
                       </Box>
                     </Group>
@@ -166,7 +192,8 @@ export default function NearbyRequestsUI() {
                     >
                       <IconMapPin size={18} className="text-brand-red" />
                       <Text size="sm" fw={600} className="text-white">
-                        {req.location}
+                        {req.location?.address ??
+                          `${req.location?.lat?.toFixed?.(4) ?? ""}, ${req.location?.lng?.toFixed?.(4) ?? ""}`}
                       </Text>
                     </Group>
 
@@ -176,7 +203,7 @@ export default function NearbyRequestsUI() {
                       className="bg-white/5 border border-white/5"
                     >
                       <Text size="sm" lineClamp={3} className="text-gray-300">
-                        {req.issueDescription}
+                        {req.issueDescription ?? "No description provided."}
                       </Text>
                     </Paper>
 
@@ -184,8 +211,41 @@ export default function NearbyRequestsUI() {
                       <Button
                         className="bg-green-600 hover:bg-green-700 h-12 rounded-xl transition-all font-bold hover:scale-105 active:scale-95"
                         leftSection={<IconCheck size={20} />}
-                        disabled={!userData.isOnline}
-                        onClick={() => showSuccess("Job accepted!")}
+                        loading={acceptingId === req.id}
+                        disabled={!isOnline || acceptingId !== null}
+                        onClick={async () => {
+                          const helperId = auth.currentUser?.uid;
+                          if (!helperId) {
+                            await showError("Not signed in", "Please log in again.");
+                            return;
+                          }
+                          if (!live.coords) {
+                            await showError(
+                              "Location required",
+                              "Turn on GPS to accept jobs and share your ETA.",
+                            );
+                            return;
+                          }
+                          try {
+                            setAcceptingId(req.id);
+                            await acceptRideRequest({
+                              requestId: req.id,
+                              helperId,
+                              helperLocation: {
+                                lat: live.coords.lat,
+                                lng: live.coords.lng,
+                              },
+                            });
+                            await showSuccess("Job accepted!", "Redirecting to live journey…");
+                            router.push(`/journey/${req.id}`);
+                          } catch (e: unknown) {
+                            const msg =
+                              e instanceof Error ? e.message : "Unable to accept request.";
+                            await showError("Accept Failed", msg);
+                          } finally {
+                            setAcceptingId(null);
+                          }
+                        }}
                       >
                         Accept Job
                       </Button>
@@ -208,7 +268,7 @@ export default function NearbyRequestsUI() {
                       </Button>
                     </Group>
 
-                    {!userData.isOnline && (
+                    {!isOnline && (
                       <Text
                         size="xs"
                         className="text-red-400 font-semibold text-center"
