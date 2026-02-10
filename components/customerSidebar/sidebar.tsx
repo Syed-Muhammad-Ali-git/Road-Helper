@@ -2,7 +2,7 @@
 
 import React, { memo } from "react";
 import SharedSidebar from "@/components/SharedSidebar";
-import { LayoutDashboard, User, History, HelpCircle } from "lucide-react";
+import { LayoutDashboard, History, HelpCircle } from "lucide-react";
 
 interface SideBarProps {
   open: boolean;
@@ -11,7 +11,6 @@ interface SideBarProps {
 
 const customerItems = [
   { text: "Dashboard", icon: LayoutDashboard, path: "/customer/dashboard" },
-  { text: "Profile", icon: User, path: "/customer/profile" },
   { text: "History", icon: History, path: "/customer/history" },
   { text: "Help", icon: HelpCircle, path: "/customer/request-help" },
   { text: "My Requests", icon: HelpCircle, path: "/customer/request-status" },

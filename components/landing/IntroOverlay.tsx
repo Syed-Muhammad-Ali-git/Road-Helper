@@ -2,7 +2,12 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconActivity, IconChartBar, IconMapPin, IconShieldCheck } from "@tabler/icons-react";
+import {
+  IconActivity,
+  IconChartBar,
+  IconMapPin,
+  IconShieldCheck,
+} from "@tabler/icons-react";
 
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
@@ -29,13 +34,13 @@ export default function IntroOverlay() {
     const seen = window.localStorage.getItem(seenKey);
     if (seen) return;
 
-    setVisible(true);
     const start = Date.now();
     const duration = 5000;
     const t = setInterval(() => {
       const raw = ((Date.now() - start) / duration) * 100;
       const p = clamp(Math.round(raw), 0, 100);
       setProgress(p);
+      setVisible(true);
       if (p >= 100) {
         clearInterval(t);
         window.localStorage.setItem(seenKey, "1");
@@ -53,7 +58,7 @@ export default function IntroOverlay() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] bg-brand-black text-white flex items-center justify-center px-6"
+          className="fixed inset-0 z-100 bg-brand-black text-white flex items-center justify-center px-6"
         >
           <motion.div
             initial={{ scale: 0.98, y: 10, opacity: 0 }}
@@ -76,7 +81,8 @@ export default function IntroOverlay() {
                 Initializing <span className="text-brand-red">Live Rescue</span>
               </div>
               <div className="text-gray-400 mt-3">
-                We’re preparing dispatch, tracking, and verification layers for a premium experience.
+                We’re preparing dispatch, tracking, and verification layers for
+                a premium experience.
               </div>
 
               <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -127,4 +133,3 @@ export default function IntroOverlay() {
     </AnimatePresence>
   );
 }
-

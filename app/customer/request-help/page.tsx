@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState, Suspense } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import {
   Title,
   Text,
@@ -33,9 +33,14 @@ import { zodResolver } from "mantine-form-zod-resolver";
 import { auth } from "@/lib/firebase/config";
 import { useRouter } from "next/navigation";
 import { useLiveLocation } from "@/hooks/useLiveLocation";
-import LiveMap from "@/components/map/LiveMap";
-import { createRideRequest, subscribeRideRequest } from "@/lib/services/requestService";
-import type { ServiceType } from "@/app/types";
+import dynamic from 'next/dynamic';
+import {
+  createRideRequest,
+  subscribeRideRequest,
+} from "@/lib/services/requestService";
+
+const LiveMap = dynamic(() => import('@/components/map/LiveMap'), { ssr: false });
+import type { ServiceType } from "@/types";
 
 const requestHelpSchema = z.object({
   serviceType: z.string().min(1, "Service type is required"),
@@ -84,7 +89,11 @@ function RequestHelpContent() {
 
         const serviceType = values.serviceType as ServiceType;
         const location = live.coords
-          ? { lat: live.coords.lat, lng: live.coords.lng, address: values.location }
+          ? {
+              lat: live.coords.lat,
+              lng: live.coords.lng,
+              address: values.location,
+            }
           : { lat: 24.8607, lng: 67.0011, address: values.location };
 
         const id = await createRideRequest({
@@ -109,7 +118,10 @@ function RequestHelpContent() {
         setLoading(false);
       }
     } else {
-      await showError("Validation Error", "Please fill in all required fields correctly.");
+      await showError(
+        "Validation Error",
+        "Please fill in all required fields correctly.",
+      );
     }
   };
 
@@ -234,7 +246,12 @@ function RequestHelpContent() {
             <Stack gap="md" className="py-6">
               <Group justify="space-between" align="center">
                 <Group>
-                  <ThemeIcon size="xl" radius="xl" color="green" variant="light">
+                  <ThemeIcon
+                    size="xl"
+                    radius="xl"
+                    color="green"
+                    variant="light"
+                  >
                     <IconCircleCheck size={32} />
                   </ThemeIcon>
                   <Box>
@@ -250,26 +267,37 @@ function RequestHelpContent() {
                 <Button
                   variant="light"
                   color="blue"
-                  onClick={() => requestId && router.push(`/journey/${requestId}`)}
+                  onClick={() =>
+                    requestId && router.push(`/journey/${requestId}`)
+                  }
                   disabled={!requestId}
                 >
                   Open Live View
                 </Button>
               </Group>
 
-              <Paper p="md" radius="xl" className="bg-black/20 border border-white/10">
+              <Paper
+                p="md"
+                radius="xl"
+                className="bg-black/20 border border-white/10"
+              >
                 <Text fw={700} className="text-white mb-1">
                   Request sent, waiting for helper
                 </Text>
                 <Text size="sm" c="dimmed">
-                  Keep this page open. When a helper accepts, we’ll take you to the live journey screen automatically.
+                  Keep this page open. When a helper accepts, we’ll take you to
+                  the live journey screen automatically.
                 </Text>
               </Paper>
 
               <LiveMap
                 customer={
                   live.coords
-                    ? { lat: live.coords.lat, lng: live.coords.lng, label: "You" }
+                    ? {
+                        lat: live.coords.lat,
+                        lng: live.coords.lng,
+                        label: "You",
+                      }
                     : null
                 }
                 helper={null}

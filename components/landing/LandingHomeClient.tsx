@@ -11,8 +11,8 @@ import { LandingFooter } from "@/components/landing/LandingFooter";
 export default function LandingHomeClient() {
   return (
     <main className="min-h-screen bg-brand-black text-white font-satoshi">
-      <IntroOverlay />
       <LandingNavbar />
+      <IntroOverlay />
       <HeroSection />
       <StatsSection />
       <HowItWorks />

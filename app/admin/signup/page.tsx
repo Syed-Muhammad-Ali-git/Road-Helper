@@ -45,12 +45,8 @@ interface AdminSignupValues {
 }
 
 const AdminSignup = () => {
-  const [isClient, setIsClient] = useState(false);
+  const [isClient] = useState(true);
   const router = useRouter();
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const form = useForm<AdminSignupValues>({
     initialValues: {

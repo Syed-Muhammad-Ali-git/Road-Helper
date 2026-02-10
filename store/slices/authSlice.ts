@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { AppDispatch } from "../index";
-import type { UserRole } from "@/app/types";
+import type { UserRole } from "@/types";
 import {
   loginWithEmail as serviceLoginWithEmail,
   loginWithGoogle as serviceLoginWithGoogle,
@@ -41,7 +41,7 @@ const authSlice = createSlice({
           photoURL: string | null;
           role: UserRole;
         } | null;
-      }
+      },
     ) => {
       state.user = action.payload;
     },
@@ -70,18 +70,26 @@ const setAuthCookies = (token: string, role: UserRole) => {
 
 export const loginWithEmail =
   (email: string, password: string, role: UserRole) =>
-  async (dispatch: AppDispatch): Promise<{ success: boolean; error?: string }> => {
+  async (
+    dispatch: AppDispatch,
+  ): Promise<{ success: boolean; error?: string }> => {
     dispatch(setLoading(true));
     dispatch(setError(null));
     try {
-      const { user, token } = await serviceLoginWithEmail({ role, email, password });
-      dispatch(setUser({
-        uid: user.uid,
-        email: user.email ?? null,
-        displayName: user.displayName ?? null,
-        photoURL: user.photoURL ?? null,
+      const { user, token } = await serviceLoginWithEmail({
         role,
-      }));
+        email,
+        password,
+      });
+      dispatch(
+        setUser({
+          uid: user.uid,
+          email: user.email ?? null,
+          displayName: user.displayName ?? null,
+          photoURL: user.photoURL ?? null,
+          role,
+        }),
+      );
       dispatch(setToken(token));
       dispatch(setLoading(false));
       return { success: true };
@@ -95,23 +103,28 @@ export const loginWithEmail =
 
 export const loginWithGoogle =
   (role: UserRole) =>
-  async (dispatch: AppDispatch): Promise<{ success: boolean; error?: string }> => {
+  async (
+    dispatch: AppDispatch,
+  ): Promise<{ success: boolean; error?: string }> => {
     dispatch(setLoading(true));
     dispatch(setError(null));
     try {
       const { user, token } = await serviceLoginWithGoogle({ role });
-      dispatch(setUser({
-        uid: user.uid,
-        email: user.email ?? null,
-        displayName: user.displayName ?? null,
-        photoURL: user.photoURL ?? null,
-        role,
-      }));
+      dispatch(
+        setUser({
+          uid: user.uid,
+          email: user.email ?? null,
+          displayName: user.displayName ?? null,
+          photoURL: user.photoURL ?? null,
+          role,
+        }),
+      );
       dispatch(setToken(token));
       dispatch(setLoading(false));
       return { success: true };
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Google login failed";
+      const message =
+        err instanceof Error ? err.message : "Google login failed";
       dispatch(setError(message));
       dispatch(setLoading(false));
       return { success: false, error: message };

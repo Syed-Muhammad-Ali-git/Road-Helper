@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, memo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Title,
   Text,
@@ -9,36 +9,35 @@ import {
   Stack,
   Button,
   Box,
-  ThemeIcon,
   Group,
   Avatar,
   Badge,
   ActionIcon,
-  ScrollArea,
 } from "@mantine/core";
 import {
   IconCar,
-  IconBike,
   IconDroplet,
   IconTruck,
   IconMapPin,
-  IconCurrentLocation,
   IconPhoneCall,
   IconHistory,
   IconArrowRight,
   IconSparkles,
   IconShieldCheck,
   IconBolt,
+  IconWheel,
 } from "@tabler/icons-react";
 import Link from "next/link";
-import { motion, AnimatePresence, Variants } from "framer-motion";
-import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import LiveMap from "@/components/map/LiveMap";
+import dynamic from "next/dynamic";
 import { useLiveLocation } from "@/hooks/useLiveLocation";
 
+const LiveMap = dynamic(() => import("@/components/map/LiveMap"), {
+  ssr: false,
+});
+
 // Background assets (using standard paths)
-const mapBg = "/assets/images/backgrounds/map-bg.svg";
 const avatar1 = "/assets/images/avatars/avatar-1.jpg";
 const avatar5 = "/assets/images/avatars/avatar-5.jpg";
 const avatar6 = "/assets/images/avatars/avatar-6.jpg";
@@ -59,6 +58,14 @@ const serviceCategories = [
     desc: "Ran out of gas? We'll bring fuel.",
     id: "fuel",
     gradient: "from-red-600/20 to-rose-600/20",
+  },
+  {
+    title: "Tyre Punkcher",
+    icon: IconWheel,
+    color: "blue",
+    desc: "Breakdown, tire change, diagnostics",
+    id: "Tyre Punkcher",
+    gradient: "from-blue-600/20 to-indigo-600/20",
   },
   {
     title: "Towing Service",
@@ -99,7 +106,9 @@ const ClientDashboard = () => {
       try {
         const parsed = JSON.parse(loginData);
         if (parsed.fullName) setUserName(parsed.fullName.split(" ")[0]);
-      } catch (e) {}
+      } catch (e) {
+        console.log(e);
+      }
     }
   }, []);
 
@@ -172,7 +181,7 @@ const ClientDashboard = () => {
               variants={itemVariants as any}
               className="flex items-center gap-2 mb-2"
             >
-              <div className="h-[1px] w-8 bg-brand-red" />
+              <div className="h-px w-8 bg-brand-red" />
               <Text className="text-brand-red font-bold uppercase tracking-[0.2em] text-[10px]">
                 Member Area
               </Text>
@@ -182,12 +191,12 @@ const ClientDashboard = () => {
               className="font-manrope font-extrabold text-4xl md:text-5xl text-white tracking-tight"
             >
               Welcome Back,{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-400">
                 {userName}
               </span>
             </Title>
             <Text className="text-gray-400 mt-2 font-medium">
-              Ready for your next journey? We've got your back.
+              Ready for your next journey? We&apos;ve got your back.
             </Text>
           </Box>
           <motion.div variants={itemVariants as any}>
@@ -211,12 +220,16 @@ const ClientDashboard = () => {
           <motion.div variants={itemVariants as any} className="lg:col-span-2">
             <Paper
               radius="32px"
-              className="relative overflow-hidden h-[350px] md:h-[450px] border border-white/10 glass-dark shadow-2xl group"
+              className="relative overflow-hidden h-87.5 md:h-112.5 border border-white/10 glass-dark shadow-2xl group"
             >
               <LiveMap
                 customer={
                   live.coords
-                    ? { lat: live.coords.lat, lng: live.coords.lng, label: "You" }
+                    ? {
+                        lat: live.coords.lat,
+                        lng: live.coords.lng,
+                        label: "You",
+                      }
                     : null
                 }
                 helper={null}
@@ -224,7 +237,7 @@ const ClientDashboard = () => {
               />
 
               {/* Map Controls */}
-              <div className="absolute bottom-8 left-8 right-8 p-6 glass-dark rounded-[24px] border border-white/20 flex flex-col md:flex-row items-center justify-between z-20 gap-4">
+              <div className="absolute bottom-8 left-8 right-8 p-6 glass-dark rounded-3xl border border-white/20 flex flex-col md:flex-row items-center justify-between z-20 gap-4">
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-12 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
                     <IconMapPin size={24} />
@@ -257,7 +270,7 @@ const ClientDashboard = () => {
               <Paper
                 p={32}
                 radius="32px"
-                className="bg-gradient-to-br from-blue-600/20 to-indigo-600/20 text-white relative overflow-hidden shadow-2xl border border-blue-500/20 min-h-[210px] flex flex-col justify-between"
+                className="bg-linear-to-br from-blue-600/20 to-indigo-600/20 text-white relative overflow-hidden shadow-2xl border border-blue-500/20 min-h-[210px] flex flex-col justify-between"
               >
                 <div className="absolute top-[-20px] right-[-20px] opacity-10">
                   <IconShieldCheck size={180} />

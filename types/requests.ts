@@ -23,6 +23,7 @@ export type RideStatus =
 
 export interface RideRequestDoc {
   customerId: string;
+  customerName?: string;
   helperId: string | null;
   serviceType: ServiceType;
   status: RideStatus;
@@ -31,10 +32,10 @@ export interface RideRequestDoc {
   helperLocation?: GeoLocation | null;
   vehicleDetails: string;
   issueDescription: string;
-  createdAt: unknown;
-  updatedAt: unknown;
-  acceptedAt?: unknown;
-  completedAt?: unknown;
+  createdAt: Date;
+  updatedAt: Date;
+  acceptedAt?: Date;
+  completedAt?: Date;
 }
 
 export interface UserLocationDoc {

@@ -5,6 +5,7 @@ import {
   customerRoutes,
   helperRoutes,
   adminRoutes,
+  publicRoutes,
 } from "./routes";
 import HelperSideBar from "@/components/helperSidebar/sidebar";
 import HelperHeader from "@/components/helperHeader/header";
@@ -25,6 +26,7 @@ interface PathCheckerProps {
 const PathChecker = ({ pathName, open, setOpen }: PathCheckerProps) => {
   // ----- CHECK IF THE CURRENT PATH IS A PROTECTED ROUTE -----
   const show = useMemo(() => {
+    if (publicRoutes.includes(pathName)) return false;
     if (protectedRoutes.includes(pathName)) return true;
     // Dynamic and nested routes
     if (pathName.startsWith("/customer")) return true;

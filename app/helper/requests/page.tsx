@@ -36,9 +36,9 @@ import type { RideRequestDoc } from "@/types";
 export default function NearbyRequestsUI() {
   const router = useRouter();
   const live = useLiveLocation();
-  const [requests, setRequests] = useState<Array<{ id: string } & RideRequestDoc>>(
-    [],
-  );
+  const [requests, setRequests] = useState<
+    Array<{ id: string } & RideRequestDoc>
+  >([]);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
 
   const isOnline = useMemo(() => !!live.coords, [live.coords]);
@@ -131,15 +131,14 @@ export default function NearbyRequestsUI() {
                   No requests in your area right now.
                 </Text>
                 <Text size="sm" className="text-gray-400">
-                  Jobs matching your service (
-                  live) will appear here.
+                  Jobs matching your service ( live) will appear here.
                 </Text>
               </Stack>
             </Paper>
           </motion.div>
         ) : (
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
-            {requests.map((req, idx) => (
+            {requests.map((req) => (
               <motion.div
                 key={req.id}
                 variants={itemVariants}
@@ -174,7 +173,7 @@ export default function NearbyRequestsUI() {
                         size="lg"
                         className="ring-2 ring-blue-500/30"
                       >
-                        {(req.customerName ?? "C").toString().charAt(0)}
+                        {(req.customerName || "C").toString().charAt(0)}
                       </Avatar>
                       <Box>
                         <Text fw={700} className="text-white text-lg">
@@ -216,7 +215,10 @@ export default function NearbyRequestsUI() {
                         onClick={async () => {
                           const helperId = auth.currentUser?.uid;
                           if (!helperId) {
-                            await showError("Not signed in", "Please log in again.");
+                            await showError(
+                              "Not signed in",
+                              "Please log in again.",
+                            );
                             return;
                           }
                           if (!live.coords) {
@@ -236,11 +238,16 @@ export default function NearbyRequestsUI() {
                                 lng: live.coords.lng,
                               },
                             });
-                            await showSuccess("Job accepted!", "Redirecting to live journey…");
+                            await showSuccess(
+                              "Job accepted!",
+                              "Redirecting to live journey…",
+                            );
                             router.push(`/journey/${req.id}`);
                           } catch (e: unknown) {
                             const msg =
-                              e instanceof Error ? e.message : "Unable to accept request.";
+                              e instanceof Error
+                                ? e.message
+                                : "Unable to accept request.";
                             await showError("Accept Failed", msg);
                           } finally {
                             setAcceptingId(null);

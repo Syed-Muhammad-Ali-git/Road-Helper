@@ -10,3 +10,18 @@ export interface AuthUser {
   role: UserRole;
 }
 
+export interface HelperProfile extends AuthUser {
+  role: "helper";
+  // Add additional helper-specific fields here if needed
+}
+
+export interface CustomerProfile extends AuthUser {
+  role: "customer";
+  // Add additional customer-specific fields here if needed
+}
+
+export interface AdminProfile extends AuthUser {
+  role: "admin";
+  // Add additional admin-specific fields here if needed
+}
+

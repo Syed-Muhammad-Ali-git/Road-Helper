@@ -9,7 +9,7 @@ import {
 } from "firebase/auth";
 import { setCookie, deleteCookie } from "cookies-next";
 import { auth } from "@/lib/firebase/config";
-import type { UserRole } from "@/app/types";
+import type { UserRole } from "@/types";
 import {
   getUserByEmail,
   deleteUserDataCompletely,

@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type { AppDispatch } from "../index";
-import type { HelperProfile, CustomerProfile, AdminProfile } from "@/app/types";
+import type { HelperProfile, CustomerProfile, AdminProfile } from "@/types";
 
 export type UserProfile = HelperProfile | CustomerProfile | AdminProfile | null;
 

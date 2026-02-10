@@ -87,13 +87,13 @@ export default function RequestStatusList() {
     };
   }, []);
 
-  if (loading) {
-    return (
-      <Box className="min-h-screen flex items-center justify-center bg-brand-black">
-        <Loader size="xl" color="red" />
-      </Box>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <Box className="min-h-screen flex items-center justify-center bg-brand-black">
+  //       <Loader size="xl" color="red" />
+  //     </Box>
+  //   );
+  // }
 
   return (
     <Box className="min-h-screen p-4 md:p-8 bg-brand-black text-white">
@@ -183,7 +183,7 @@ export default function RequestStatusList() {
                         <Group gap={6} mt={2}>
                           <IconClock size={14} className="text-gray-500" />
                           <Text size="xs" className="text-gray-500">
-                          {toDateLabel(request.createdAt)}
+                            {toDateLabel(request.createdAt)}
                           </Text>
                         </Group>
                       </Box>

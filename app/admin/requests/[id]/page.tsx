@@ -90,7 +90,9 @@ const getRequestById = (id: string) => {
   };
 };
 
-const IconTruck = (props: React.SVGProps<SVGSVGElement>) => <IconTools {...props} />;
+const IconTruck = (props: React.SVGProps<SVGSVGElement>) => (
+  <IconTools {...props} />
+);
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -129,7 +131,7 @@ const RequestDetailPage = () => {
       </div>
 
       <motion.div
-        variants={containerVariants as any}
+        variants={containerVariants}
         initial="hidden"
         animate="visible"
         className="relative z-10 max-w-6xl mx-auto"
@@ -148,7 +150,7 @@ const RequestDetailPage = () => {
               />
               Return to Registry
             </Button>
-            <div className="h-10 w-[1px] bg-white/10 hidden md:block" />
+            <div className="h-10 w-px bg-white/10 hidden md:block" />
             <Box>
               <Text className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-1">
                 Operational ID
@@ -187,7 +189,7 @@ const RequestDetailPage = () => {
                 radius="40px"
                 className="glass-dark border border-white/10 shadow-2xl relative overflow-hidden"
               >
-                <div className="absolute top-0 right-0 p-10 text-white/[0.01]">
+                <div className="absolute top-0 right-0 p-10 text-white/1">
                   <IconRoute size={240} />
                 </div>
                 <Group justify="space-between" mb={35} align="flex-start">
@@ -353,10 +355,10 @@ const RequestDetailPage = () => {
                   <Paper
                     p={24}
                     radius="20px"
-                    className="bg-white/[0.02] border border-white/5 relative"
+                    className="bg-white/2 border border-white/5 relative"
                   >
-                    <Text className="text-gray-300 font-medium italic italic leading-loose">
-                      "{request.notes}"
+                    <Text className="text-gray-300 font-medium italic leading-loose">
+                      &quot;{request.notes}&quot;
                     </Text>
                   </Paper>
                 </div>
@@ -373,7 +375,7 @@ const RequestDetailPage = () => {
                 radius="40px"
                 className="glass-dark border border-white/10 shadow-2xl overflow-hidden relative group"
               >
-                <div className="absolute top-0 right-0 p-6 text-white/[0.01] group-hover:text-white/[0.03] transition-colors">
+                <div className="absolute top-0 right-0 p-6 text-white/1 group-hover:text-white/3 transition-colors">
                   <IconUser size={100} />
                 </div>
                 <Title
@@ -387,7 +389,7 @@ const RequestDetailPage = () => {
                   <Avatar
                     size={72}
                     radius="24px"
-                    className="bg-gradient-to-br from-brand-red to-brand-dark-red border-2 border-white/10 font-black shadow-xl"
+                    className="bg-liner-to-br from-brand-red to-brand-dark-red border-2 border-white/10 font-black shadow-xl"
                   >
                     {request.user.name[0]}
                   </Avatar>
@@ -447,7 +449,7 @@ const RequestDetailPage = () => {
                 radius="40px"
                 className="glass-dark border border-white/10 shadow-2xl overflow-hidden relative group"
               >
-                <div className="absolute top-0 right-0 p-6 text-white/[0.01]">
+                <div className="absolute top-0 right-0 p-6 text-white/1">
                   <IconTools size={100} />
                 </div>
                 <Title
@@ -461,7 +463,7 @@ const RequestDetailPage = () => {
                   <Avatar
                     size={72}
                     radius="24px"
-                    className="bg-gradient-to-br from-blue-600 to-indigo-700 border-2 border-white/10 font-black shadow-xl"
+                    className="bg-linear-to-br from-blue-600 to-indigo-700 border-2 border-white/10 font-black shadow-xl"
                   >
                     {request.helper.name[0]}
                   </Avatar>

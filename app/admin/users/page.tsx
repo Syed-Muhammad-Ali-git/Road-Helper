@@ -90,7 +90,7 @@ const initialUsers = [
 ];
 
 const UsersPage = () => {
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded] = useState(true);
   const [opened, { open, close }] = useDisclosure(false);
   const [users, setUsers] = useState(initialUsers);
   const [search, setSearch] = useState("");
@@ -102,8 +102,6 @@ const UsersPage = () => {
     role: "",
     phone: "",
   });
-
-  useEffect(() => setIsLoaded(true), []);
 
   const handleAddUser = useCallback(async () => {
     if (!newUser.firstName || !newUser.email || !newUser.role) {

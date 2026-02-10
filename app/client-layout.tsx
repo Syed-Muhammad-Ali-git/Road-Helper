@@ -4,7 +4,7 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import PathChecker from "./utils/pathChecker";
-import { helperRoutes, customerRoutes, adminRoutes } from "./utils/routes";
+import { helperRoutes, customerRoutes, adminRoutes, publicRoutes } from "./utils/routes";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -33,13 +33,15 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
 
   // ----- DETERMINE IF SIDEBAR SHOULD BE SHOWN -----
   const showSidebar =
-    helperRoutes.includes(pathname) ||
-    customerRoutes.includes(pathname) ||
-    adminRoutes.includes(pathname) ||
-    pathname.startsWith("/helper") ||
-    pathname.startsWith("/customer") ||
-    pathname.startsWith("/admin") ||
-    pathname.startsWith("/journey/");
+    !publicRoutes.includes(pathname) && (
+      helperRoutes.includes(pathname) ||
+      customerRoutes.includes(pathname) ||
+      adminRoutes.includes(pathname) ||
+      pathname.startsWith("/helper") ||
+      pathname.startsWith("/customer") ||
+      pathname.startsWith("/admin") ||
+      pathname.startsWith("/journey/")
+    );
 
   const isAdmin = pathname?.includes("/admin");
 

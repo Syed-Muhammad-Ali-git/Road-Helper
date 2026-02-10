@@ -13,7 +13,7 @@ const helperItems = [
   { text: "Dashboard", icon: LayoutDashboard, path: "/helper/dashboard" },
   { text: "Requests", icon: List, path: "/helper/requests" },
   { text: "Earnings", icon: Wallet, path: "/helper/earnings" },
-  { text: "Profile", icon: User, path: "/helper/profile" },
+  { text: "Job List", icon: User, path: "/helper/active-job" },
 ];
 
 const HelperSideBar = ({ open, setOpen }: SideBarProps) => {
