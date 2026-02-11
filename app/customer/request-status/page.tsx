@@ -10,10 +10,7 @@ import {
   Group,
   Button,
   Badge,
-  Loader,
-  Avatar,
   ThemeIcon,
-  Timeline,
 } from "@mantine/core";
 import {
   IconArrowLeft,
@@ -26,6 +23,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { auth } from "@/lib/firebase/config";
 import { subscribeCustomerRequests } from "@/lib/services/requestService";
+import type { RideRequestDoc } from "@/types";
 
 /* ---------------- TYPES ---------------- */
 
@@ -35,14 +33,13 @@ interface Request {
   status: string;
   helperName: string | null;
   location: string;
-  createdAt?: any;
+  createdAt: Date | undefined;
 }
 
 /* ---------------- COMPONENT ---------------- */
 
 export default function RequestStatusList() {
   const [requests, setRequests] = useState<Request[]>([]);
-  const [loading, setLoading] = useState(true);
   const [uid, setUid] = useState<string | null>(null);
 
   useEffect(() => {
@@ -56,44 +53,32 @@ export default function RequestStatusList() {
       customerId: uid,
       cb: (reqs) => {
         setRequests(
-          reqs.map((r: any) => ({
+          reqs.map((r: RideRequestDoc & { id: string }) => ({
             id: r.id,
             serviceType: r.serviceType,
             status: r.status,
-            helperName: r.helperName ?? null,
+            helperName: r.customerName ?? null,
             location: r.location?.address ?? "Live location",
             createdAt: r.createdAt,
           })),
         );
-        setLoading(false);
       },
     });
     return () => unsub();
   }, [uid]);
 
   const toDateLabel = useMemo(() => {
-    return (createdAt: any) => {
-      const d =
-        createdAt?.toDate?.() instanceof Date
-          ? createdAt.toDate()
-          : createdAt instanceof Date
-            ? createdAt
-            : null;
-      if (!d) return "Just now";
-      return `${d.toLocaleDateString()} at ${d.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      })}`;
+    return (createdAt: Date | undefined): string => {
+      if (!createdAt || !(createdAt instanceof Date)) return "Just now";
+      return `${createdAt.toLocaleDateString()} at ${createdAt.toLocaleTimeString(
+        [],
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+        },
+      )}`;
     };
   }, []);
-
-  // if (loading) {
-  //   return (
-  //     <Box className="min-h-screen flex items-center justify-center bg-brand-black">
-  //       <Loader size="xl" color="red" />
-  //     </Box>
-  //   );
-  // }
 
   return (
     <Box className="min-h-screen p-4 md:p-8 bg-brand-black text-white">
@@ -111,7 +96,7 @@ export default function RequestStatusList() {
             </Button>
             <Title
               order={1}
-              className="font-manrope text-3xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent"
+              className="font-manrope text-3xl font-bold bg-linear-to-r from-white to-gray-400 bg-clip-text text-transparent"
             >
               My Requests
             </Title>

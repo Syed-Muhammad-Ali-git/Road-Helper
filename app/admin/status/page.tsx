@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, memo } from "react";
+import React, { memo } from "react";
 import {
   Title,
   Text,
@@ -21,17 +21,17 @@ import {
   IconShieldLock,
   IconCloudComputing,
   IconBolt,
-  IconAlertTriangle,
 } from "@tabler/icons-react";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion } from "framer-motion";
+import type { Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-const containerVariants: any = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
-const itemVariants: any = {
+const itemVariants: Variants = {
   hidden: { scale: 0.9, opacity: 0 },
   visible: {
     scale: 1,

@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import IntroOverlay from "@/components/landing/IntroOverlay";
 import LandingNavbar from "@/components/landing/LandingNavbar";

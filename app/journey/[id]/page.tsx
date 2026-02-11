@@ -31,6 +31,7 @@ import {
 import { getUserByUid } from "@/lib/services/userService";
 import { useLiveLocation } from "@/hooks/useLiveLocation";
 import type { RideRequestDoc } from "@/types";
+import type { AppUserRecord } from "@/lib/services/userService";
 
 function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
   const toRad = (v: number) => (v * Math.PI) / 180;
@@ -57,8 +58,8 @@ export default function JourneyPage() {
 
   const live = useLiveLocation();
   const [req, setReq] = useState<({ id: string } & RideRequestDoc) | null>(null);
-  const [customer, setCustomer] = useState<any>(null);
-  const [helper, setHelper] = useState<any>(null);
+  const [customer, setCustomer] = useState<({ id: string } & AppUserRecord) | null>(null);
+  const [helper, setHelper] = useState<({ id: string } & AppUserRecord) | null>(null);
 
   useEffect(() => {
     if (!requestId) return;

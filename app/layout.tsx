@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 import { SearchProvider } from "./context/searchContext";
 import { LayoutProvider } from "./context/layoutContext";
+import { LoadingProvider } from "./context/LoadingContext";
 import { ReduxProvider } from "@/components/providers/ReduxProvider";
 import { LanguageProvider } from "./context/LanguageContext";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -116,9 +117,11 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
             <ThemeProvider>
               <LanguageProvider>
                 <LayoutProvider>
-                  <SearchProvider>
-                    <ClientLayout>{children}</ClientLayout>
-                  </SearchProvider>
+                  <LoadingProvider>
+                    <SearchProvider>
+                      <ClientLayout>{children}</ClientLayout>
+                    </SearchProvider>
+                  </LoadingProvider>
                 </LayoutProvider>
               </LanguageProvider>
             </ThemeProvider>
