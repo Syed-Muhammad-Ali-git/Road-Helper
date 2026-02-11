@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { X, LogOut, LucideIcon } from "lucide-react";
 import Image from "next/image";
 import { useMediaQuery } from "@mantine/hooks";
+import { useLanguage } from "@/app/context/LanguageContext";
+import { useAppTheme } from "@/app/context/ThemeContext";
 
 interface MenuItem {
   text: string;
@@ -59,6 +61,8 @@ const SharedSidebarComponent = ({
   const router = useRouter();
   const dispatch = useAppDispatch();
   const isDesktop = useMediaQuery("(min-width: 900px)");
+  const { isRTL, dict } = useLanguage();
+  const { isDark } = useAppTheme();
 
   const handleLogout = useCallback(() => {
     clearAuthStorage();
@@ -112,23 +116,37 @@ const SharedSidebarComponent = ({
         variants={sidebarVariants}
         custom={isDesktop}
         className={cn(
-          "fixed top-0 left-0 h-full bg-brand-black border-r border-white/10 z-50 flex flex-col shadow-2xl overflow-hidden",
+          `fixed top-0 h-full z-50 flex flex-col shadow-2xl overflow-hidden border-r border-white/10 transition-all duration-300 ${
+            isDark ? "bg-brand-black" : "bg-white"
+          }`,
+          isRTL ? "right-0" : "left-0",
           !isDesktop && !open && "pointer-events-none",
         )}
       >
         {/* Header */}
-        <div className="h-20 flex items-center justify-between px-6 border-b border-white/5 min-w-[280px]">
+        <div
+          className={cn(
+            `h-20 flex items-center justify-between px-6 border-b transition-colors duration-300 min-w-[280px]`,
+            isDark ? "border-white/5" : "border-black/5",
+          )}
+        >
           <Link
             href="/"
             onClick={handleLogoClick}
-            className="flex items-center gap-3 no-underline group"
+            className={cn(
+              "flex items-center gap-3 no-underline group",
+              isRTL && "flex-row-reverse",
+            )}
           >
             <div className="relative w-8 h-8 bg-white rounded-lg p-1 shrink-0 group-hover:scale-105 transition-transform">
               <Image src={logoSrc} alt="Logo" fill className="object-contain" />
             </div>
             <motion.h1
               animate={{ opacity: open ? 1 : 0, x: open ? 0 : -20 }}
-              className="font-manrope font-bold text-xl text-white tracking-tight whitespace-nowrap group-hover:text-brand-red transition-colors"
+              className={cn(
+                `font-manrope font-bold text-xl tracking-tight whitespace-nowrap group-hover:text-brand-red transition-colors`,
+                isDark ? "text-white" : "text-black",
+              )}
             >
               {title}
             </motion.h1>
@@ -138,7 +156,12 @@ const SharedSidebarComponent = ({
               variant="ghost"
               size="icon"
               onClick={handleClose}
-              className="text-gray-400 hover:text-white hover:bg-white/5"
+              className={cn(
+                `transition-colors`,
+                isDark
+                  ? "text-gray-400 hover:text-white hover:bg-white/5"
+                  : "text-gray-600 hover:text-black hover:bg-black/5",
+              )}
             >
               <X size={20} />
             </Button>
@@ -146,7 +169,7 @@ const SharedSidebarComponent = ({
         </div>
 
         {/* Menu Items */}
-        <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-2">
+        <nav className={cn("flex-1 overflow-y-auto py-6 px-3 space-y-2")}>
           {menuItems.map((item) => {
             const isActive =
               pathname === item.path || pathname.startsWith(`${item.path}/`);
@@ -156,22 +179,36 @@ const SharedSidebarComponent = ({
                 href={item.path}
                 onClick={handleClose}
                 className={cn(
-                  "flex items-center gap-4 px-3.5 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden border",
+                  `flex items-center gap-4 px-3.5 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden border`,
+                  isRTL && "flex-row-reverse",
                   isActive
-                    ? "bg-brand-red/15 border-brand-red/40 text-white shadow-lg shadow-brand-red/10"
-                    : "border-transparent text-gray-400 hover:text-white hover:bg-white/5 hover:border-white/10",
+                    ? isDark
+                      ? "bg-brand-red/15 border-brand-red/40 text-white shadow-lg shadow-brand-red/10"
+                      : "bg-brand-red/10 border-brand-red/30 text-brand-red shadow-lg shadow-brand-red/5"
+                    : isDark
+                      ? "border-transparent text-gray-400 hover:text-white hover:bg-white/5 hover:border-white/10"
+                      : "border-transparent text-gray-600 hover:text-black hover:bg-black/5 hover:border-black/10",
                 )}
               >
                 {isActive && (
-                  <span className="absolute left-0 top-0 bottom-0 w-1 bg-brand-red rounded-r-full" />
+                  <span
+                    className={cn(
+                      `top-0 bottom-0 w-1 bg-brand-red rounded-r-full absolute`,
+                      isRTL ? "left-0" : "left-0",
+                    )}
+                  />
                 )}
                 <item.icon
                   size={22}
                   className={cn(
                     "transition-colors shrink-0",
                     isActive
-                      ? "text-white"
-                      : "text-gray-400 group-hover:text-white",
+                      ? isDark
+                        ? "text-white"
+                        : "text-brand-red"
+                      : isDark
+                        ? "text-gray-400 group-hover:text-white"
+                        : "text-gray-600 group-hover:text-black",
                   )}
                 />
                 <motion.span
@@ -182,7 +219,14 @@ const SharedSidebarComponent = ({
                 </motion.span>
 
                 {!isActive && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div
+                    className={cn(
+                      `absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity`,
+                      isDark
+                        ? "bg-gradient-to-r from-white/5 to-transparent"
+                        : "bg-gradient-to-r from-black/5 to-transparent",
+                    )}
+                  />
                 )}
               </Link>
             );
@@ -190,12 +234,21 @@ const SharedSidebarComponent = ({
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-white/5 min-w-[280px]">
+        <div
+          className={cn(
+            `p-4 border-t min-w-[280px] transition-colors duration-300`,
+            isDark ? "border-white/5" : "border-black/5",
+          )}
+        >
           <Button
             variant="ghost"
             onClick={handleLogout}
             className={cn(
-              "w-full justify-start text-gray-400 hover:text-red-500 hover:bg-red-500/10 gap-4 px-3.5 h-12 transition-all cursor-pointer",
+              `w-full justify-start gap-4 px-3.5 h-12 transition-all cursor-pointer rounded-xl`,
+              isRTL && "flex-row-reverse",
+              isDark
+                ? "text-gray-400 hover:text-red-500 hover:bg-red-500/10"
+                : "text-gray-600 hover:text-red-600 hover:bg-red-600/10",
               !open && "px-3",
             )}
           >
@@ -204,7 +257,7 @@ const SharedSidebarComponent = ({
               animate={{ opacity: open ? 1 : 0 }}
               className="font-medium whitespace-nowrap"
             >
-              Logout
+              {dict.sidebar.logout}
             </motion.span>
           </Button>
         </div>

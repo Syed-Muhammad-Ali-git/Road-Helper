@@ -1,29 +1,51 @@
 "use client";
 
-import React, { memo } from "react";
+import React, { memo, useMemo } from "react";
 import SharedSidebar from "@/components/SharedSidebar";
 import { LayoutDashboard, History, HelpCircle } from "lucide-react";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 interface SideBarProps {
   open: boolean;
   setOpen: (open: boolean) => void;
 }
 
-const customerItems = [
-  { text: "Dashboard", icon: LayoutDashboard, path: "/customer/dashboard" },
-  { text: "History", icon: History, path: "/customer/history" },
-  { text: "Help", icon: HelpCircle, path: "/customer/request-help" },
-  { text: "My Requests", icon: HelpCircle, path: "/customer/request-status" },
-];
-
 const CustomerSideBar = ({ open, setOpen }: SideBarProps) => {
+  const { dict } = useLanguage();
+
+  const customerItems = useMemo(
+    () => [
+      {
+        text: dict.sidebar.dashboard,
+        icon: LayoutDashboard,
+        path: "/customer/dashboard",
+      },
+      {
+        text: dict.sidebar.history,
+        icon: History,
+        path: "/customer/history",
+      },
+      {
+        text: dict.sidebar.help,
+        icon: HelpCircle,
+        path: "/customer/request-help",
+      },
+      {
+        text: dict.sidebar.my_requests,
+        icon: HelpCircle,
+        path: "/customer/request-status",
+      },
+    ],
+    [dict],
+  );
+
   return (
     <SharedSidebar
       open={open}
       setOpen={setOpen}
       menuItems={customerItems}
       logoSrc="/assets/images/logo.png"
-      title="Customer"
+      title={dict.sidebar.dashboard}
     />
   );
 };

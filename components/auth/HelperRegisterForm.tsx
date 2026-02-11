@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/app/context/LanguageContext";
+import { useAppTheme } from "@/app/context/ThemeContext";
 import { Eye, EyeOff, Mail, User, Lock, Phone, CreditCard } from "lucide-react";
 import { MultiSelect, Stack } from "@mantine/core";
 import { motion } from "framer-motion";
@@ -41,11 +42,68 @@ const SERVICE_OPTIONS = [
   { value: "lockout", label: "🔑 Lockout Service" },
 ] as const;
 
+const FormField = React.memo(
+  ({
+    label,
+    error,
+    icon: Icon,
+    children,
+    isDark,
+    isRTL,
+  }: {
+    label: string;
+    error?: string;
+    icon: React.ComponentType<{ size: number; className?: string }>;
+    children: React.ReactNode;
+    isDark: boolean;
+    isRTL: boolean;
+  }) => (
+    <motion.div
+      className={cn("space-y-2", isRTL && "text-right")}
+      initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Label
+        className={cn(
+          "text-sm font-semibold",
+          isDark ? "text-gray-300" : "text-gray-700"
+        )}
+      >
+        {label}
+      </Label>
+      <div className="relative">
+        <Icon
+          className={cn(
+            "absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none",
+            isDark ? "text-gray-500" : "text-gray-400"
+          )}
+          size={18}
+        />
+        {children}
+      </div>
+      {error && (
+        <p
+          className={cn(
+            "text-sm font-medium",
+            isDark ? "text-red-400" : "text-red-600"
+          )}
+        >
+          {error}
+        </p>
+      )}
+    </motion.div>
+  )
+);
+
+FormField.displayName = "FormField";
+
 export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
   isLoading,
   onSubmit,
 }) => {
   const { dict, isRTL } = useLanguage();
+  const { isDark } = useAppTheme();
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -72,94 +130,76 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
 
   const serviceOptions = useMemo(() => SERVICE_OPTIONS, []);
 
+  const inputClassName = (hasError?: boolean) =>
+    cn(
+      "pl-10 transition-all duration-300",
+      isDark
+        ? "bg-black/40 border-gray-700 text-white placeholder:text-gray-500 focus:border-brand-yellow focus:bg-black/60"
+        : "bg-white/80 border-gray-300 text-black placeholder:text-gray-400 focus:border-brand-yellow focus:bg-white",
+      hasError && (isDark ? "border-red-500" : "border-red-500")
+    );
+
   return (
     <motion.form
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
       onSubmit={handleSubmit(handleFormSubmit)}
-      className="space-y-4"
+      className={cn("space-y-4", isRTL && "text-right")}
     >
       {/* Full Name */}
-      <div className={`space-y-2 ${isRTL ? "text-right" : ""}`}>
-        <Label className="text-gray-300">{dict.auth.full_name}</Label>
-        <div className="relative">
-          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
-          <Input
-            {...register("fullName")}
-            placeholder={dict.auth.full_name}
-            className={cn(
-              "pl-10 bg-black/40 border-gray-700 text-white placeholder:text-gray-500",
-              errors.fullName && "border-red-500"
-            )}
-          />
-        </div>
-        {errors.fullName && (
-          <p className="text-red-400 text-sm">{errors.fullName.message}</p>
-        )}
-      </div>
+      <FormField label={dict.auth.full_name} icon={User} isDark={isDark} isRTL={isRTL} error={errors.fullName?.message}>
+        <Input
+          {...register("fullName")}
+          placeholder={dict.auth.full_name}
+          className={inputClassName(!!errors.fullName)}
+        />
+      </FormField>
 
       {/* Email */}
-      <div className={`space-y-2 ${isRTL ? "text-right" : ""}`}>
-        <Label className="text-gray-300">{dict.auth.email_address}</Label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
-          <Input
-            {...register("email")}
-            type="email"
-            placeholder={dict.auth.email_address}
-            className={cn(
-              "pl-10 bg-black/40 border-gray-700 text-white placeholder:text-gray-500",
-              errors.email && "border-red-500"
-            )}
-          />
-        </div>
-        {errors.email && (
-          <p className="text-red-400 text-sm">{errors.email.message}</p>
-        )}
-      </div>
+      <FormField label={dict.auth.email_address} icon={Mail} isDark={isDark} isRTL={isRTL} error={errors.email?.message}>
+        <Input
+          {...register("email")}
+          type="email"
+          placeholder={dict.auth.email_address}
+          className={inputClassName(!!errors.email)}
+        />
+      </FormField>
 
       {/* Phone */}
-      <div className={`space-y-2 ${isRTL ? "text-right" : ""}`}>
-        <Label className="text-gray-300">{dict.auth.phone_number}</Label>
-        <div className="relative">
-          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
-          <Input
-            {...register("phone")}
-            type="tel"
-            placeholder={dict.auth.phone_number}
-            className={cn(
-              "pl-10 bg-black/40 border-gray-700 text-white placeholder:text-gray-500",
-              errors.phone && "border-red-500"
-            )}
-          />
-        </div>
-        {errors.phone && (
-          <p className="text-red-400 text-sm">{errors.phone.message}</p>
-        )}
-      </div>
+      <FormField label={dict.auth.phone_number} icon={Phone} isDark={isDark} isRTL={isRTL} error={errors.phone?.message}>
+        <Input
+          {...register("phone")}
+          type="tel"
+          placeholder={dict.auth.phone_number}
+          className={inputClassName(!!errors.phone)}
+        />
+      </FormField>
 
       {/* CNIC */}
-      <div className={`space-y-2 ${isRTL ? "text-right" : ""}`}>
-        <Label className="text-gray-300">{dict.auth.cnic_number}</Label>
-        <div className="relative">
-          <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
-          <Input
-            {...register("cnic")}
-            placeholder={dict.auth.cnic_number}
-            className={cn(
-              "pl-10 bg-black/40 border-gray-700 text-white placeholder:text-gray-500",
-              errors.cnic && "border-red-500"
-            )}
-          />
-        </div>
-        {errors.cnic && (
-          <p className="text-red-400 text-sm">{errors.cnic.message}</p>
-        )}
-      </div>
+      <FormField label={dict.auth.cnic_number} icon={CreditCard} isDark={isDark} isRTL={isRTL} error={errors.cnic?.message}>
+        <Input
+          {...register("cnic")}
+          placeholder={dict.auth.cnic_number}
+          className={inputClassName(!!errors.cnic)}
+        />
+      </FormField>
 
       {/* Services */}
-      <div className={`space-y-2 ${isRTL ? "text-right" : ""}`}>
-        <Label className="text-gray-300">{dict.auth.service_types}</Label>
+      <motion.div
+        className={cn("space-y-2", isRTL && "text-right")}
+        initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Label
+          className={cn(
+            "text-sm font-semibold",
+            isDark ? "text-gray-300" : "text-gray-700"
+          )}
+        >
+          {dict.auth.service_types}
+        </Label>
         <Controller
           control={control}
           name="services"
@@ -173,49 +213,95 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
               className="rounded-lg"
               styles={{
                 input: {
-                  backgroundColor: "rgba(0,0,0,0.4)",
-                  borderColor: "rgba(255,255,255,0.1)",
-                  color: "white",
+                  backgroundColor: isDark ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.8)",
+                  borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+                  color: isDark ? "white" : "black",
                 },
                 dropdown: {
-                  backgroundColor: "rgba(10,10,10,0.95)",
-                  borderColor: "rgba(255,255,255,0.1)",
+                  backgroundColor: isDark ? "rgba(10,10,10,0.95)" : "rgba(255,255,255,0.95)",
+                  borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+                },
+                option: {
+                  color: isDark ? "white" : "black",
+                  "&:hover": {
+                    backgroundColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
+                  },
                 },
               }}
             />
           )}
         />
         {errors.services && (
-          <p className="text-red-400 text-sm">{errors.services.message}</p>
+          <p
+            className={cn(
+              "text-sm font-medium",
+              isDark ? "text-red-400" : "text-red-600"
+            )}
+          >
+            {errors.services.message}
+          </p>
         )}
-      </div>
+      </motion.div>
 
       {/* Password */}
-      <div className={`space-y-2 ${isRTL ? "text-right" : ""}`}>
-        <Label className="text-gray-300">{dict.auth.password}</Label>
+      <motion.div
+        className={cn("space-y-2", isRTL && "text-right")}
+        initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Label
+          className={cn(
+            "text-sm font-semibold",
+            isDark ? "text-gray-300" : "text-gray-700"
+          )}
+        >
+          {dict.auth.password}
+        </Label>
         <div className="relative">
-          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
+          <Lock
+            className={cn(
+              "absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none",
+              isDark ? "text-gray-500" : "text-gray-400"
+            )}
+            size={18}
+          />
           <Input
             {...register("password")}
             type={showPassword ? "text" : "password"}
             placeholder={dict.auth.password}
             className={cn(
-              "pl-10 pr-10 bg-black/40 border-gray-700 text-white placeholder:text-gray-500",
-              errors.password && "border-red-500"
+              "pl-10 pr-10 transition-all duration-300",
+              isDark
+                ? "bg-black/40 border-gray-700 text-white placeholder:text-gray-500 focus:border-brand-yellow focus:bg-black/60"
+                : "bg-white/80 border-gray-300 text-black placeholder:text-gray-400 focus:border-brand-yellow focus:bg-white",
+              errors.password && (isDark ? "border-red-500" : "border-red-500")
             )}
           />
           <button
             type="button"
             onClick={onPasswordToggle}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-300"
+            className={cn(
+              "absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors",
+              isDark
+                ? "text-gray-500 hover:text-gray-300"
+                : "text-gray-500 hover:text-gray-700"
+            )}
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
         {errors.password && (
-          <p className="text-red-400 text-sm">{errors.password.message}</p>
+          <p
+            className={cn(
+              "text-sm font-medium",
+              isDark ? "text-red-400" : "text-red-600"
+            )}
+          >
+            {errors.password.message}
+          </p>
         )}
-      </div>
+      </motion.div>
 
       {/* Submit Button */}
       <Button

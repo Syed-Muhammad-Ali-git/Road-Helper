@@ -145,5 +145,31 @@
     "verified": "Verified",
     "fast": "Fast",
     "already_have_account": "Already have an account?"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "history": "History",
+    "help": "Help",
+    "my_requests": "My Requests",
+    "active_jobs": "Active Jobs",
+    "earnings": "Earnings",
+    "profile": "Profile",
+    "requests": "Requests",
+    "users": "Users",
+    "settings": "Settings",
+    "status": "Status",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "welcome": "Welcome",
+    "customer_dashboard": "Customer Dashboard",
+    "helper_dashboard": "Helper Dashboard",
+    "admin_dashboard": "Admin Dashboard",
+    "request_help": "Request Help",
+    "track_rescuers": "Track Rescuers",
+    "view_all": "View All",
+    "active_requests": "Active Requests",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
   }
 }

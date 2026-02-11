@@ -38,9 +38,12 @@ const LiveMap = dynamic(() => import("@/components/map/LiveMap"), {
 });
 
 // Background assets (using standard paths)
-const avatar1 = "/assets/images/avatars/avatar-1.jpg";
-const avatar5 = "/assets/images/avatars/avatar-5.jpg";
-const avatar6 = "/assets/images/avatars/avatar-6.jpg";
+// Placeholder avatars - using Mantine Avatar with initials instead
+const avatars = [
+  { name: "John Smith", initials: "JS", color: "blue" },
+  { name: "Sarah Johnson", initials: "SJ", color: "green" },
+  { name: "Mike Brown", initials: "MB", color: "orange" },
+];
 
 const serviceCategories = [
   {
@@ -326,24 +329,17 @@ const ClientDashboard = () => {
 
                 <Group justify="space-between">
                   <Avatar.Group spacing="lg">
-                    <Avatar
-                      src={avatar1}
-                      radius="xl"
-                      size="lg"
-                      className="border-2 border-brand-black"
-                    />
-                    <Avatar
-                      src={avatar5}
-                      radius="xl"
-                      size="lg"
-                      className="border-2 border-brand-black"
-                    />
-                    <Avatar
-                      src={avatar6}
-                      radius="xl"
-                      size="lg"
-                      className="border-2 border-brand-black"
-                    />
+                    {avatars.map((avatar, idx) => (
+                      <Avatar
+                        key={idx}
+                        radius="xl"
+                        size="lg"
+                        color={avatar.color}
+                        className="border-2 border-brand-black"
+                      >
+                        {avatar.initials}
+                      </Avatar>
+                    ))}
                     <Avatar
                       radius="xl"
                       size="lg"

@@ -9,6 +9,8 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import { useLanguage } from "@/app/context/LanguageContext";
+
 /* ---------------- INTERFACES ---------------- */
 interface ClientLayoutProps {
   children: ReactNode;
@@ -21,6 +23,7 @@ const drawerWidth = 280;
 const ClientLayout = ({ children }: ClientLayoutProps) => {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { isRTL } = useLanguage();
 
   // ----- MEDIA QUERY FOR DESKTOP VIEW -----
   // Using 900px breakpoint to match MUI default for 'md'
@@ -47,14 +50,21 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
 
   // ----- DYNAMIC STYLING FOR THE MAIN CONTENT -----
   const mainStyle: React.CSSProperties = {
-    transition: "margin-left 225ms cubic-bezier(0.4, 0, 0.6, 1) 0ms",
-    marginLeft: !showSidebar
+    transition: isRTL ? "margin-right 225ms cubic-bezier(0.4, 0, 0.6, 1) 0ms" : "margin-left 225ms cubic-bezier(0.4, 0, 0.6, 1) 0ms",
+    marginLeft: isRTL ? 0 : !showSidebar
       ? 0
       : !isDesktop
         ? 0 // Mobile: No margin, sidebar overlays
         : drawerOpen
           ? `${drawerWidth}px` // Desktop Open
           : "70px", // Desktop Collapsed
+    marginRight: isRTL ? !showSidebar
+      ? 0
+      : !isDesktop
+        ? 0 // Mobile: No margin, sidebar overlays
+        : drawerOpen
+          ? `${drawerWidth}px` // Desktop Open
+          : "70px" : 0,
     paddingTop: showSidebar && !isAdmin ? "70px" : "0",
   };
 
@@ -80,7 +90,7 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
         setOpen={setDrawerOpen}
       />
       {/* MAIN CONTENT */}
-      <main style={mainStyle}>{children}</main>
+      <main style={mainStyle} dir={isRTL ? "rtl" : "ltr"}>{children}</main>
     </>
   );
 };

@@ -32,6 +32,7 @@ import {
   ArrowLeft, // Added ArrowLeft for RTL support
 } from "lucide-react";
 import { useLanguage } from "@/app/context/LanguageContext"; // Import useLanguage
+import { useAppTheme } from "@/app/context/ThemeContext"; // Import useAppTheme
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -42,6 +43,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const { dict, isRTL } = useLanguage(); // Use language hook
+  const { isDark } = useAppTheme(); // Use theme hook
   const [loginType, setLoginType] = useState<"customer" | "helper">("customer");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -134,7 +136,11 @@ export default function LoginPage() {
 
   return (
     <div
-      className={`min-h-screen flex bg-gradient-to-br from-black via-brand-black to-black font-satoshi text-white overflow-hidden relative ${isRTL ? "font-urdu" : "font-satoshi"}`}
+      className={cn(
+        "min-h-screen flex font-satoshi overflow-hidden relative",
+        isDark ? "bg-gradient-to-br from-black via-brand-black to-black text-white" : "bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900",
+        isRTL ? "font-urdu" : "font-satoshi"
+      )}
     >
       {/* Animated Background Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -164,30 +170,34 @@ export default function LoginPage() {
       </div>
 
       {/* Gradient Orbs */}
-      <motion.div
-        animate={{
-          scale: [1, 1.2, 1],
-          rotate: [0, 180, 360],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "linear",
-        }}
-        className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-brand-red/20 blur-[150px] rounded-full"
-      />
-      <motion.div
-        animate={{
-          scale: [1, 1.3, 1],
-          rotate: [360, 180, 0],
-        }}
-        transition={{
-          duration: 25,
-          repeat: Infinity,
-          ease: "linear",
-        }}
-        className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-600/20 blur-[150px] rounded-full"
-      />
+      {isDark && (
+        <>
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 180, 360],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+            className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-brand-red/20 blur-[150px] rounded-full"
+          />
+          <motion.div
+            animate={{
+              scale: [1, 1.3, 1],
+              rotate: [360, 180, 0],
+            }}
+            transition={{
+              duration: 25,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+            className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-600/20 blur-[150px] rounded-full"
+          />
+        </>
+      )}
 
       {/* Left Side - Premium Image */}
       <motion.div
@@ -364,10 +374,10 @@ export default function LoginPage() {
                 </motion.div>
               </div>
             </motion.div>
-            <h2 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            <h2 className={cn("text-4xl font-bold mb-2 bg-clip-text text-transparent", isDark ? "bg-gradient-to-r from-white to-gray-400" : "bg-gradient-to-r from-gray-900 to-gray-600")}>
               {dict.auth.welcome_back}
             </h2>
-            <p className="text-gray-400 text-lg">
+            <p className={cn("text-lg", isDark ? "text-gray-400" : "text-gray-600")}>
               {dict.auth.sign_in_continue}
             </p>
           </motion.div>
@@ -438,7 +448,7 @@ export default function LoginPage() {
               transition={{ delay: 0.3 }}
               className="space-y-2"
             >
-              <Label className="text-gray-300 text-xs uppercase tracking-wider font-bold flex items-center gap-2">
+              <Label className={cn("text-xs uppercase tracking-wider font-bold flex items-center gap-2", isDark ? "text-gray-300" : "text-gray-700")}>
                 <Mail size={14} className="text-brand-red" />
                 {dict.auth.email_address}
               </Label>
@@ -451,7 +461,12 @@ export default function LoginPage() {
                 />
                 <Input
                   {...register("email")}
-                  className={`${isRTL ? "pr-12" : "pl-12"} h-14 bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red rounded-xl transition-all hover:bg-white/10 hover:border-brand-red/50`}
+                  className={cn(
+                    `${isRTL ? "pr-12" : "pl-12"} h-14 border-2 backdrop-blur-xl rounded-xl transition-all focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red`,
+                    isDark
+                      ? "bg-white/5 border-white/10 text-white focus:bg-white/10 hover:bg-white/10 hover:border-brand-red/50"
+                      : "bg-white border-gray-300 text-black placeholder:text-gray-400 focus:bg-gray-50 hover:bg-gray-50 hover:border-brand-red/30"
+                  )}
                   placeholder="name@example.com"
                   dir="ltr" // Email is usually LTR
                 />
@@ -474,7 +489,7 @@ export default function LoginPage() {
               transition={{ delay: 0.4 }}
               className="space-y-2"
             >
-              <Label className="text-gray-300 text-xs uppercase tracking-wider font-bold flex items-center gap-2">
+              <Label className={cn("text-xs uppercase tracking-wider font-bold flex items-center gap-2", isDark ? "text-gray-300" : "text-gray-700")}>
                 <Lock size={14} className="text-brand-red" />
                 {dict.auth.password}
               </Label>
@@ -488,7 +503,12 @@ export default function LoginPage() {
                 <Input
                   {...register("password")}
                   type={showPassword ? "text" : "password"}
-                  className={`${isRTL ? "pr-12 pl-12" : "pl-12 pr-12"} h-14 bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red rounded-xl transition-all hover:bg-white/10 hover:border-brand-red/50`}
+                  className={cn(
+                    `${isRTL ? "pr-12 pl-12" : "pl-12 pr-12"} h-14 border-2 backdrop-blur-xl rounded-xl transition-all focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red`,
+                    isDark
+                      ? "bg-white/5 border-white/10 text-white focus:bg-white/10 hover:bg-white/10 hover:border-brand-red/50"
+                      : "bg-white border-gray-300 text-black placeholder:text-gray-400 focus:bg-gray-50 hover:bg-gray-50 hover:border-brand-red/30"
+                  )}
                   placeholder="••••••••"
                   dir="ltr"
                 />
@@ -533,7 +553,12 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-16 text-lg font-bold bg-gradient-to-r from-brand-red via-brand-dark-red to-brand-red bg-size-200 bg-pos-0 hover:bg-pos-100 hover:shadow-2xl hover:shadow-brand-red/50 transition-all duration-500 rounded-xl mt-4 group relative overflow-hidden border-2 border-brand-red/50 hover:border-brand-red cursor-pointer"
+                className={cn(
+                  "w-full h-16 text-lg font-bold rounded-xl mt-4 group relative overflow-hidden border-2 transition-all duration-500 cursor-pointer",
+                  isDark
+                    ? "bg-gradient-to-r from-brand-red via-brand-dark-red to-brand-red hover:shadow-2xl hover:shadow-brand-red/50 border-brand-red/50 hover:border-brand-red"
+                    : "bg-gradient-to-r from-brand-red via-orange-600 to-brand-red hover:shadow-2xl hover:shadow-red-500/30 border-brand-red hover:border-brand-red"
+                )}
                 style={{ backgroundSize: "200% 100%" }}
               >
                 <motion.div

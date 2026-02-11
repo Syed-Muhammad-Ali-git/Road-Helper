@@ -12,6 +12,7 @@ import {
 import { SearchProvider } from "./context/searchContext";
 import { LayoutProvider } from "./context/layoutContext";
 import { LoadingProvider } from "./context/LoadingContext";
+import { GlobalLoaderProvider } from "./context/GlobalLoaderContext";
 import { ReduxProvider } from "@/components/providers/ReduxProvider";
 import { LanguageProvider } from "./context/LanguageContext";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -118,9 +119,11 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
               <LanguageProvider>
                 <LayoutProvider>
                   <LoadingProvider>
-                    <SearchProvider>
-                      <ClientLayout>{children}</ClientLayout>
-                    </SearchProvider>
+                    <GlobalLoaderProvider>
+                      <SearchProvider>
+                        <ClientLayout>{children}</ClientLayout>
+                      </SearchProvider>
+                    </GlobalLoaderProvider>
                   </LoadingProvider>
                 </LayoutProvider>
               </LanguageProvider>

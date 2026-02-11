@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/app/context/LanguageContext";
+import { useAppTheme } from "@/app/context/ThemeContext";
 import { Eye, EyeOff, Mail, User, Lock, Phone } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -34,6 +35,8 @@ const FormField = React.memo(
     type = "text",
     showPassword,
     onPasswordToggle,
+    isDark,
+    isRTL,
     ...inputProps
   }: {
     label: string;
@@ -43,33 +46,71 @@ const FormField = React.memo(
     type?: string;
     showPassword?: boolean;
     onPasswordToggle?: () => void;
+    isDark: boolean;
+    isRTL: boolean;
     [key: string]: any;
   }) => (
-    <div className="space-y-2">
-      <Label className="text-gray-300">{label}</Label>
+    <motion.div
+      className="space-y-2"
+      initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Label
+        className={cn(
+          "text-sm font-semibold",
+          isDark ? "text-gray-300" : "text-gray-700"
+        )}
+      >
+        {label}
+      </Label>
       <div className="relative">
-        <Icon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
+        <Icon
+          className={cn(
+            "absolute left-3 top-1/2 transform -translate-y-1/2",
+            isDark ? "text-gray-500" : "text-gray-400",
+            "pointer-events-none"
+          )}
+          size={18}
+        />
         <Input
           {...inputProps}
           type={showPassword && type === "password" ? "text" : type}
           className={cn(
-            "pl-10 bg-black/40 border-gray-700 text-white placeholder:text-gray-500",
+            "pl-10 transition-all duration-300",
             type === "password" && "pr-10",
-            error && "border-red-500"
+            isDark
+              ? "bg-black/40 border-gray-700 text-white placeholder:text-gray-500 focus:border-brand-yellow focus:bg-black/60"
+              : "bg-white/80 border-gray-300 text-black placeholder:text-gray-400 focus:border-brand-yellow focus:bg-white",
+            error && (isDark ? "border-red-500" : "border-red-500")
           )}
         />
         {type === "password" && onPasswordToggle && (
           <button
             type="button"
             onClick={onPasswordToggle}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-300"
+            className={cn(
+              "absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors",
+              isDark
+                ? "text-gray-500 hover:text-gray-300"
+                : "text-gray-500 hover:text-gray-700"
+            )}
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         )}
       </div>
-      {error && <p className="text-red-400 text-sm">{error}</p>}
-    </div>
+      {error && (
+        <p
+          className={cn(
+            "text-sm font-medium",
+            isDark ? "text-red-400" : "text-red-600"
+          )}
+        >
+          {error}
+        </p>
+      )}
+    </motion.div>
   )
 );
 
@@ -80,6 +121,7 @@ export const CustomerRegisterForm: React.FC<CustomerRegisterFormProps> = ({
   onSubmit,
 }) => {
   const { dict, isRTL } = useLanguage();
+  const { isDark } = useAppTheme();
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -102,18 +144,37 @@ export const CustomerRegisterForm: React.FC<CustomerRegisterFormProps> = ({
     []
   );
 
-  const formFields = useMemo(() => [
-    { field: "fullName", label: dict.auth.full_name, icon: User, type: "text" },
-    { field: "email", label: dict.auth.email_address, icon: Mail, type: "email" },
-    { field: "phone", label: dict.auth.phone_number, icon: Phone, type: "tel" },
-  ], [dict]);
+  const formFields = useMemo(
+    () => [
+      {
+        field: "fullName",
+        label: dict.auth.full_name,
+        icon: User,
+        type: "text",
+      },
+      {
+        field: "email",
+        label: dict.auth.email_address,
+        icon: Mail,
+        type: "email",
+      },
+      {
+        field: "phone",
+        label: dict.auth.phone_number,
+        icon: Phone,
+        type: "tel",
+      },
+    ],
+    [dict]
+  );
 
   return (
     <motion.form
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
       onSubmit={handleSubmit(handleFormSubmit)}
-      className="space-y-4"
+      className={cn("space-y-4", isRTL && "text-right")}
     >
       {formFields.map((config) => (
         <FormField
@@ -121,9 +182,11 @@ export const CustomerRegisterForm: React.FC<CustomerRegisterFormProps> = ({
           label={config.label}
           icon={config.icon}
           type={config.type}
+          error={(errors as any)[config.field]?.message}
+          isDark={isDark}
+          isRTL={isRTL}
+          {...register(config.field as any)}
           placeholder={config.label}
-          error={errors[config.field as keyof typeof errors]?.message}
-          {...register(config.field as keyof CustomerFormData)}
         />
       ))}
 
@@ -136,6 +199,8 @@ export const CustomerRegisterForm: React.FC<CustomerRegisterFormProps> = ({
         showPassword={showPassword}
         onPasswordToggle={onPasswordToggle}
         error={errors.password?.message}
+        isDark={isDark}
+        isRTL={isRTL}
         {...register("password")}
       />
 

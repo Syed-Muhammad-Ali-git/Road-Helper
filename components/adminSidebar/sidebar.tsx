@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo } from "react";
+import React, { memo, useMemo } from "react";
 import SharedSidebar from "@/components/SharedSidebar";
 import {
   LayoutDashboard,
@@ -9,21 +9,39 @@ import {
   Activity,
   Settings,
 } from "lucide-react";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 interface SideBarProps {
   open: boolean;
   setOpen: (open: boolean) => void;
 }
 
-const adminItems = [
-  { text: "Overview", icon: LayoutDashboard, path: "/admin/dashboard" },
-  { text: "Users", icon: Users, path: "/admin/users" },
-  { text: "Requests", icon: Receipt, path: "/admin/requests" },
-  { text: "Status", icon: Activity, path: "/admin/status" },
-  { text: "Settings", icon: Settings, path: "/admin/settings" },
-];
-
 const AdminSideBar = ({ open, setOpen }: SideBarProps) => {
+  const { dict } = useLanguage();
+
+  const adminItems = useMemo(
+    () => [
+      {
+        text: dict.sidebar.dashboard,
+        icon: LayoutDashboard,
+        path: "/admin/dashboard",
+      },
+      { text: dict.sidebar.users, icon: Users, path: "/admin/users" },
+      {
+        text: dict.sidebar.requests,
+        icon: Receipt,
+        path: "/admin/requests",
+      },
+      { text: dict.sidebar.status, icon: Activity, path: "/admin/status" },
+      {
+        text: dict.sidebar.settings,
+        icon: Settings,
+        path: "/admin/settings",
+      },
+    ],
+    [dict],
+  );
+
   return (
     <SharedSidebar
       open={open}
