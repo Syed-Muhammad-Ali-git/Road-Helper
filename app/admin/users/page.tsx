@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import {
   Title,
   Text,
@@ -40,58 +40,23 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { showSuccess, showError, showConfirm } from "@/lib/sweetalert";
 import { cn } from "@/lib/utils";
+import { useAppTheme } from "@/app/context/ThemeContext";
+import { getAllUsers } from "@/lib/services/userService";
+import type { AppUserRecord } from "@/lib/services/userService";
 
-const initialUsers = [
-  {
-    id: 1,
-    name: "Ali Raza",
-    email: "ali@gmail.com",
-    role: "Customer",
-    phone: "+92 300 1234567",
-    status: "Active",
-    lastActive: "2 mins ago",
-  },
-  {
-    id: 2,
-    name: "Ahmed Khan",
-    email: "ahmed@helper.com",
-    role: "Helper",
-    phone: "+92 321 7654321",
-    status: "Active",
-    lastActive: "1 hour ago",
-  },
-  {
-    id: 3,
-    name: "Sara Smith",
-    email: "sara@gmail.com",
-    role: "Customer",
-    phone: "+92 333 9876543",
-    status: "Inactive",
-    lastActive: "3 days ago",
-  },
-  {
-    id: 4,
-    name: "Mike T.",
-    email: "mike@mechanic.com",
-    role: "Helper",
-    phone: "+92 301 1122334",
-    status: "Suspended",
-    lastActive: "1 week ago",
-  },
-  {
-    id: 5,
-    name: "John Doe",
-    email: "john@doe.com",
-    role: "Customer",
-    phone: "+92 345 6789012",
-    status: "Active",
-    lastActive: "5 mins ago",
-  },
-];
+type AdminUserRow = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  phone: string;
+  status: string;
+  lastActive: string;
+};
 
 const UsersPage = () => {
   const [opened, { open, close }] = useDisclosure(false);
-  const [users, setUsers] = useState(initialUsers);
+  const [users, setUsers] = useState<AdminUserRow[]>([]);
   const [search, setSearch] = useState("");
   const [newUser, setNewUser] = useState({
     firstName: "",
@@ -101,35 +66,56 @@ const UsersPage = () => {
     phone: "",
   });
 
-  const handleAddUser = useCallback(async () => {
-    if (!newUser.firstName || !newUser.email || !newUser.role) {
-      await showError("Validation", "Please fill in all required fields.");
-      return;
-    }
-    const userToAdd = {
-      id: users.length + 1,
-      name: `${newUser.firstName} ${newUser.lastName}`,
-      email: newUser.email,
-      role: newUser.role,
-      phone: newUser.phone,
-      status: "Active",
-      lastActive: "Just now",
-    };
-    setUsers([userToAdd, ...users]);
-    await showSuccess("User added successfully!");
-    setNewUser({ firstName: "", lastName: "", email: "", role: "", phone: "" });
-    close();
-  }, [newUser, users, close]);
+  const { isDark } = useAppTheme();
 
-  const handleDeleteUser = useCallback(async (id: number) => {
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const records = await getAllUsers();
+        if (!alive) return;
+        const mapped: AdminUserRow[] = records.map((u) => ({
+          id: u.id,
+          name: u.displayName,
+          email: u.email,
+          role:
+            u.role === "admin"
+              ? "Admin"
+              : u.role === "helper"
+              ? "Helper"
+              : "Customer",
+          phone: u.phone ?? "",
+          status: "Active",
+          lastActive: "",
+        }));
+        setUsers(mapped);
+      } catch (e) {
+        console.error("Failed to load users", e);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const handleAddUser = useCallback(async () => {
+    // In production, admins should not onboard users manually from here.
+    await showError(
+      "Not available",
+      "Admins cannot manually create users from this panel. Ask users to register via the signup flow."
+    );
+  }, []);
+
+  const handleDeleteUser = useCallback(async (id: string) => {
     const { isConfirmed } = await showConfirm(
       "Delete User",
       "Are you sure you want to delete this user?",
       "Yes, delete",
     );
     if (isConfirmed) {
+      // Soft delete from UI only; full deletion should be handled by a dedicated admin flow.
       setUsers((prev) => prev.filter((u) => u.id !== id));
-      await showSuccess("User deleted.");
+      await showSuccess("User removed from view. Full account deletion must be done from the auth console.");
     }
   }, []);
 
@@ -154,7 +140,12 @@ const UsersPage = () => {
   };
 
   return (
-    <Box className="relative min-h-screen bg-[#0a0a0a] overflow-hidden p-4 md:p-8 font-satoshi text-white">
+    <Box
+      className={cn(
+        "relative min-h-screen overflow-hidden p-4 md:p-8 font-satoshi",
+        isDark ? "bg-[#0a0a0a] text-white" : "bg-gray-50 text-gray-900"
+      )}
+    >
       {/* Premium Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div

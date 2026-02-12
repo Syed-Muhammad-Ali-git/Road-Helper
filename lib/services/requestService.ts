@@ -232,6 +232,34 @@ export function subscribeCustomerRequests(params: {
   );
 }
 
+export function subscribeAllRequests(params: {
+  cb: (reqs: Array<{ id: string } & RideRequestDoc>) => void;
+}): Unsubscribe {
+  const q = query(
+    collection(db, COLLECTIONS.RIDE_REQUESTS),
+    orderBy("createdAt", "desc"),
+  );
+  return onSnapshot(
+    q,
+    (snap) => {
+      params.cb(
+        snap.docs.map((d) => {
+          const data = d.data() as Record<string, unknown>;
+          return {
+            id: d.id,
+            ...data,
+            createdAt: toDate(data.createdAt),
+            updatedAt: toDate(data.updatedAt),
+            acceptedAt: data.acceptedAt ? toDate(data.acceptedAt) : undefined,
+            completedAt: data.completedAt ? toDate(data.completedAt) : undefined,
+          } as { id: string } & RideRequestDoc;
+        }),
+      );
+    },
+    (err) => console.error("[subscribeAllRequests]", err),
+  );
+}
+
 export async function submitFeedback(params: {
   requestId: string;
   fromUid: string;

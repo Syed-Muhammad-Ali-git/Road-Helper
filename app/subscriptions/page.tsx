@@ -16,6 +16,7 @@ import { IconSparkles, IconCheck } from "@tabler/icons-react";
 import { SUBSCRIPTION_PLANS } from "@/data/subscriptions";
 import { assignPlanToCurrentUser } from "@/lib/services/subscriptionService";
 import { showError, showSuccess } from "@/lib/sweetalert";
+import { useAppTheme } from "@/app/context/ThemeContext";
 
 function formatPKR(amount: number) {
   return amount === 0 ? "PKR 0" : `PKR ${amount.toLocaleString("en-PK")}`;
@@ -29,9 +30,16 @@ export default function SubscriptionsPage() {
   const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
 
   const plans = useMemo(() => SUBSCRIPTION_PLANS, []);
+  const { isDark } = useAppTheme();
 
   return (
-    <Box className="min-h-screen bg-brand-black text-white p-4 md:p-10">
+    <Box
+      className={
+        isDark
+          ? "min-h-screen bg-brand-black text-white p-4 md:p-10"
+          : "min-h-screen bg-gray-50 text-gray-900 p-4 md:p-10"
+      }
+    >
       <Stack gap="lg" className="max-w-6xl mx-auto">
         <Box>
           <Text className="text-gray-400 text-xs uppercase tracking-wider mb-1">

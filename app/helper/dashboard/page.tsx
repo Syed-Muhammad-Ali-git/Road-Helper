@@ -36,10 +36,12 @@ import {
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useAppTheme } from "@/app/context/ThemeContext";
 import { auth } from "@/lib/firebase/config";
 import { subscribeHelperCompletedCount } from "@/lib/services/requestService";
 
 const HelperDashboard = () => {
+  const { isDark } = useAppTheme();
   const [isOnline, setIsOnline] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
   const [helperName, setHelperName] = useState("Helper");
@@ -120,7 +122,12 @@ const HelperDashboard = () => {
   }, []);
 
   return (
-    <Box className="relative min-h-screen bg-[#0a0a0a] overflow-hidden p-4 md:p-8 font-satoshi">
+    <Box
+      className={cn(
+        "relative min-h-screen overflow-hidden p-4 md:p-8 font-satoshi",
+        isDark ? "bg-[#0a0a0a]" : "bg-gray-50",
+      )}
+    >
       {/* Premium Background Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div

@@ -146,22 +146,41 @@ const HelperHeader: React.FC<HeaderProps> = ({
           {isDark ? <IconSun size={20} /> : <IconMoon size={20} />}
         </ActionIcon>
 
-        {/* Language Toggle */}
-        <ActionIcon
-          variant="subtle"
-          size="lg"
-          radius="xl"
-          onClick={() => setLanguage(language === "en" ? "ur" : "en")}
-          className={`${
-            isDark ? "text-gray-300 hover:text-brand-yellow" : "text-gray-600 hover:text-brand-gold"
-          } transition-colors flex items-center gap-1`}
-          title={language === "en" ? "Urdu" : "English"}
-        >
-          <IconLanguage size={20} />
-          <span className="text-xs font-bold uppercase">
-            {language === "en" ? "UR" : "EN"}
-          </span>
-        </ActionIcon>
+        {/* Language Dropdown */}
+        <Menu shadow="md" width={180} position="bottom-end">
+          <Menu.Target>
+            <ActionIcon
+              variant="subtle"
+              size="lg"
+              radius="xl"
+              className={`${
+                isDark
+                  ? "text-gray-300 hover:text-brand-yellow"
+                  : "text-gray-600 hover:text-brand-gold"
+              } transition-colors flex items-center gap-1`}
+              title={dict?.tooltips?.language_toggle ?? "Change language"}
+            >
+              <IconLanguage size={20} />
+              <span className="text-xs font-bold uppercase">
+                {language === "en" ? "EN" : language === "ur" ? "UR" : "RO"}
+              </span>
+            </ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item onClick={() => setLanguage("en")} disabled={language === "en"}>
+              {dict.navbar.english}
+            </Menu.Item>
+            <Menu.Item onClick={() => setLanguage("ur")} disabled={language === "ur"}>
+              {dict.navbar.urdu}
+            </Menu.Item>
+            <Menu.Item
+              onClick={() => setLanguage("roman" as any)}
+              disabled={language === "roman"}
+            >
+              {dict.navbar.roman}
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
 
         {/* Help Logo */}
         <div

@@ -61,6 +61,17 @@ export async function getUserByUid(uid: string) {
     : null;
 }
 
+export async function getAllUsers() {
+  const snap = await getDocs(collection(db, COLLECTIONS.USERS));
+  return snap.docs.map(
+    (d) =>
+      ({
+        id: d.id,
+        ...(d.data() as unknown as AppUserRecord),
+      }) as { id: string } & AppUserRecord,
+  );
+}
+
 export async function upsertUserRecord(input: {
   uid: string;
   email: string;

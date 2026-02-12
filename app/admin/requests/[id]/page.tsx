@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, memo } from "react";
+import React, { useMemo, memo, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   IconArrowLeft,
@@ -38,61 +38,8 @@ import { motion, Variants } from "framer-motion";
 import Link from "next/link";
 import { showSuccess, showInfo } from "@/lib/sweetalert";
 import { cn } from "@/lib/utils";
-
-const getRequestById = (id: string) => {
-  return {
-    id: id || "REQ-001",
-    user: {
-      name: "Ali Raza",
-      phone: "+92 300 1234567",
-      email: "ali@example.com",
-      avatar: null,
-    },
-    helper: {
-      name: "Ahmed K.",
-      phone: "+92 321 7654321",
-      rating: 4.8,
-      avatar: null,
-    },
-    service: "Towing",
-    vehicle: "Honda Civic 2019 (White)",
-    location: "Gulberg III, Lahore, Pakistan",
-    status: "In Progress",
-    createdAt: "2024-02-15 10:30 AM",
-    amount: "4,500",
-    notes: "Car broke down near Main Boulevard. Engine is not starting.",
-    timeline: [
-      {
-        title: "Protocol Initiated",
-        time: "10:30 AM",
-        active: true,
-        icon: IconClock,
-      },
-      {
-        title: "Helper Dispatched",
-        time: "10:35 AM",
-        active: true,
-        icon: IconTruck,
-      },
-      {
-        title: "Arrival at Site",
-        time: "10:50 AM",
-        active: true,
-        icon: IconMapPin,
-      },
-      {
-        title: "Final Resolution",
-        time: "-",
-        active: false,
-        icon: IconCircleCheck,
-      },
-    ],
-  };
-};
-
-const IconTruck = (props: React.SVGProps<SVGSVGElement>) => (
-  <IconTools {...props} />
-);
+import { subscribeRideRequest } from "@/lib/services/requestService";
+import type { RideRequestDoc } from "@/types";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -108,11 +55,27 @@ const RequestDetailPage = () => {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  const request = useMemo(() => getRequestById(id), [id]);
+  const [request, setRequest] = useState<({ id: string } & RideRequestDoc) | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (!id) return;
+    const unsub = subscribeRideRequest(id, (req) => setRequest(req));
+    return () => unsub();
+  }, [id]);
 
   const handleAction = async () => {
     await showSuccess("Job status updated successfully.");
   };
+
+  if (!request) {
+    return (
+      <Box className="relative min-h-screen bg-[#0a0a0a] overflow-hidden p-4 md:p-8 font-satoshi text-white flex items-center justify-center">
+        <Text>Loading request…</Text>
+      </Box>
+    );
+  }
 
   return (
     <Box className="relative min-h-screen bg-[#0a0a0a] overflow-hidden p-4 md:p-8 font-satoshi text-white">
@@ -286,26 +249,36 @@ const RequestDetailPage = () => {
                     {
                       icon: IconTools,
                       label: "Assigned Service",
-                      value: request.service,
+                      value: request.serviceType,
                       color: "red",
                     },
                     {
                       icon: IconCar,
                       label: "Subject Vehicle",
-                      value: request.vehicle,
+                      value: request.vehicleDetails,
                       color: "blue",
                     },
                     {
                       icon: IconMapPin,
                       label: "Deployment Zone",
-                      value: request.location,
+                      value:
+                        request.location?.address ??
+                        (request.location?.lat && request.location?.lng
+                          ? `${request.location.lat.toFixed(
+                              4,
+                            )}, ${request.location.lng.toFixed(4)}`
+                          : "Live location"),
                       color: "emerald",
                       full: true,
                     },
                     {
                       icon: IconReceipt2,
                       label: "Estimated Value",
-                      value: `Rs ${request.amount.toLocaleString()}`,
+                      value: `Rs ${
+                        (request as any).amount
+                          ? Number((request as any).amount).toLocaleString()
+                          : "0"
+                      }`,
                       color: "emerald",
                       premium: true,
                     },

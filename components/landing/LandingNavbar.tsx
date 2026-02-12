@@ -20,6 +20,7 @@ import {
   Title,
   Burger,
   Tooltip,
+  Menu,
 } from "@mantine/core";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import Link from "next/link";
@@ -154,30 +155,42 @@ const LandingNavbar = () => {
             </Tooltip>
 
             {/* LANGUAGE */}
-            <Tooltip
-              label={
-                dict?.tooltips?.language_toggle ??
-                "Change language (English / Urdu / Roman)"
-              }
-              withArrow
-              position="bottom"
-            >
-              <ActionIcon
-                variant="subtle"
-                onClick={() => {
-                  const next =
-                    language === "en"
-                      ? "ur"
-                      : language === "ur"
-                        ? "roman"
-                        : "en";
-                  // @ts-expect-error - language includes roman in context
-                  setLanguage(next);
-                }}
-              >
-                <IconLanguage size={20} />
-              </ActionIcon>
-            </Tooltip>
+            <Menu shadow="md" width={180} position="bottom-end">
+              <Menu.Target>
+                <Tooltip
+                  label={
+                    dict?.tooltips?.language_toggle ??
+                    "Change language (English / Urdu / Roman)"
+                  }
+                  withArrow
+                  position="bottom"
+                >
+                  <ActionIcon variant="subtle">
+                    <IconLanguage size={20} />
+                  </ActionIcon>
+                </Tooltip>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  onClick={() => setLanguage("en")}
+                  disabled={language === "en"}
+                >
+                  {dict.navbar.english}
+                </Menu.Item>
+                <Menu.Item
+                  onClick={() => setLanguage("ur")}
+                  disabled={language === "ur"}
+                >
+                  {dict.navbar.urdu}
+                </Menu.Item>
+                <Menu.Item
+                  onClick={() => setLanguage("roman" as any)}
+                  disabled={language === "roman"}
+                >
+                  {dict.navbar.roman}
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
 
             {/* AUTH (DESKTOP ONLY) */}
             <Group visibleFrom="md">

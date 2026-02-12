@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, memo, useCallback } from "react";
+import React, { useState, useMemo, memo, useCallback, useEffect } from "react";
 import {
   Title,
   Text,
@@ -35,102 +35,44 @@ import {
 import { showSuccess } from "@/lib/sweetalert";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-
-// Enhanced Mock Data
-const allRequests = [
-  {
-    id: "REQ-001",
-    user: "Ali Raza",
-    phone: "+92 300 1234567",
-    service: "Towing",
-    vehicle: "Honda Civic 2019",
-    location: "Gulberg III, Lahore",
-    helper: "Ahmed K.",
-    helperPhone: "+92 321 7654321",
-    status: "In Progress",
-    time: "10 mins ago",
-    amount: "4,500",
-    paymentStatus: "Pending",
-    notes: "Car broke down near Main Boulevard.",
-  },
-  {
-    id: "REQ-002",
-    user: "Sara Ahmed",
-    phone: "+92 333 9876543",
-    service: "Flat Tire",
-    vehicle: "Suzuki Alto",
-    location: "DHA Phase 5, Lahore",
-    helper: "Looking...",
-    helperPhone: "N/A",
-    status: "Pending",
-    time: "25 mins ago",
-    amount: "1,200",
-    paymentStatus: "Unpaid",
-    notes: "Need urgent assistance.",
-  },
-  {
-    id: "REQ-003",
-    user: "John Doe",
-    phone: "+92 345 6789012",
-    service: "Fuel Delivery",
-    vehicle: "Toyota Corolla",
-    location: "Johar Town, Lahore",
-    helper: "Mike T.",
-    helperPhone: "+92 301 1122334",
-    status: "Completed",
-    time: "2 hours ago",
-    amount: "2,200",
-    paymentStatus: "Paid",
-    notes: "Ran out of fuel on highway exit.",
-  },
-  {
-    id: "REQ-004",
-    user: "Bilal Khan",
-    phone: "+92 312 3456789",
-    service: "Car Mechanic",
-    vehicle: "Kia Sportage",
-    location: "Model Town, Lahore",
-    helper: "Usman A.",
-    helperPhone: "+92 322 4455667",
-    status: "Completed",
-    time: "5 hours ago",
-    amount: "3,500",
-    paymentStatus: "Paid",
-    notes: "Engine overheating issues.",
-  },
-  {
-    id: "REQ-005",
-    user: "Ayesha Malik",
-    phone: "+92 307 7788990",
-    service: "Locksmith",
-    vehicle: "Honda City",
-    location: "Bahria Town, Lahore",
-    helper: "Looking...",
-    helperPhone: "N/A",
-    status: "Pending",
-    time: "1 hour ago",
-    amount: "1,500",
-    paymentStatus: "Unpaid",
-    notes: "Keys locked inside the car.",
-  },
-];
+import { useAppTheme } from "@/app/context/ThemeContext";
+import { subscribeAllRequests } from "@/lib/services/requestService";
+import type { RideRequestDoc } from "@/types";
 
 const RequestsPage = () => {
   const [activeTab, setActiveTab] = useState<string | null>("all");
   const [search, setSearch] = useState("");
+  const [requests, setRequests] = useState<Array<{ id: string } & RideRequestDoc>>(
+    [],
+  );
+  const { isDark } = useAppTheme();
+
+  useEffect(() => {
+    const unsub = subscribeAllRequests({
+      cb: setRequests,
+    });
+    return () => unsub();
+  }, []);
 
   const filteredRequests = useMemo(() => {
-    return allRequests.filter((req) => {
+    return requests.filter((req) => {
       const matchesTab =
         activeTab === "all" ||
-        (activeTab === "pending" && req.status === "Pending") ||
-        (activeTab === "inprogress" && req.status === "In Progress") ||
-        (activeTab === "completed" && req.status === "Completed");
+        (activeTab === "pending" && req.status === "pending") ||
+        (activeTab === "inprogress" &&
+          (req.status === "accepted" || req.status === "in_progress")) ||
+        (activeTab === "completed" && req.status === "completed");
 
       const matchesSearch =
-        req.user.toLowerCase().includes(search.toLowerCase()) ||
+        (req.customerName ?? "")
+          .toString()
+          .toLowerCase()
+          .includes(search.toLowerCase()) ||
         req.id.toLowerCase().includes(search.toLowerCase()) ||
-        req.service.toLowerCase().includes(search.toLowerCase());
+        (req.serviceType ?? "")
+          .toString()
+          .toLowerCase()
+          .includes(search.toLowerCase());
 
       return matchesTab && matchesSearch;
     });
@@ -146,17 +88,21 @@ const RequestsPage = () => {
       "Amount",
       "Time",
     ];
-    const rows = filteredRequests.map((req) =>
-      [
+    const rows = filteredRequests.map((req) => {
+      const loc = req.location;
+      const locLabel =
+        loc?.address ??
+        (loc?.lat && loc?.lng ? `${loc.lat},${loc.lng}` : "Unknown");
+      return [
         req.id,
-        req.user,
-        req.service,
-        req.location,
+        req.customerName ?? "",
+        req.serviceType ?? "",
+        locLabel,
         req.status,
-        req.amount,
-        req.time,
-      ].join(","),
-    );
+        (req as any).amount ?? "",
+        req.createdAt instanceof Date ? req.createdAt.toISOString() : "",
+      ].join(",");
+    });
     const csvContent =
       "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
     const link = document.createElement("a");
@@ -182,7 +128,12 @@ const RequestsPage = () => {
   };
 
   return (
-    <Box className="relative min-h-screen bg-[#0a0a0a] overflow-hidden p-4 md:p-8 font-satoshi text-white">
+    <Box
+      className={cn(
+        "relative min-h-screen overflow-hidden p-4 md:p-8 font-satoshi",
+        isDark ? "bg-[#0a0a0a] text-white" : "bg-gray-50 text-gray-900",
+      )}
+    >
       {/* Dynamic Background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
