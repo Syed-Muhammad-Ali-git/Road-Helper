@@ -232,15 +232,16 @@ const CustomerHeader: React.FC<HeaderProps> = ({
               >
                 {!profile && userName.charAt(0).toUpperCase()}
               </Avatar>
-              <div>
+              <div className="min-w-0 flex-1 overflow-hidden">
                 <div
-                  className={`font-bold text-sm ${
+                  className={`font-bold text-sm truncate ${
                     isDark ? "text-white" : "text-black"
                   }`}
+                  title={userName || "User"}
                 >
                   {userName || "User"}
                 </div>
-                <div className={`text-xs ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                <div className={`text-xs truncate ${isDark ? "text-gray-400" : "text-gray-600"}`} title={userEmail || "email@example.com"}>
                   {userEmail || "email@example.com"}
                 </div>
                 <Badge

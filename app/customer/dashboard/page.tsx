@@ -32,6 +32,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 import { useLiveLocation } from "@/hooks/useLiveLocation";
+import { toast } from "react-toastify";
+import { showInfo } from "@/lib/sweetalert";
 import { useLanguage } from "@/app/context/LanguageContext";
 import { useAppTheme } from "@/app/context/ThemeContext";
 import { auth } from "@/lib/firebase/config";
@@ -104,7 +106,9 @@ const itemVariants: any = {
 const ClientDashboard = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
-  const live = useLiveLocation();
+  const live = useLiveLocation({
+    onSuccess: () => toast.success("Location enabled! Your position is now visible on the map."),
+  });
   const { dict } = useLanguage();
   const { isDark } = useAppTheme();
   const serviceCategories = getServiceCategories(dict);
@@ -292,7 +296,13 @@ const ClientDashboard = () => {
                     "rounded-xl px-8 h-12 font-bold transition-all w-full md:w-auto hover:scale-105 active:scale-95",
                     isDark ? "bg-white text-black hover:bg-gray-200" : "bg-brand-red text-white hover:bg-brand-dark-red"
                   )}
-                  onClick={() => live.requestPermission()}
+                  onClick={async () => {
+                    await showInfo(
+                      "Enable Location",
+                      "Allow location access to show your position on the map and enable live tracking for faster assistance.",
+                    );
+                    live.requestPermission();
+                  }}
                   rightSection={<IconArrowRight size={18} />}
                 >
                   {dict.dashboard.enable_gps}

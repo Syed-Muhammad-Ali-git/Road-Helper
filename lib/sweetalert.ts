@@ -32,8 +32,12 @@ export const showSuccess = (title: string, text?: string) =>
     title,
     text: text ?? "",
     ...getThemeConfig(),
-    timer: 3000,
+    timer: 2500,
     timerProgressBar: true,
+    customClass: {
+      popup: "rounded-2xl shadow-2xl",
+      title: "text-lg font-bold",
+    },
   });
 
 export const showError = (title: string, text?: string) =>
@@ -50,6 +54,11 @@ export const showInfo = (title: string, text?: string) =>
     title,
     text: text ?? "",
     ...getThemeConfig(),
+    customClass: {
+      popup: "rounded-2xl shadow-2xl",
+      title: "text-xl font-bold",
+      confirmButton: "px-6 py-2.5 rounded-xl font-semibold",
+    },
   });
 
 export const showWarning = (title: string, text?: string) =>

@@ -36,11 +36,26 @@ import {
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { auth } from "@/lib/firebase/config";
+import { subscribeHelperCompletedCount } from "@/lib/services/requestService";
 
 const HelperDashboard = () => {
   const [isOnline, setIsOnline] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
   const [helperName, setHelperName] = useState("Helper");
+  const [completedCount, setCompletedCount] = useState(0);
+  const [uid, setUid] = useState<string | null>(null);
+
+  useEffect(() => {
+    const unsub = auth.onAuthStateChanged((u) => setUid(u?.uid ?? null));
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    if (!uid) return;
+    const unsub = subscribeHelperCompletedCount(uid, setCompletedCount);
+    return () => unsub();
+  }, [uid]);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -65,26 +80,23 @@ const HelperDashboard = () => {
     );
   }, []);
 
+  const freeRidesLimit = 10;
+  const ridesRemaining = Math.max(0, freeRidesLimit - completedCount);
+  const commissionRate = 20;
+
   const userData = useMemo(
     () => ({
       fullName: helperName,
-      totalJobs: 12,
-      rating: 4.9,
-      todaysEarnings: 15000,
-      pendingPayment: 3000,
-      paymentDue: true,
+      totalJobs: completedCount,
+      rating: 0,
+      todaysEarnings: 0,
+      pendingPayment: 0,
+      paymentDue: completedCount > freeRidesLimit,
     }),
-    [helperName],
+    [helperName, completedCount],
   );
 
-  const paymentHistory = useMemo(
-    () => [
-      { date: "2026-01-25", amount: 25, status: "paid" },
-      { date: "2026-01-20", amount: 40, status: "paid" },
-      { date: "2026-01-15", amount: 35, status: "paid" },
-    ],
-    [],
-  );
+  const paymentHistory = useMemo(() => [] as { date: string; amount: number; status: string }[], []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -253,11 +265,11 @@ const HelperDashboard = () => {
                     order={1}
                     className="font-manrope text-7xl font-black tracking-tighter mb-4 italic italic"
                   >
-                    PKR {userData.todaysEarnings.toLocaleString("en-PK")}
+                    PKR {(userData.todaysEarnings || 0).toLocaleString("en-PK")}
                   </Title>
                   <Group gap="xs">
                     <div className="px-3 py-1 bg-green-500/20 text-green-400 text-[10px] font-bold rounded-full border border-green-500/30">
-                      +12.5% vs Average
+                      {completedCount > 0 ? `${completedCount} completed` : "Start earning"}
                     </div>
                   </Group>
                 </div>
@@ -292,7 +304,7 @@ const HelperDashboard = () => {
                   Completion Rate
                 </Text>
                 <Title order={2} className="text-white text-4xl font-black">
-                  98 <span className="text-xl text-blue-400">%</span>
+                  {userData.totalJobs > 0 ? "98" : "0"} <span className="text-xl text-blue-400">%</span>
                 </Title>
                 <Text className="text-gray-500 text-xs mt-2 font-medium">
                   {userData.totalJobs} Jobs Completed
@@ -301,7 +313,7 @@ const HelperDashboard = () => {
             </Paper>
           </motion.div>
 
-          {/* Rating Card */}
+          {/* Rating Card / Free Rides Card */}
           <motion.div variants={itemVariants as any}>
             <Paper
               p={32}
@@ -317,22 +329,25 @@ const HelperDashboard = () => {
               </ThemeIcon>
               <div>
                 <Text className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2">
-                  Expertise Score
+                  Free Rides Policy
                 </Text>
                 <Title order={2} className="text-white text-4xl font-black">
-                  {userData.rating}{" "}
-                  <span className="text-xl text-yellow-500">★</span>
+                  {ridesRemaining}{" "}
+                  <span className="text-xl text-yellow-500">/ {freeRidesLimit}</span>
                 </Title>
                 <Text className="text-gray-500 text-xs mt-2 font-medium">
-                  Top 5% in your area
+                  Free rides left. After {freeRidesLimit}: {commissionRate}% commission
+                </Text>
+                <Text className="text-gray-600 text-[10px] mt-1">
+                  Completed: {completedCount}
                 </Text>
               </div>
             </Paper>
           </motion.div>
         </SimpleGrid>
 
-        {/* Payment Warning */}
-        {userData.paymentDue && (
+        {/* Payment Warning - only when past free rides */}
+        {userData.paymentDue && completedCount > freeRidesLimit && (
           <motion.div variants={itemVariants as any} className="mb-24">
             <Paper
               p={24}
@@ -395,8 +410,10 @@ const HelperDashboard = () => {
                   variant="subtle"
                   className="hover:bg-white/5 text-gray-400 font-bold rounded-xl"
                   leftSection={<IconMap2 size={18} />}
+                  component={Link}
+                  href="/helper/requests"
                 >
-                  Visual Mode
+                  Browse Jobs
                 </Button>
               </Group>
 
@@ -553,7 +570,11 @@ const HelperDashboard = () => {
             </Group>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {paymentHistory.map((payment, idx) => (
+              {paymentHistory.length === 0 ? (
+                <div className="col-span-full py-12 text-center">
+                  <Text className="text-gray-500">No settlement history yet. Complete jobs to see earnings.</Text>
+                </div>
+              ) : paymentHistory.map((payment, idx) => (
                 <motion.div
                   key={idx}
                   whileHover={{ y: -5 }}

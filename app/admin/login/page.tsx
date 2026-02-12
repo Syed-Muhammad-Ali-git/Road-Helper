@@ -107,6 +107,7 @@ export default function AdminLoginPage() {
             src="/assets/images/login-sidebar.png"
             alt="Admin Background"
             fill
+            sizes="50vw"
             className="object-cover opacity-20 grayscale"
             priority
           />
@@ -124,6 +125,7 @@ export default function AdminLoginPage() {
                 src="/assets/images/logo.png"
                 alt="Logo"
                 fill
+                sizes="48px"
                 className="object-contain"
               />
             </div>

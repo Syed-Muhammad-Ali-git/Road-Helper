@@ -29,6 +29,7 @@ import {
 import { useForm } from "@mantine/form";
 import z from "zod";
 import { showSuccess, showError } from "@/lib/sweetalert";
+import { toast } from "react-toastify";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { auth } from "@/lib/firebase/config";
 import { useRouter } from "next/navigation";
@@ -56,7 +57,12 @@ function RequestHelpContent() {
   const [requestStatus, setRequestStatus] = useState<string | null>(null);
   const [uid, setUid] = useState<string | null>(null);
   const router = useRouter();
-  const live = useLiveLocation();
+  const live = useLiveLocation({
+    onSuccess: (coords) => {
+      form.setFieldValue("location", `Current location (${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)})`);
+      toast.success("Location captured! Coordinates filled in.");
+    },
+  });
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((u) => setUid(u?.uid ?? null));
     return () => unsub();
@@ -97,9 +103,12 @@ function RequestHelpContent() {
           : { lat: 24.8607, lng: 67.0011, address: values.location };
 
         const displayName = auth.currentUser?.displayName ?? auth.currentUser?.email?.split("@")[0] ?? "Customer";
+        const { getUserByUid } = await import("@/lib/services/userService");
+        const customerProfile = await getUserByUid(uid);
         const id = await createRideRequest({
           customerId: uid,
           customerName: displayName,
+          customerPhone: customerProfile?.phone ?? null,
           serviceType,
           location,
           vehicleDetails: values.vehicleDetails,

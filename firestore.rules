@@ -85,5 +85,12 @@ service cloud.firestore {
       allow create: if isAuth();
       allow update: if isAuth();
     }
+    
+    // Feedback - participants of a ride can submit
+    match /feedback/{feedbackId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update, delete: if false;
+    }
   }
 }

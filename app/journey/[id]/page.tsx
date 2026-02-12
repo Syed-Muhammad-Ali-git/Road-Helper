@@ -18,6 +18,8 @@ import {
   IconMapPin,
   IconClock,
   IconCheck,
+  IconStar,
+  IconStarFilled,
 } from "@tabler/icons-react";
 import LiveMap from "@/components/map/LiveMap";
 import { auth } from "@/lib/firebase/config";
@@ -27,9 +29,11 @@ import {
   subscribeRideRequest,
   updateRideLocations,
   updateRideStatus,
+  submitFeedback,
 } from "@/lib/services/requestService";
 import { getUserByUid } from "@/lib/services/userService";
 import { useLiveLocation } from "@/hooks/useLiveLocation";
+import { toast } from "react-toastify";
 import type { RideRequestDoc } from "@/types";
 import type { AppUserRecord } from "@/lib/services/userService";
 
@@ -56,16 +60,25 @@ export default function JourneyPage() {
     | "helper"
     | "admin";
 
-  const live = useLiveLocation();
+  const live = useLiveLocation({
+    onSuccess: () => toast.success("Location enabled! Live tracking is active."),
+  });
   const [req, setReq] = useState<({ id: string } & RideRequestDoc) | null>(null);
   const [customer, setCustomer] = useState<({ id: string } & AppUserRecord) | null>(null);
   const [helper, setHelper] = useState<({ id: string } & AppUserRecord) | null>(null);
+  const [feedbackRating, setFeedbackRating] = useState(0);
+  const [feedbackComment, setFeedbackComment] = useState("");
+  const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   useEffect(() => {
     if (!requestId) return;
     const unsub = subscribeRideRequest(requestId, async (r) => {
       setReq(r);
       if (!r) return;
+      if (r.customerRating) {
+        setFeedbackSubmitted(true);
+      }
       if (r.customerId) setCustomer(await getUserByUid(r.customerId));
       if (r.helperId) setHelper(await getUserByUid(r.helperId));
     });
@@ -286,12 +299,68 @@ export default function JourneyPage() {
                     When your helper completes the job, you’ll be able to leave feedback here.
                   </Text>
                   {req?.status === "completed" && (
-                    <Button
-                      className="bg-brand-red hover:bg-brand-dark-red rounded-xl"
-                      onClick={() => showSuccess("Thanks!", "Feedback flow will appear next.")}
-                    >
-                      Leave Feedback
-                    </Button>
+                    feedbackSubmitted || (req as { customerRating?: number | null }).customerRating ? (
+                      <Group gap="xs">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <IconStarFilled key={s} size={24} className="text-brand-yellow" />
+                        ))}
+                        <Text size="sm" className="text-gray-400">Thank you for your feedback!</Text>
+                      </Group>
+                    ) : (
+                      <Stack gap="md">
+                        <Group gap={4}>
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <button
+                              key={s}
+                              type="button"
+                              onClick={() => setFeedbackRating(s)}
+                              className="p-1 rounded-lg hover:bg-white/10 transition-colors"
+                            >
+                              {s <= feedbackRating ? (
+                                <IconStarFilled size={28} className="text-brand-yellow" />
+                              ) : (
+                                <IconStar size={28} className="text-gray-500" />
+                              )}
+                            </button>
+                          ))}
+                        </Group>
+                        <textarea
+                          placeholder="Optional: Add a comment..."
+                          value={feedbackComment}
+                          onChange={(e) => setFeedbackComment(e.target.value)}
+                          className="w-full min-h-[80px] px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-gray-500 resize-none"
+                          rows={3}
+                        />
+                        <Button
+                          className="bg-brand-red hover:bg-brand-dark-red rounded-xl"
+                          loading={feedbackSubmitting}
+                          disabled={feedbackRating < 1}
+                          onClick={async () => {
+                            const uid = auth.currentUser?.uid;
+                            if (!uid || !requestId || !req?.helperId) return;
+                            setFeedbackSubmitting(true);
+                            try {
+                              await submitFeedback({
+                                requestId,
+                                fromUid: uid,
+                                fromRole: "customer",
+                                toUid: req.helperId,
+                                rating: feedbackRating,
+                                comment: feedbackComment || undefined,
+                              });
+                              setFeedbackSubmitted(true);
+                              toast.success("Thanks for your feedback!");
+                            } catch (e) {
+                              await showError("Failed", e instanceof Error ? e.message : "Could not submit feedback.");
+                            } finally {
+                              setFeedbackSubmitting(false);
+                            }
+                          }}
+                        >
+                          Submit Feedback
+                        </Button>
+                      </Stack>
+                    )
                   )}
                 </Stack>
               )}

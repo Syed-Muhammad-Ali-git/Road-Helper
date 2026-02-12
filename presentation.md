@@ -90,7 +90,6 @@ The web app is built as if it were a real startup product: role-based dashboards
     - Cleans up related `rideRequests`.
 
 - **Subscriptions Flow**
-
   - `/subscriptions` page shows PKR-based plans:
     - Free Plan: 10 rides/helpers, PKR 0.
     - Growth Plan: higher limits, flagged as “Coming soon”.
@@ -191,4 +190,3 @@ The web app is built as if it were a real startup product: role-based dashboards
   - Real-time location and map flows show comfort with async, streaming data.
 - Visually **stage-ready**:
   - Looks and feels like a SaaS product you could pitch to investors tomorrow.
-

@@ -18,7 +18,7 @@ import { motion } from "framer-motion";
 
 export default function SettingsPage() {
   return (
-    <Box className="p-4 md:p-8 min-h-screen font-satoshi bg-brand-black text-white">
+    <Box className="p-4 md:p-8 pt-20 min-h-screen font-satoshi bg-brand-black text-white">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

@@ -68,7 +68,7 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
         : drawerOpen
           ? `${drawerWidth}px` // Desktop Open
           : "70px" : 0,
-    paddingTop: showSidebar && !isAdmin ? "70px" : "0",
+    paddingTop: showSidebar ? "70px" : "0",
   };
 
   return (

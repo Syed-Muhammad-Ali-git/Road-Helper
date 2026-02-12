@@ -6,6 +6,11 @@ export interface LiveCoords {
   accuracy?: number;
 }
 
+export interface UseLiveLocationOptions {
+  onSuccess?: (coords: LiveCoords) => void;
+  onError?: (err: string) => void;
+}
+
 export interface LiveLocationState {
   coords: LiveCoords | null;
   permission: "prompt" | "granted" | "denied" | "unsupported";
@@ -15,7 +20,7 @@ export interface LiveLocationState {
   stop: () => void;
 }
 
-export function useLiveLocation(): LiveLocationState {
+export function useLiveLocation(options?: UseLiveLocationOptions): LiveLocationState {
   const [coords, setCoords] = useState<LiveCoords | null>(null);
   const [permission, setPermission] = useState<
     LiveLocationState["permission"]
@@ -23,6 +28,8 @@ export function useLiveLocation(): LiveLocationState {
   const [error, setError] = useState<string | null>(null);
   const [isWatching, setIsWatching] = useState(false);
   const watchIdRef = useRef<number | null>(null);
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
 
   const supported = typeof navigator !== "undefined" && "geolocation" in navigator;
 
@@ -47,15 +54,19 @@ export function useLiveLocation(): LiveLocationState {
     watchIdRef.current = navigator.geolocation.watchPosition(
       (pos) => {
         setPermission("granted");
-        setCoords({
+        const c = {
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
           accuracy: pos.coords.accuracy,
-        });
+        };
+        setCoords(c);
+        optionsRef.current?.onSuccess?.(c);
       },
       (err) => {
         if (err.code === err.PERMISSION_DENIED) setPermission("denied");
-        setError(err.message || "Unable to access location.");
+        const msg = err.message || "Unable to access location.";
+        setError(msg);
+        optionsRef.current?.onError?.(msg);
       },
       {
         enableHighAccuracy: true,

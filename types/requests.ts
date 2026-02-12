@@ -21,9 +21,20 @@ export type RideStatus =
   | "completed"
   | "cancelled";
 
+export interface FeedbackDoc {
+  requestId: string;
+  fromUid: string;
+  fromRole: "customer" | "helper";
+  toUid: string;
+  rating: number;
+  comment?: string;
+  createdAt: Date;
+}
+
 export interface RideRequestDoc {
   customerId: string;
   customerName?: string;
+  customerPhone?: string | null;
   helperId: string | null;
   helperName?: string | null;
   serviceType: ServiceType;
@@ -37,6 +48,8 @@ export interface RideRequestDoc {
   updatedAt: Date;
   acceptedAt?: Date;
   completedAt?: Date;
+  customerRating?: number | null;
+  helperRating?: number | null;
 }
 
 export interface UserLocationDoc {

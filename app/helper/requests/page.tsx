@@ -22,7 +22,8 @@ import {
   IconBrandWhatsapp,
   IconCurrentLocation,
 } from "@tabler/icons-react";
-import { showError, showSuccess } from "@/lib/sweetalert";
+import { showError } from "@/lib/sweetalert";
+import { toast } from "react-toastify";
 import { motion, type Variants } from "framer-motion";
 import { auth } from "@/lib/firebase/config";
 import { useRouter } from "next/navigation";
@@ -35,7 +36,9 @@ import type { RideRequestDoc } from "@/types";
 
 export default function NearbyRequestsUI() {
   const router = useRouter();
-  const live = useLiveLocation();
+  const live = useLiveLocation({
+    onSuccess: () => toast.success("GPS enabled! You can now accept nearby jobs."),
+  });
   const [requests, setRequests] = useState<
     Array<{ id: string } & RideRequestDoc>
   >([]);
@@ -240,10 +243,7 @@ export default function NearbyRequestsUI() {
                                 lng: live.coords.lng,
                               },
                             });
-                            await showSuccess(
-                              "Job accepted!",
-                              "Redirecting to live journey…",
-                            );
+                            toast.success("Job accepted! Redirecting…");
                             router.push(`/journey/${req.id}`);
                           } catch (e: unknown) {
                             const msg =
@@ -265,6 +265,10 @@ export default function NearbyRequestsUI() {
                         variant="outline"
                         className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10 h-11 rounded-xl transition-all"
                         leftSection={<IconPhone size={18} />}
+                        component="a"
+                        href={req.customerPhone ? `tel:${String(req.customerPhone).replace(/[^\d+]/g, "")}` : "#"}
+                        target={req.customerPhone ? "_blank" : undefined}
+                        disabled={!req.customerPhone}
                       >
                         Call
                       </Button>
@@ -272,6 +276,14 @@ export default function NearbyRequestsUI() {
                         variant="outline"
                         className="border-green-500/30 text-green-400 hover:bg-green-500/10 h-11 rounded-xl transition-all"
                         leftSection={<IconBrandWhatsapp size={18} />}
+                        component="a"
+                        href={
+                          req.customerPhone
+                            ? `https://wa.me/${String(req.customerPhone).replace(/[^\d]/g, "")}?text=${encodeURIComponent(`RoadHelper: I'm accepting your request.`)}`
+                            : "#"
+                        }
+                        target={req.customerPhone ? "_blank" : undefined}
+                        disabled={!req.customerPhone}
                       >
                         WhatsApp
                       </Button>

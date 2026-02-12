@@ -140,7 +140,7 @@ const SharedSidebarComponent = ({
             )}
           >
             <div className="relative w-8 h-8 bg-white rounded-lg p-1 shrink-0 group-hover:scale-105 transition-transform">
-              <Image src={logoSrc} alt="Logo" fill className="object-contain" />
+              <Image src={logoSrc} alt="Logo" fill sizes="32px" className="object-contain" />
             </div>
             <motion.h1
               animate={{ opacity: open ? 1 : 0, x: open ? 0 : -20 }}

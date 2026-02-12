@@ -75,12 +75,12 @@ export default function LoginPage() {
           dict.auth.welcome_back,
           loginType === "customer" ? dict.auth.customer : dict.auth.helper,
         );
-
         router.push(
           loginType === "customer"
             ? "/customer/dashboard"
             : "/helper/dashboard",
         );
+        // Keep loader visible until navigation completes; do not set false on success
       } catch (error: unknown) {
         console.error(error);
         const message =
@@ -90,7 +90,6 @@ export default function LoginPage() {
               ? error.message
               : "Login failed. Please try again.";
         await showError("Login Failed", message);
-      } finally {
         setIsLoading(false);
       }
     },
@@ -109,6 +108,7 @@ export default function LoginPage() {
       router.push(
         loginType === "customer" ? "/customer/dashboard" : "/helper/dashboard",
       );
+      // Keep loader until navigation completes
     } catch (err: unknown) {
       const msg =
         err instanceof AuthRuleError
@@ -117,7 +117,6 @@ export default function LoginPage() {
             ? err.message
             : "Google sign-in failed";
       await showError("Google Sign-in Failed", msg);
-    } finally {
       setIsLoading(false);
     }
   }, [loginType, router, dict]);
@@ -211,6 +210,7 @@ export default function LoginPage() {
             src="/assets/images/login-sidebar.png"
             alt="Background"
             fill
+            sizes="50vw"
             className="object-cover opacity-30 grayscale"
             priority
           />
@@ -232,6 +232,7 @@ export default function LoginPage() {
                 src="/assets/images/logo.png"
                 alt="Road Helper Logo"
                 fill
+                sizes="56px"
                 className="object-contain"
               />
             </motion.div>

@@ -5,12 +5,16 @@
   color-scheme: dark;
   --background: #0a0a0a;
   --foreground: #ededed;
+  --accent: #FFD700;
+  --accent-light: #FFF7CC;
 }
 
 .light {
   color-scheme: light;
   --background: #ffffff;
   --foreground: #0a0a0a;
+  --accent: #F59E0B;
+  --accent-light: #FEF3C7;
 }
 
 .dark {

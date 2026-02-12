@@ -16,7 +16,7 @@ const RouteChangeLoaderContent = () => {
 
     const contentLoadTimer = setTimeout(() => {
       setIsLoading(false);
-    }, 400);
+    }, 600);
 
     return () => clearTimeout(contentLoadTimer);
   }, [pathname, searchParams]);
@@ -30,7 +30,7 @@ const RouteChangeLoaderContent = () => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className={`fixed inset-0 z-9997 flex items-center justify-center ${
+          className={`fixed inset-0 z-[99999] flex items-center justify-center ${
             isDark ? "bg-black/40" : "bg-white/60"
           } backdrop-blur-md`}
         >

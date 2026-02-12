@@ -216,15 +216,16 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
               >
                 {adminName.charAt(0).toUpperCase()}
               </Avatar>
-              <div>
+              <div className="min-w-0 flex-1 overflow-hidden">
                 <div
-                  className={`font-bold text-sm ${
+                  className={`font-bold text-sm truncate ${
                     isDark ? "text-white" : "text-black"
                   }`}
+                  title={adminName}
                 >
                   {adminName}
                 </div>
-                <div className={`text-xs ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                <div className={`text-xs truncate ${isDark ? "text-gray-400" : "text-gray-600"}`} title={adminEmail}>
                   {adminEmail}
                 </div>
                 <Badge
