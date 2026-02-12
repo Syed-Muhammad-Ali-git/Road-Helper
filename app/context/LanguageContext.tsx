@@ -12,7 +12,7 @@ import en from "@/dictionaries/en.json";
 import ur from "@/dictionaries/ur.json";
 import roman from "@/dictionaries/roman.json";
 
-type Language = "en" | "ur" | "roman";
+export type Language = "en" | "ur" | "roman";
 type Dictionary = typeof en;
 
 interface LanguageContextType {

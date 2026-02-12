@@ -55,9 +55,7 @@ const RequestDetailPage = () => {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  const [request, setRequest] = useState<({ id: string } & RideRequestDoc) | null>(
-    null,
-  );
+  const [request, setRequest] = useState<any | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -187,7 +185,7 @@ const RequestDetailPage = () => {
                   lineWidth={3}
                   color="brand-red"
                 >
-                  {request.timeline.map((item, idx) => (
+                  {request.timeline.map((item: any, idx: any) => (
                     <Timeline.Item
                       key={idx}
                       bullet={

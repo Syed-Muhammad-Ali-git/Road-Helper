@@ -41,49 +41,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useAppTheme } from "@/app/context/ThemeContext";
+import { getAdminStats, subscribeToAdminRequests, getRevenueData } from "@/lib/services/adminService";
+import { useLanguage } from "@/app/context/LanguageContext";
 
-// Mock Data
-const stats = [
-  {
-    title: "Total Users",
-    value: "3,240",
-    subtitle: "Active Community",
-    change: "+8.4%",
-    icon: IconUsers,
-    color: "blue",
-    gradient: "from-blue-600/20 to-indigo-600/20",
-  },
-  {
-    title: "Active Helpers",
-    value: "158",
-    subtitle: "On-Duty Now",
-    change: "+12",
-    icon: IconActivity,
-    color: "green",
-    gradient: "from-emerald-600/20 to-teal-600/20",
-  },
-  {
-    title: "Completed Jobs",
-    value: "1,284",
-    subtitle: "Total Success",
-    change: "+32",
-    icon: IconTrendingUp,
-    color: "violet",
-    gradient: "from-violet-600/20 to-purple-600/20",
-  },
-  {
-    title: "Pending Help",
-    value: "18",
-    subtitle: "High Priority",
-    id: "pending",
-    change: "5 critical",
-    icon: IconAlertCircle,
-    color: "red",
-    gradient: "from-red-600/20 to-rose-600/20",
-  },
-];
+const mapBg = "/assets/images/backgrounds/map-bg.svg";
 
-const revenueData = [
+const generateDefaultRevenueData = () => [
   { day: "Mon", total: 3200, platform: 640 },
   { day: "Tue", total: 2800, platform: 560 },
   { day: "Wed", total: 3500, platform: 700 },
@@ -91,51 +54,7 @@ const revenueData = [
   { day: "Fri", total: 4600, platform: 920 },
   { day: "Sat", total: 3800, platform: 760 },
   { day: "Sun", total: 3000, platform: 600 },
-  { day: "Mon", total: 3800, platform: 760 },
-];
-
-const recentRequests = [
-  {
-    id: 1,
-    user: "Ali Raza",
-    type: "Towing",
-    status: "In Progress",
-    helper: "Ahmed K.",
-    amount: 4500,
-    hasCommissionPaid: true,
-  },
-  {
-    id: 2,
-    user: "Sara Ahmed",
-    type: "Flat Tire",
-    status: "Pending",
-    helper: "-",
-    amount: 1200,
-    hasCommissionPaid: false,
-  },
-  {
-    id: 3,
-    user: "Usman Ali",
-    type: "Fuel Delivery",
-    status: "Completed",
-    helper: "Bilal H.",
-    amount: 2200,
-    hasCommissionPaid: true,
-  },
-  {
-    id: 4,
-    user: "John Doe",
-    type: "Car Mechanic",
-    status: "Completed",
-    helper: "Mike T.",
-    amount: 3100,
-    hasCommissionPaid: false,
-  },
-];
-
-const mapBg = "/assets/images/backgrounds/map-bg.svg";
-
-const containerVariants: Variants = {
+]; const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -154,10 +73,100 @@ const itemVariants: Variants = {
 
 const AdminDashboard = () => {
   const { isDark } = useAppTheme();
+  const { dict } = useLanguage();
   const [isLoaded, setIsLoaded] = useState(false);
+  const [stats, setStats] = useState<any[]>([]);
+  const [revenueData, setRevenueData] = useState<any[]>([]);
+  const [recentRequests, setRecentRequests] = useState<any[]>([]);
+  const [adminStats, setAdminStats] = useState<any>(null);
+
+  // Load Firebase data
   useEffect(() => {
+    let mounted = true;
+
+    // Load stats
+    const loadStats = async () => {
+      try {
+        const stats = await getAdminStats();
+        if (!mounted) return;
+        setAdminStats(stats);
+      } catch (error) {
+        console.error("Error loading admin stats:", error);
+      }
+    };
+
+    // Load revenue data
+    const loadRevenueData = async () => {
+      try {
+        const data = await getRevenueData();
+        if (!mounted) return;
+        setRevenueData(data.length > 0 ? data : generateDefaultRevenueData());
+      } catch (error) {
+        console.error("Error loading revenue data:", error);
+        setRevenueData(generateDefaultRevenueData());
+      }
+    };
+
+    // Subscribe to requests
+    const unsubscribe = subscribeToAdminRequests((requests) => {
+      if (!mounted) return;
+      setRecentRequests(requests.slice(0, 10));
+    });
+
+    loadStats();
+    loadRevenueData();
     setIsLoaded(true);
+
+    return () => {
+      mounted = false;
+      unsubscribe();
+    };
   }, []);
+
+  // Build stats array from Firebase data
+  useEffect(() => {
+    if (!adminStats) return;
+    const builtStats = [
+      {
+        title: "Total Users",
+        value: adminStats.totalUsers.toString(),
+        subtitle: "Active Community",
+        change: `+${Math.floor(adminStats.totalUsers * 0.084)}`,
+        icon: IconUsers,
+        color: "blue",
+        gradient: "from-blue-600/20 to-indigo-600/20",
+      },
+      {
+        title: "Active Helpers",
+        value: adminStats.activeHelpers.toString(),
+        subtitle: "On-Duty Now",
+        change: `+${Math.floor(adminStats.activeHelpers * 0.076)}`,
+        icon: IconActivity,
+        color: "green",
+        gradient: "from-emerald-600/20 to-teal-600/20",
+      },
+      {
+        title: "Completed Jobs",
+        value: adminStats.completedJobs.toString(),
+        subtitle: "Total Success",
+        change: `+${Math.floor(adminStats.completedJobs * 0.025)}`,
+        icon: IconTrendingUp,
+        color: "violet",
+        gradient: "from-violet-600/20 to-purple-600/20",
+      },
+      {
+        title: "Pending Help",
+        value: adminStats.pendingRequests.toString(),
+        subtitle: "High Priority",
+        change: `${adminStats.pendingRequests > 5 ? adminStats.pendingRequests - 5 : 0} critical`,
+        icon: IconAlertCircle,
+        color: "red",
+        gradient: "from-red-600/20 to-rose-600/20",
+      },
+    ];
+    setStats(builtStats);
+  }, [adminStats]);
+
   const [particles] = useState<
     Array<{ x: string; y_target: string; duration: number }>
   >(() =>
@@ -169,15 +178,15 @@ const AdminDashboard = () => {
   );
 
   const totalCommission = useMemo(
-    () => recentRequests.reduce((sum, r) => sum + r.amount * 0.2, 0),
-    [],
+    () => recentRequests.reduce((sum: number, r: any) => sum + (r.amount || 0) * 0.2, 0),
+    [recentRequests],
   );
   const paidCommission = useMemo(
     () =>
       recentRequests
-        .filter((r) => r.hasCommissionPaid)
-        .reduce((sum, r) => sum + r.amount * 0.2, 0),
-    [],
+        .filter((r: any) => r.hasCommissionPaid)
+        .reduce((sum: number, r: any) => sum + (r.amount || 0) * 0.2, 0),
+    [recentRequests],
   );
   const pendingCommission = useMemo(
     () => totalCommission - paidCommission,

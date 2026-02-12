@@ -42,9 +42,9 @@ import type { RideRequestDoc } from "@/types";
 const RequestsPage = () => {
   const [activeTab, setActiveTab] = useState<string | null>("all");
   const [search, setSearch] = useState("");
-  const [requests, setRequests] = useState<Array<{ id: string } & RideRequestDoc>>(
-    [],
-  );
+  const [requests, setRequests] = useState<
+    Array<{ id: string } & RideRequestDoc>
+  >([]);
   const { isDark } = useAppTheme();
 
   useEffect(() => {
@@ -114,7 +114,10 @@ const RequestsPage = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    await showSuccess("Export Complete", "Operational log exported successfully.");
+    await showSuccess(
+      "Export Complete",
+      "Operational log exported successfully.",
+    );
   }, [filteredRequests, activeTab]);
 
   const containerVariants: Variants = {
@@ -296,7 +299,7 @@ const RequestsPage = () => {
                 </Table.Thead>
                 <Table.Tbody>
                   <AnimatePresence mode="popLayout">
-                    {filteredRequests.map((req, idx) => (
+                    {filteredRequests.map((req: any, idx) => (
                       <motion.tr
                         key={req.id}
                         layout

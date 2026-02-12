@@ -137,8 +137,10 @@ export default function LoginPage() {
     <div
       className={cn(
         "min-h-screen flex font-satoshi overflow-hidden relative",
-        isDark ? "bg-gradient-to-br from-black via-brand-black to-black text-white" : "bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900",
-        isRTL ? "font-urdu" : "font-satoshi"
+        isDark
+          ? "bg-gradient-to-br from-black via-brand-black to-black text-white"
+          : "bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900",
+        isRTL ? "font-urdu" : "font-satoshi",
       )}
     >
       {/* Animated Background Particles */}
@@ -251,7 +253,7 @@ export default function LoginPage() {
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red via-orange-500 to-yellow-500 animate-pulse">
               Assistance
             </span>
-            <br /> Redefined.
+            <br />
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
@@ -375,10 +377,22 @@ export default function LoginPage() {
                 </motion.div>
               </div>
             </motion.div>
-            <h2 className={cn("text-4xl font-bold mb-2 bg-clip-text text-transparent", isDark ? "bg-gradient-to-r from-white to-gray-400" : "bg-gradient-to-r from-gray-900 to-gray-600")}>
+            <h2
+              className={cn(
+                "text-4xl font-bold mb-2 bg-clip-text text-transparent",
+                isDark
+                  ? "bg-gradient-to-r from-white to-gray-400"
+                  : "bg-gradient-to-r from-gray-900 to-gray-600",
+              )}
+            >
               {dict.auth.welcome_back}
             </h2>
-            <p className={cn("text-lg", isDark ? "text-gray-400" : "text-gray-600")}>
+            <p
+              className={cn(
+                "text-lg",
+                isDark ? "text-gray-400" : "text-gray-600",
+              )}
+            >
               {dict.auth.sign_in_continue}
             </p>
           </motion.div>
@@ -449,7 +463,12 @@ export default function LoginPage() {
               transition={{ delay: 0.3 }}
               className="space-y-2"
             >
-              <Label className={cn("text-xs uppercase tracking-wider font-bold flex items-center gap-2", isDark ? "text-gray-300" : "text-gray-700")}>
+              <Label
+                className={cn(
+                  "text-xs uppercase tracking-wider font-bold flex items-center gap-2",
+                  isDark ? "text-gray-300" : "text-gray-700",
+                )}
+              >
                 <Mail size={14} className="text-brand-red" />
                 {dict.auth.email_address}
               </Label>
@@ -466,7 +485,7 @@ export default function LoginPage() {
                     `${isRTL ? "pr-12" : "pl-12"} h-14 border-2 backdrop-blur-xl rounded-xl transition-all focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red`,
                     isDark
                       ? "bg-white/5 border-white/10 text-white focus:bg-white/10 hover:bg-white/10 hover:border-brand-red/50"
-                      : "bg-white border-gray-300 text-black placeholder:text-gray-400 focus:bg-gray-50 hover:bg-gray-50 hover:border-brand-red/30"
+                      : "bg-white border-gray-300 text-black placeholder:text-gray-400 focus:bg-gray-50 hover:bg-gray-50 hover:border-brand-red/30",
                   )}
                   placeholder="name@example.com"
                   dir="ltr" // Email is usually LTR
@@ -490,7 +509,12 @@ export default function LoginPage() {
               transition={{ delay: 0.4 }}
               className="space-y-2"
             >
-              <Label className={cn("text-xs uppercase tracking-wider font-bold flex items-center gap-2", isDark ? "text-gray-300" : "text-gray-700")}>
+              <Label
+                className={cn(
+                  "text-xs uppercase tracking-wider font-bold flex items-center gap-2",
+                  isDark ? "text-gray-300" : "text-gray-700",
+                )}
+              >
                 <Lock size={14} className="text-brand-red" />
                 {dict.auth.password}
               </Label>
@@ -508,7 +532,7 @@ export default function LoginPage() {
                     `${isRTL ? "pr-12 pl-12" : "pl-12 pr-12"} h-14 border-2 backdrop-blur-xl rounded-xl transition-all focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red`,
                     isDark
                       ? "bg-white/5 border-white/10 text-white focus:bg-white/10 hover:bg-white/10 hover:border-brand-red/50"
-                      : "bg-white border-gray-300 text-black placeholder:text-gray-400 focus:bg-gray-50 hover:bg-gray-50 hover:border-brand-red/30"
+                      : "bg-white border-gray-300 text-black placeholder:text-gray-400 focus:bg-gray-50 hover:bg-gray-50 hover:border-brand-red/30",
                   )}
                   placeholder="••••••••"
                   dir="ltr"
@@ -558,7 +582,7 @@ export default function LoginPage() {
                   "w-full h-16 text-lg font-bold rounded-xl mt-4 group relative overflow-hidden border-2 transition-all duration-500 cursor-pointer",
                   isDark
                     ? "bg-gradient-to-r from-brand-red via-brand-dark-red to-brand-red hover:shadow-2xl hover:shadow-brand-red/50 border-brand-red/50 hover:border-brand-red"
-                    : "bg-gradient-to-r from-brand-red via-orange-600 to-brand-red hover:shadow-2xl hover:shadow-red-500/30 border-brand-red hover:border-brand-red"
+                    : "bg-gradient-to-r from-brand-red via-orange-600 to-brand-red hover:shadow-2xl hover:shadow-red-500/30 border-brand-red hover:border-brand-red",
                 )}
                 style={{ backgroundSize: "200% 100%" }}
               >

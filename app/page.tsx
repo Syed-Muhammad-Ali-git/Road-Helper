@@ -19,7 +19,9 @@ const Home = () => {
       // 2. Or, it's a hard refresh on the home page (splashSeen is 'true', but sessionStarted is null, and current path is '/')
       const shouldShow =
         splashSeen !== "true" ||
-        (splashSeen === "true" && sessionStarted !== "true" && window.location.pathname === "/");
+        (splashSeen === "true" &&
+          sessionStarted !== "true" &&
+          window.location.pathname === "/");
 
       // If showing splash due to a refresh or first visit, immediately mark session as started
       // This prevents re-showing on soft navigations *within* the same browser session after the splash has played.

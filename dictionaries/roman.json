@@ -220,6 +220,13 @@
     "request_help_now": "Abhi help mangain",
     "helper": "Helper",
     "live_view": "Live view"
+  },
+  "tooltips": {
+    "theme_light": "Light theme par switch karein",
+    "theme_dark": "Dark theme par switch karein",
+    "language_toggle": "Zaban badlein (English / Urdu / Roman)",
+    "login": "Apne account mein log in karein",
+    "register": "Naaya RoadHelper account banayein"
   }
 }
 
