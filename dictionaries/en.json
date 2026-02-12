@@ -338,5 +338,38 @@
     "get_pro_perks": "Get Pro Perks",
     "earn_more": "Earn 5% more per job",
     "on_duty_mock": "1h 12m On Duty (Mock)"
+  },
+  "active_job": {
+    "title": "Active Job",
+    "no_active_job_title": "No Active Job",
+    "no_active_job_desc": "You don't have any ongoing jobs right now.",
+    "find_jobs": "Find Nearby Jobs",
+    "location": "LOCATION",
+    "vehicle_details": "VEHICLE DETAILS",
+    "issue_description": "ISSUE DESCRIPTION",
+    "get_directions": "Get Directions",
+    "start_service": "Start Service",
+    "mark_completed": "Mark as Completed",
+    "timeline_accepted": "Request Accepted",
+    "timeline_progress": "In Progress",
+    "timeline_completed": "Completed"
+  },
+  "earnings_page": {
+    "title": "Earnings",
+    "subtitle": "Track your income and payouts",
+    "total_earned": "Total Earned",
+    "lifetime_earnings": "Lifetime Earnings",
+    "payout_status_paid": "Paid",
+    "payout_status_pending": "Pending",
+    "average_per_job": "Average per Job",
+    "recent_earnings": "Recent Earnings",
+    "no_earnings_yet": "No earnings yet",
+    "table_service": "Service",
+    "table_customer": "Customer",
+    "table_amount": "Amount",
+    "table_commission": "Commission",
+    "table_your_earning": "Your Earning",
+    "table_status": "Status",
+    "table_date": "Date"
   }
 }

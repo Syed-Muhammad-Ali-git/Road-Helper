@@ -338,5 +338,38 @@
     "get_pro_perks": "پرو فوائد حاصل کریں",
     "earn_more": "ہر نوکری پر 5% مزید کمائیں",
     "on_duty_mock": "1 گھنٹہ 12 منٹ آن ڈیوٹی (فرضی)"
+  },
+  "active_job": {
+    "title": "فعال کام",
+    "no_active_job_title": "کوئی فعال کام نہیں",
+    "no_active_job_desc": "آپ کا اس وقت کوئی کام جاری نہیں ہے۔",
+    "find_jobs": "قریبی نوکریاں تلاش کریں",
+    "location": "مقام",
+    "vehicle_details": "گاڑی کی تفصیلات",
+    "issue_description": "مسئلے کی تفصیل",
+    "get_directions": "راستہ دیکھیں",
+    "start_service": "کام شروع کریں",
+    "mark_completed": "مکمل قرار دیں",
+    "timeline_accepted": "درخواست قبول کر لی گئی",
+    "timeline_progress": "جاری ہے",
+    "timeline_completed": "مکمل ہو گیا"
+  },
+  "earnings_page": {
+    "title": "آمدنی",
+    "subtitle": "اپنی آمدنی اور ادائیگیوں کو ٹریک کریں",
+    "total_earned": "کل آمدنی",
+    "lifetime_earnings": "تاحیات آمدنی",
+    "payout_status_paid": "ادائیگی ہو گئی",
+    "payout_status_pending": "زیر التواء",
+    "average_per_job": "فی کام اوسط",
+    "recent_earnings": "حالیہ آمدنی",
+    "no_earnings_yet": "ابھی تک کوئی آمدنی نہیں ہے",
+    "table_service": "سروس",
+    "table_customer": "کسٹمر",
+    "table_amount": "رقم",
+    "table_commission": "کمیشن",
+    "table_your_earning": "آپ کی آمدنی",
+    "table_status": "حالت",
+    "table_date": "تاریخ"
   }
 }

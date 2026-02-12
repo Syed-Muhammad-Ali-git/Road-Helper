@@ -52,33 +52,41 @@ export function subscribeToHelperEarnings(
   const q = query(
     collection(db, EARNINGS_COLLECTION),
     where("helperId", "==", helperId),
-    orderBy("createdAt", "desc"),
   );
 
-  return onSnapshot(q, (snapshot) => {
-    const earnings: EarningRecord[] = [];
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      earnings.push({
-        id: doc.id,
-        helperId: data.helperId,
-        requestId: data.requestId,
-        amount: data.amount || 0,
-        platformFee: data.platformFee || 0,
-        helperEarning: data.helperEarning || 0,
-        currency: data.currency || "PKR",
-        status: data.status || "pending",
-        createdAt: data.createdAt?.toDate?.() || new Date(),
-        paidAt: data.paidAt?.toDate?.(),
-        serviceType: data.serviceType || "Unknown",
-        customerName: data.customerName || "Unknown Customer",
-        customerImage: data.customerImage,
-        rideLocation: data.rideLocation,
-        distance: data.distance,
-      } as EarningRecord);
-    });
-    callback(earnings);
-  });
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const earnings: EarningRecord[] = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        earnings.push({
+          id: doc.id,
+          helperId: data.helperId,
+          requestId: data.requestId,
+          amount: data.amount || 0,
+          platformFee: data.platformFee || 0,
+          helperEarning: data.helperEarning || 0,
+          currency: data.currency || "PKR",
+          status: data.status || "pending",
+          createdAt: data.createdAt?.toDate?.() || new Date(),
+          paidAt: data.paidAt?.toDate?.(),
+          serviceType: data.serviceType || "Unknown",
+          customerName: data.customerName || "Unknown Customer",
+          customerImage: data.customerImage,
+          rideLocation: data.rideLocation,
+          distance: data.distance,
+        } as EarningRecord);
+      });
+      // Client-side sort: newest first
+      earnings.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      callback(earnings);
+    },
+    (err) => {
+      console.error("[subscribeToHelperEarnings] Error:", err);
+      callback([]); // Stop loader
+    },
+  );
 }
 
 /**

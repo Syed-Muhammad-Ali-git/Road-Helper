@@ -143,22 +143,22 @@ export function subscribePendingRequests(params: {
   const q = query(
     collection(db, COLLECTIONS.RIDE_REQUESTS),
     where("status", "==", "pending"),
-    orderBy("createdAt", "desc"),
   );
   return onSnapshot(
     q,
     (snap) => {
-      params.cb(
-        snap.docs.map((d) => {
-          const data = d.data() as Record<string, unknown>;
-          return {
-            id: d.id,
-            ...data,
-            createdAt: toDate(data.createdAt),
-            updatedAt: toDate(data.updatedAt),
-          } as { id: string } & RideRequestDoc;
-        }),
-      );
+      const reqs = snap.docs.map((d) => {
+        const data = d.data() as Record<string, unknown>;
+        return {
+          id: d.id,
+          ...data,
+          createdAt: toDate(data.createdAt),
+          updatedAt: toDate(data.updatedAt),
+        } as { id: string } & RideRequestDoc;
+      });
+      // Sort newest first on client side
+      reqs.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      params.cb(reqs);
     },
     (err) => console.error("[subscribePendingRequests]", err),
   );

@@ -128,10 +128,10 @@ export default function EarningsPage() {
               isDark ? "text-white" : "text-gray-900",
             )}
           >
-            Earnings
+            {dict.earnings_page.title}
           </Title>
           <Text c="dimmed" size="lg" mt="xs">
-            Track your income and payouts
+            {dict.earnings_page.subtitle}
           </Text>
         </motion.div>
 
@@ -160,7 +160,7 @@ export default function EarningsPage() {
                   <IconWallet size={20} />
                 </ThemeIcon>
                 <Badge variant="light" color="green">
-                  Total
+                  {dict.earnings_page.total_earned}
                 </Badge>
               </Group>
               <Title
@@ -173,7 +173,7 @@ export default function EarningsPage() {
                 {formatPKR(stats.totalEarned)}
               </Title>
               <Text size="sm" c="dimmed" mt="xs">
-                Lifetime Earnings
+                {dict.earnings_page.lifetime_earnings}
               </Text>
             </Paper>
 
@@ -193,7 +193,7 @@ export default function EarningsPage() {
                   <IconClock size={20} />
                 </ThemeIcon>
                 <Badge variant="light" color="yellow">
-                  Pending
+                  {dict.earnings_page.payout_status_pending}
                 </Badge>
               </Group>
               <Title
@@ -206,7 +206,7 @@ export default function EarningsPage() {
                 {formatPKR(stats.pendingAmount)}
               </Title>
               <Text size="sm" c="dimmed" mt="xs">
-                Awaiting Payout
+                {dict.earnings_page.payout_status_pending}
               </Text>
             </Paper>
 
@@ -226,7 +226,7 @@ export default function EarningsPage() {
                   <IconChecklist size={20} />
                 </ThemeIcon>
                 <Badge variant="light" color="blue">
-                  Paid
+                  {dict.earnings_page.payout_status_paid}
                 </Badge>
               </Group>
               <Title
@@ -239,7 +239,7 @@ export default function EarningsPage() {
                 {formatPKR(stats.paidAmount)}
               </Title>
               <Text size="sm" c="dimmed" mt="xs">
-                Completed Payouts
+                {dict.earnings_page.payout_status_paid}
               </Text>
             </Paper>
 
@@ -259,7 +259,7 @@ export default function EarningsPage() {
                   <IconTrendingUp size={20} />
                 </ThemeIcon>
                 <Badge variant="light" color="grape">
-                  Average
+                  {dict.earnings_page.average_per_job}
                 </Badge>
               </Group>
               <Title
@@ -272,7 +272,7 @@ export default function EarningsPage() {
                 {formatPKR(stats.averageEarningPerJob)}
               </Title>
               <Text size="sm" c="dimmed" mt="xs">
-                Per Job ({stats.totalJobs})
+                {dict.earnings_page.average_per_job} ({stats.totalJobs})
               </Text>
             </Paper>
           </SimpleGrid>
@@ -296,7 +296,7 @@ export default function EarningsPage() {
                 size="lg"
                 className={isDark ? "text-white" : "text-gray-900"}
               >
-                Recent Earnings
+                {dict.earnings_page.recent_earnings}
               </Title>
               {earnings.length > 0 && (
                 <ActionIcon variant="light" size="lg">
@@ -311,7 +311,7 @@ export default function EarningsPage() {
               </Center>
             ) : earnings.length === 0 ? (
               <Center py="xl">
-                <Text c="dimmed">No earnings yet</Text>
+                <Text c="dimmed">{dict.earnings_page.no_earnings_yet}</Text>
               </Center>
             ) : (
               <ScrollArea>
@@ -321,37 +321,37 @@ export default function EarningsPage() {
                       <Table.Th
                         className={isDark ? "text-gray-300" : "text-gray-700"}
                       >
-                        Service
+                        {dict.earnings_page.table_service}
                       </Table.Th>
                       <Table.Th
                         className={isDark ? "text-gray-300" : "text-gray-700"}
                       >
-                        Customer
+                        {dict.earnings_page.table_customer}
                       </Table.Th>
                       <Table.Th
                         className={isDark ? "text-gray-300" : "text-gray-700"}
                       >
-                        Amount
+                        {dict.earnings_page.table_amount}
                       </Table.Th>
                       <Table.Th
                         className={isDark ? "text-gray-300" : "text-gray-700"}
                       >
-                        Commission
+                        {dict.earnings_page.table_commission}
                       </Table.Th>
                       <Table.Th
                         className={isDark ? "text-gray-300" : "text-gray-700"}
                       >
-                        Your Earning
+                        {dict.earnings_page.table_your_earning}
                       </Table.Th>
                       <Table.Th
                         className={isDark ? "text-gray-300" : "text-gray-700"}
                       >
-                        Status
+                        {dict.earnings_page.table_status}
                       </Table.Th>
                       <Table.Th
                         className={isDark ? "text-gray-300" : "text-gray-700"}
                       >
-                        Date
+                        {dict.earnings_page.table_date}
                       </Table.Th>
                     </Table.Tr>
                   </Table.Thead>
@@ -389,7 +389,9 @@ export default function EarningsPage() {
                             }
                             variant="light"
                           >
-                            {earning.status === "paid" ? "Paid" : "Pending"}
+                            {earning.status === "paid"
+                              ? dict.earnings_page.payout_status_paid
+                              : dict.earnings_page.payout_status_pending}
                           </Badge>
                         </Table.Td>
                         <Table.Td c="dimmed">

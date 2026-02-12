@@ -26,15 +26,22 @@ import {
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { auth } from "@/lib/firebase/config";
-import { subscribeHelperActiveJobs, updateRideStatus } from "@/lib/services/requestService";
+import {
+  subscribeHelperActiveJobs,
+  updateRideStatus,
+} from "@/lib/services/requestService";
 import { showError } from "@/lib/sweetalert";
 import { toast } from "react-toastify";
 import type { RideRequestDoc } from "@/types";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 export default function ActiveJobUI() {
-  const [activeJobs, setActiveJobs] = useState<Array<{ id: string } & RideRequestDoc>>([]);
+  const [activeJobs, setActiveJobs] = useState<
+    Array<{ id: string } & RideRequestDoc>
+  >([]);
   const [updating, setUpdating] = useState(false);
   const [uid, setUid] = useState<string | null>(null);
+  const { dict, isRTL } = useLanguage();
 
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((u) => setUid(u?.uid ?? null));
@@ -72,7 +79,9 @@ export default function ActiveJobUI() {
   };
 
   const customerPhone = activeJob?.customerPhone ?? null;
-  const phoneClean = customerPhone ? String(customerPhone).replace(/[^\d+]/g, "") : "";
+  const phoneClean = customerPhone
+    ? String(customerPhone).replace(/[^\d+]/g, "")
+    : "";
   const whatsappHref = phoneClean
     ? `https://wa.me/${phoneClean}?text=${encodeURIComponent("RoadHelper: I'm on my way to assist you.")}`
     : "#";
@@ -92,14 +101,20 @@ export default function ActiveJobUI() {
             withBorder
             className="text-center max-w-md bg-slate-50 dark:bg-gray-900 border-dashed dark:border-gray-700"
           >
-            <ThemeIcon size={80} radius="xl" color="gray" variant="light" mb="md">
+            <ThemeIcon
+              size={80}
+              radius="xl"
+              color="gray"
+              variant="light"
+              mb="md"
+            >
               <IconClock size={40} />
             </ThemeIcon>
             <Title order={3} mb="xs">
-              No Active Job
+              {dict.active_job.no_active_job_title}
             </Title>
             <Text c="dimmed" mb="xl">
-              You don&apos;t have any ongoing jobs right now.
+              {dict.active_job.no_active_job_desc}
             </Text>
             <Button
               color="red"
@@ -109,7 +124,7 @@ export default function ActiveJobUI() {
               href="/helper/requests"
               className="hover:scale-105 transition-transform"
             >
-              Find Nearby Jobs
+              {dict.active_job.find_jobs}
             </Button>
           </Paper>
         </motion.div>
@@ -118,10 +133,15 @@ export default function ActiveJobUI() {
   }
 
   const loc = activeJob.location;
-  const locationStr = loc?.address ?? (loc?.lat && loc?.lng ? `${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)}` : "Live location");
-  const mapsHref = loc?.lat && loc?.lng
-    ? `https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lng}`
-    : "#";
+  const locationStr =
+    loc?.address ??
+    (loc?.lat && loc?.lng
+      ? `${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)}`
+      : "Live location");
+  const mapsHref =
+    loc?.lat && loc?.lng
+      ? `https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lng}`
+      : "#";
 
   return (
     <Box className="p-4 md:p-8 max-w-4xl mx-auto">
@@ -131,9 +151,12 @@ export default function ActiveJobUI() {
         transition={{ duration: 0.4 }}
       >
         <Stack gap="xl">
-          <Group justify="space-between">
+          <Group
+            justify="space-between"
+            className={isRTL ? "flex-row-reverse" : ""}
+          >
             <Title order={1} className="text-3xl font-bold">
-              Active Job
+              {dict.active_job.title}
             </Title>
             <Badge
               size="xl"
@@ -141,7 +164,9 @@ export default function ActiveJobUI() {
               variant="filled"
               p="lg"
             >
-              {activeJob.status.replace("_", " ").toUpperCase()}
+              {activeJob.status === "accepted"
+                ? dict.active_job.timeline_accepted.toUpperCase()
+                : dict.active_job.timeline_progress.toUpperCase()}
             </Badge>
           </Group>
 
@@ -152,7 +177,9 @@ export default function ActiveJobUI() {
                   {(activeJob.customerName ?? "C").charAt(0)}
                 </Avatar>
                 <Box>
-                  <Title order={3}>{activeJob.customerName ?? "Customer"}</Title>
+                  <Title order={3}>
+                    {activeJob.customerName ?? "Customer"}
+                  </Title>
                   <Group gap="xs">
                     <IconPhone size={14} className="text-slate-400" />
                     <Text size="sm" c="dimmed">
@@ -170,28 +197,28 @@ export default function ActiveJobUI() {
                 target="_blank"
                 className="hover:scale-105 transition-transform"
               >
-                Get Directions
+                {dict.active_job.get_directions}
               </Button>
             </Group>
 
             <Divider my="xl" />
 
             <Stack gap="lg">
-              <Box>
+              <Box className={isRTL ? "text-right" : ""}>
                 <Text fw={700} size="sm" c="dimmed">
-                  LOCATION
+                  {dict.active_job.location}
                 </Text>
                 <Text fw={600}>{locationStr}</Text>
               </Box>
-              <Box>
+              <Box className={isRTL ? "text-right" : ""}>
                 <Text fw={700} size="sm" c="dimmed">
-                  VEHICLE DETAILS
+                  {dict.active_job.vehicle_details}
                 </Text>
                 <Text>{activeJob.vehicleDetails ?? "—"}</Text>
               </Box>
-              <Box>
+              <Box className={isRTL ? "text-right" : ""}>
                 <Text fw={700} size="sm" c="dimmed">
-                  ISSUE DESCRIPTION
+                  {dict.active_job.issue_description}
                 </Text>
                 <Text className="bg-slate-50 dark:bg-gray-800 p-4 rounded-xl italic">
                   {activeJob.issueDescription ?? "No description provided."}
@@ -209,7 +236,7 @@ export default function ActiveJobUI() {
                 href={telHref}
                 disabled={!customerPhone}
               >
-                Call
+                {dict.helper_requests.call}
               </Button>
               <Button
                 variant="outline"
@@ -220,31 +247,62 @@ export default function ActiveJobUI() {
                 target="_blank"
                 disabled={!customerPhone}
               >
-                WhatsApp
+                {dict.helper_requests.whatsapp}
               </Button>
             </Group>
 
             <Timeline
               active={
-                activeJob.status === "accepted" ? 0 : activeJob.status === "in_progress" ? 1 : 2
+                activeJob.status === "accepted"
+                  ? 0
+                  : activeJob.status === "in_progress"
+                    ? 1
+                    : 2
               }
               bulletSize={30}
               lineWidth={2}
               mt="xl"
             >
-              <Timeline.Item bullet={<IconCheck size={16} />} title="Request Accepted">
-                <Text size="xs" c="dimmed">
-                  You accepted this request
+              <Timeline.Item
+                bullet={<IconCheck size={16} />}
+                title={dict.active_job.timeline_accepted}
+              >
+                <Text
+                  size="xs"
+                  c="dimmed"
+                  className={isRTL ? "text-right" : ""}
+                >
+                  {isRTL
+                    ? "آپ نے یہ درخواست قبول کی"
+                    : "You accepted this request"}
                 </Text>
               </Timeline.Item>
-              <Timeline.Item bullet={<IconNavigation size={16} />} title="In Progress">
-                <Text size="xs" c="dimmed">
-                  Work started or you are on your way
+              <Timeline.Item
+                bullet={<IconNavigation size={16} />}
+                title={dict.active_job.timeline_progress}
+              >
+                <Text
+                  size="xs"
+                  c="dimmed"
+                  className={isRTL ? "text-right" : ""}
+                >
+                  {isRTL
+                    ? "کام شروع ہو چکا ہے یا آپ راستے میں ہیں"
+                    : "Work started or you are on your way"}
                 </Text>
               </Timeline.Item>
-              <Timeline.Item bullet={<IconCircleCheck size={16} />} title="Completed">
-                <Text size="xs" c="dimmed">
-                  Service delivered successfully
+              <Timeline.Item
+                bullet={<IconCircleCheck size={16} />}
+                title={dict.active_job.timeline_completed}
+              >
+                <Text
+                  size="xs"
+                  c="dimmed"
+                  className={isRTL ? "text-right" : ""}
+                >
+                  {isRTL
+                    ? "سروس کامیابی سے فراہم کر دی گئی"
+                    : "Service delivered successfully"}
                 </Text>
               </Timeline.Item>
             </Timeline>
@@ -259,7 +317,7 @@ export default function ActiveJobUI() {
                   onClick={() => updateStatus("in_progress")}
                   className="hover:scale-105 transition-transform"
                 >
-                  Start Service
+                  {dict.active_job.start_service}
                 </Button>
               )}
               {activeJob.status === "in_progress" && (
@@ -271,7 +329,7 @@ export default function ActiveJobUI() {
                   onClick={() => updateStatus("completed")}
                   className="hover:scale-105 transition-transform"
                 >
-                  Mark as Completed
+                  {dict.active_job.mark_completed}
                 </Button>
               )}
             </Group>

@@ -338,5 +338,38 @@
     "get_pro_perks": "Pro Perks Hasil Karen",
     "earn_more": "Har job par 5% zyada kamayen",
     "on_duty_mock": "1h 12m On Duty (Mock)"
+  },
+  "active_job": {
+    "title": "Active Job",
+    "no_active_job_title": "Koi active job nahi",
+    "no_active_job_desc": "Aap ka is waqt koi kaam jari nahi hai.",
+    "find_jobs": "Nearby jobs talash karein",
+    "location": "LOCATION",
+    "vehicle_details": "GARI KI TAFSEEL",
+    "issue_description": "MASLAY KI TAFSEEL",
+    "get_directions": "Directions hasil karein",
+    "start_service": "Service shuru karein",
+    "mark_completed": "Mukammal mark karein",
+    "timeline_accepted": "Request qabool ho gayi",
+    "timeline_progress": "Jari hai",
+    "timeline_completed": "Mukammal ho gaya"
+  },
+  "earnings_page": {
+    "title": "Aamdani",
+    "subtitle": "Apni aamdani aur payouts track karein",
+    "total_earned": "Total aamdani",
+    "lifetime_earnings": "Lifetime earnings",
+    "payout_status_paid": "Paid",
+    "payout_status_pending": "Pending",
+    "average_per_job": "Per job avg",
+    "recent_earnings": "Haliya aamdani",
+    "no_earnings_yet": "Abhi tak koi aamdani nahi hai",
+    "table_service": "Service",
+    "table_customer": "Customer",
+    "table_amount": "Amount",
+    "table_commission": "Commission",
+    "table_your_earning": "Aap ki aamdani",
+    "table_status": "Status",
+    "table_date": "Date"
   }
 }
