@@ -21,7 +21,9 @@
     "role": "Role",
     "english": "English",
     "urdu": "Urdu",
-    "roman": "Roman English"
+    "roman": "Roman English",
+    "home": "Ghar",
+    "back_to_portal": "Portal par wapas"
   },
   "roles": {
     "admin": "Admin",

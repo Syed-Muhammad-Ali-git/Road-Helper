@@ -21,7 +21,9 @@
     "role": "Role",
     "english": "English",
     "urdu": "Urdu",
-    "roman": "Roman English"
+    "roman": "Roman English",
+    "home": "Home",
+    "back_to_portal": "Back to Portal"
   },
   "roles": {
     "admin": "Admin",
@@ -137,6 +139,7 @@
     "helper": "Helper",
     "email_address": "Email Address",
     "password": "Password",
+    "login": "Admin Authentication",
     "forgot_password": "Forgot Password?",
     "sign_in": "Sign In",
     "signing_in": "Signing In...",
@@ -290,7 +293,8 @@
     "full_name": "Full Name",
     "phone_number": "Phone Number",
     "email_address": "Email Address",
-    "customer_badge": "CUSTOMER"
+    "customer_badge": "CUSTOMER",
+    "back": "Back"
   },
   "helper_requests": {
     "job_requests": "Job Requests",

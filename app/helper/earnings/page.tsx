@@ -5,7 +5,6 @@ import {
   Title,
   Text,
   Paper,
-  Stack,
   Box,
   Group,
   SimpleGrid,
@@ -22,7 +21,6 @@ import {
   IconTrendingUp,
   IconChecklist,
   IconClock,
-  IconReceipt,
   IconDownload,
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
@@ -145,8 +143,8 @@ export default function EarningsPage() {
               className={cn(
                 "relative overflow-hidden transition-all hover:shadow-lg",
                 isDark
-                  ? "bg-gradient-to-br from-green-900/40 to-green-800/20 border border-green-700/30"
-                  : "bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200",
+                  ? "bg-linear-to-br from-green-900/40 to-green-800/20 border border-green-700/30"
+                  : "bg-linear-to-br from-green-50 to-emerald-50 border border-green-200",
               )}
             >
               <Group justify="space-between" mb="md">
@@ -184,8 +182,8 @@ export default function EarningsPage() {
               className={cn(
                 "relative overflow-hidden transition-all hover:shadow-lg",
                 isDark
-                  ? "bg-gradient-to-br from-yellow-900/40 to-orange-800/20 border border-yellow-700/30"
-                  : "bg-gradient-to-br from-yellow-50 to-orange-50 border border-yellow-200",
+                  ? "bg-linear-to-br from-yellow-900/40 to-orange-800/20 border border-yellow-700/30"
+                  : "bg-linear-to-br from-yellow-50 to-orange-50 border border-yellow-200",
               )}
             >
               <Group justify="space-between" mb="md">
@@ -217,8 +215,8 @@ export default function EarningsPage() {
               className={cn(
                 "relative overflow-hidden transition-all hover:shadow-lg",
                 isDark
-                  ? "bg-gradient-to-br from-blue-900/40 to-blue-800/20 border border-blue-700/30"
-                  : "bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200",
+                  ? "bg-linear-to-br from-blue-900/40 to-blue-800/20 border border-blue-700/30"
+                  : "bg-linear-to-br from-blue-50 to-cyan-50 border border-blue-200",
               )}
             >
               <Group justify="space-between" mb="md">
@@ -250,8 +248,8 @@ export default function EarningsPage() {
               className={cn(
                 "relative overflow-hidden transition-all hover:shadow-lg",
                 isDark
-                  ? "bg-gradient-to-br from-purple-900/40 to-pink-800/20 border border-purple-700/30"
-                  : "bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200",
+                  ? "bg-linear-to-br from-purple-900/40 to-pink-800/20 border border-purple-700/30"
+                  : "bg-linear-to-br from-purple-50 to-pink-50 border border-purple-200",
               )}
             >
               <Group justify="space-between" mb="md">

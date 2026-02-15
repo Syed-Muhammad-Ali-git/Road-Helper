@@ -25,7 +25,7 @@ interface AdminStats {
   platformCommission: number;
 }
 
-interface AdminRequest {
+export interface AdminRequest {
   id: string;
   user: string;
   type: string;

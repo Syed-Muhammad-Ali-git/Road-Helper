@@ -1,18 +1,14 @@
 "use client";
 
-import React, { useMemo, memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   IconArrowLeft,
   IconMapPin,
-  IconCalendar,
   IconUser,
   IconPhone,
   IconCar,
   IconTools,
-  IconCircleCheck,
-  IconAlertCircle,
-  IconClock,
   IconMail,
   IconStar,
   IconDotsVertical,
@@ -35,7 +31,6 @@ import {
   Title,
 } from "@mantine/core";
 import { motion, Variants } from "framer-motion";
-import Link from "next/link";
 import { showSuccess, showInfo } from "@/lib/sweetalert";
 import { cn } from "@/lib/utils";
 import { useAppTheme } from "@/app/context/ThemeContext";
@@ -201,7 +196,7 @@ const RequestDetailPage = () => {
                 <div
                   className={cn(
                     "absolute top-0 right-0 p-10",
-                    isDark ? "text-white/[0.02]" : "text-gray-900/[0.02]",
+                    isDark ? "text-white/2" : "text-gray-900/2",
                   )}
                 >
                   <IconRoute size={240} />
@@ -408,7 +403,7 @@ const RequestDetailPage = () => {
                     className={cn(
                       "border relative",
                       isDark
-                        ? "bg-white/[0.02] border-white/5"
+                        ? "bg-white/2 border-white/5"
                         : "bg-gray-50/50 border-gray-100",
                     )}
                   >
@@ -444,8 +439,8 @@ const RequestDetailPage = () => {
                   className={cn(
                     "absolute top-0 right-0 p-6 transition-colors",
                     isDark
-                      ? "text-white/[0.01] group-hover:text-white/[0.03]"
-                      : "text-gray-900/[0.01] group-hover:text-gray-900/[0.03]",
+                      ? "text-white/1 group-hover:text-white/3"
+                      : "text-gray-900/1 group-hover:text-gray-900/3",
                   )}
                 >
                   <IconUser size={100} />
@@ -464,7 +459,7 @@ const RequestDetailPage = () => {
                   <Avatar
                     size={72}
                     radius="24px"
-                    className="bg-gradient-to-br from-brand-red to-brand-dark-red border-2 border-white/10 font-black shadow-xl"
+                    className="bg-linear-to-br from-brand-red to-brand-dark-red border-2 border-white/10 font-black shadow-xl"
                   >
                     {request.user.name[0]}
                   </Avatar>
@@ -556,8 +551,8 @@ const RequestDetailPage = () => {
                   className={cn(
                     "absolute top-0 right-0 p-6 transition-colors",
                     isDark
-                      ? "text-white/[0.01] group-hover:text-white/[0.03]"
-                      : "text-gray-900/[0.01] group-hover:text-gray-900/[0.03]",
+                      ? "text-white/1 group-hover:text-white/3"
+                      : "text-gray-900/1 group-hover:text-gray-900/3",
                   )}
                 >
                   <IconTools size={100} />

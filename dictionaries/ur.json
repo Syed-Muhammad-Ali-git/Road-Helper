@@ -21,7 +21,9 @@
     "role": "کردار",
     "english": "انگریزی",
     "urdu": "اردو",
-    "roman": "رومن"
+    "roman": "رومن",
+    "home": "گھر",
+    "back_to_portal": "پورٹل پر واپس"
   },
   "roles": {
     "admin": "ایڈمن",
@@ -137,6 +139,7 @@
     "helper": "ہیلپر",
     "email_address": "ای میل ایڈریس",
     "password": "پاس ورڈ",
+    "login": "ایڈمن تصدیق",
     "forgot_password": "کیا آپ پاس ورڈ بھول گئے؟",
     "sign_in": "سائن ان کریں",
     "signing_in": "سائن ان ہو رہا ہے...",

@@ -32,6 +32,11 @@ export interface FeedbackDoc {
 }
 
 export interface RideRequestDoc {
+  id: string;
+  timeline: any;
+  notes: any;
+  user:any;
+  helper: any;
   customerId: string;
   customerName?: string;
   customerPhone?: string | null;
@@ -58,4 +63,3 @@ export interface UserLocationDoc {
   coords: GeoLocation;
   updatedAt: unknown;
 }
-

@@ -68,7 +68,7 @@ function RegisterPageContent() {
   }, [registerType, router, dict]);
 
   const onCustomerSubmit = useCallback(
-    async (data: CustomerFormData & { profileImage?: string }) => {
+    async (data: CustomerFormData & { profileImage?: string | null }) => {
       setIsLoading(true);
       try {
         await signupWithEmail({
@@ -97,7 +97,7 @@ function RegisterPageContent() {
   );
 
   const onHelperSubmit = useCallback(
-    async (data: HelperFormData & { profileImage?: string }) => {
+    async (data: HelperFormData & { profileImage?: string | null }) => {
       setIsLoading(true);
       try {
         await signupWithEmail({

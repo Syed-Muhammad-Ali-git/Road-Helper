@@ -46,9 +46,9 @@ import {
   getAdminStats,
   subscribeToAdminRequests,
   getRevenueData,
+  type AdminRequest,
 } from "@/lib/services/adminService";
 import { useLanguage } from "@/app/context/LanguageContext";
-import type { RideRequestDoc } from "@/types";
 
 import { auth } from "@/lib/firebase/config";
 import { getUserByUid } from "@/lib/services/userService";
@@ -110,7 +110,7 @@ const AdminDashboard = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [stats, setStats] = useState<AdminStatItem[]>([]);
   const [revenueData, setRevenueData] = useState<RevenueDataPoint[]>([]);
-  const [recentRequests, setRecentRequests] = useState<RideRequestDoc[]>([]);
+  const [recentRequests, setRecentRequests] = useState<AdminRequest[]>([]);
   const [adminStats, setAdminStats] = useState<AdminStatsData | null>(null);
 
   const [profile, setProfile] = useState<{
@@ -228,8 +228,7 @@ const AdminDashboard = () => {
   const totalCommission = useMemo(
     () =>
       recentRequests.reduce(
-        (sum: number, r: RideRequestDoc) =>
-          sum + ((r as any).amount || 0) * 0.2,
+        (sum: number, r: AdminRequest) => sum + (r.amount || 0) * 0.2,
         0,
       ),
     [recentRequests],
@@ -237,10 +236,9 @@ const AdminDashboard = () => {
   const paidCommission = useMemo(
     () =>
       recentRequests
-        .filter((r: RideRequestDoc) => (r as any).hasCommissionPaid)
+        .filter((r: AdminRequest) => r.hasCommissionPaid)
         .reduce(
-          (sum: number, r: RideRequestDoc) =>
-            sum + ((r as any).amount || 0) * 0.2,
+          (sum: number, r: AdminRequest) => sum + (r.amount || 0) * 0.2,
           0,
         ),
     [recentRequests],
@@ -326,7 +324,7 @@ const AdminDashboard = () => {
                 y: "100%",
               }}
               animate={{
-                y: [null, p.y_target],
+                y: ["100%", p.y_target],
                 opacity: [0, 0.3, 0],
               }}
               transition={{
