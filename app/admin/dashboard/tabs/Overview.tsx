@@ -2,18 +2,21 @@
 
 import React, { useMemo, memo } from "react";
 import {
-  SimpleGrid,
+  Avatar,
+  Box,
+  Button,
+  Divider,
+  Group,
+  Loader,
   Paper,
+  Stack,
   Text,
   Title,
-  Group,
-  ThemeIcon,
+  TextInput,
+  PasswordInput,
   Badge,
+  ThemeIcon,
   Table,
-  Button,
-  Box,
-  Tooltip,
-  Avatar,
   ActionIcon,
 } from "@mantine/core";
 import {
@@ -23,10 +26,7 @@ import {
   IconActivity,
   IconTrendingUp,
   IconPercentage,
-  IconUserShield,
-  IconMapPin,
   IconArrowRight,
-  IconCrown,
 } from "@tabler/icons-react";
 import { motion, type Variants } from "framer-motion";
 import {
@@ -41,6 +41,9 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/app/context/LanguageContext";
+import { useAppTheme } from "@/app/context/ThemeContext";
+import { SimpleGrid } from "@mantine/core";
 
 const mapBg = "/assets/images/backgrounds/map-bg.svg";
 
@@ -134,6 +137,9 @@ const recentRequests = [
 ];
 
 const OverviewTab = () => {
+  const { dict } = useLanguage();
+  const { isDark } = useAppTheme();
+
   const totalCommission = useMemo(
     () => recentRequests.reduce((sum, r) => sum + r.amount * 0.2, 0),
     [],
@@ -172,9 +178,14 @@ const OverviewTab = () => {
         {stats.map((stat) => (
           <motion.div key={stat.title} variants={itemVariants}>
             <Paper
-              p={30}
-              radius="32px"
-              className="glass-dark border border-white/5 relative overflow-hidden group hover:border-white/20 transition-all duration-500 h-full shadow-xl"
+              p={24}
+              radius="24px"
+              className={cn(
+                "border relative overflow-hidden group hover:-translate-y-1 transition-all duration-300 h-full shadow-xl",
+                isDark
+                  ? "bg-white/5 border-white/5 shadow-white/5"
+                  : "bg-white border-gray-200 shadow-gray-200/50",
+              )}
             >
               <div
                 className={cn(
@@ -214,7 +225,13 @@ const OverviewTab = () => {
               <Text className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">
                 {stat.title}
               </Text>
-              <Title order={2} className="text-white text-4xl font-black mb-3">
+              <Title
+                order={2}
+                className={cn(
+                  "text-3xl font-black mb-2 transition-colors",
+                  isDark ? "text-white" : "text-gray-900",
+                )}
+              >
                 {stat.value}
               </Title>
               <div className="flex items-center gap-2">
@@ -236,9 +253,12 @@ const OverviewTab = () => {
         {/* Revenue Chart */}
         <motion.div variants={itemVariants} className="lg:col-span-2">
           <Paper
-            p={40}
+            p={32}
             radius="32px"
-            className="glass-dark border border-white/5 h-full flex flex-col relative overflow-hidden shadow-2xl"
+            className={cn(
+              "border h-full flex flex-col relative overflow-hidden shadow-2xl",
+              isDark ? "bg-white/5 border-white/5" : "bg-white border-gray-200",
+            )}
           >
             <div className="absolute top-0 right-0 p-10 text-white/[0.02]">
               <IconReceipt size={240} />
@@ -259,10 +279,10 @@ const OverviewTab = () => {
             </Group>
 
             <Box
-              className="h-[350px] mb-10 relative z-10 w-full"
-              style={{ minWidth: "100%" }}
+              className="h-[350px] mb-8 relative z-10 w-full"
+              style={{ minHeight: 350 }}
             >
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <AreaChart data={revenueData}>
                   <defs>
                     <linearGradient id="total-tab" x1="0" y1="0" x2="0" y2="1">
@@ -397,7 +417,10 @@ const OverviewTab = () => {
         <motion.div variants={itemVariants}>
           <Paper
             radius="32px"
-            className="glass-dark border border-white/5 h-full relative overflow-hidden flex flex-col shadow-2xl"
+            className={cn(
+              "border h-full relative overflow-hidden flex flex-col shadow-2xl",
+              isDark ? "bg-white/5 border-white/5" : "bg-white border-gray-200",
+            )}
           >
             <div className="p-8 relative z-10 bg-gradient-to-b from-[#0a0a0a] to-transparent">
               <Group justify="space-between">

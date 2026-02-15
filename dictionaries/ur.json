@@ -436,6 +436,22 @@
     "last_interaction": "آخری رابطہ",
     "operational_id": "آپریشنل آئی ڈی",
     "mission_telemetry": "مشین ٹیلی میٹری",
-    "deployment_specification": "تعیناتی تفصیلات"
+    "deployment_specification": "تعیناتی تفصیلات",
+    "fleet_operations": "فلیٹ آپریشنز",
+    "service_logistics": "سروس لاجسٹکس",
+    "deployment_monitoring": "لائیو تعیناتی کی نگرانی اور تاریخ",
+    "export_intelligence": "انٹیلیجنس ایکسپورٹ",
+    "total_fleet": "کل فلیٹ",
+    "pending_allocation": "تعیناتی کے انتظار میں",
+    "active_duty": "فعال ڈیوٹی",
+    "fulfillment": "تکمیل",
+    "search_requests": "درخواستیں تلاش کریں...",
+    "reference_id": "حوالہ آئی ڈی",
+    "requester_profile": "درخواست گزار کی پروفائل",
+    "deployment_detail": "تعیناتی کی تفصیل",
+    "operational_area": "آپریشنل ایریا",
+    "duty_status": "ڈیوٹی اسٹیٹس",
+    "financials": "مالی معاملات",
+    "no_signals_found": "کوئی سگنل نہیں ملا"
   }
 }

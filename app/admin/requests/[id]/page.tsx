@@ -57,7 +57,7 @@ const RequestDetailPage = () => {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  const [request, setRequest] = useState<any | null>(null);
+  const [request, setRequest] = useState<RideRequestDoc | null>(null);
   const { isDark } = useAppTheme();
   const { dict } = useLanguage();
 
@@ -83,7 +83,7 @@ const RequestDetailPage = () => {
     return (
       <Box
         className={cn(
-          "relative min-h-screen overflow-hidden p-4 md:p-8 font-satoshi flex items-center justify-center",
+          "relative min-h-screen overflow-hidden p-4 md:px-8 md:pt-0 md:pb-8 font-satoshi flex items-center justify-center",
           isDark ? "bg-[#0a0a0a] text-white" : "bg-gray-50 text-gray-900",
         )}
       >
@@ -95,7 +95,7 @@ const RequestDetailPage = () => {
   return (
     <Box
       className={cn(
-        "relative min-h-screen overflow-hidden p-4 md:p-8 font-satoshi transition-colors",
+        "min-h-screen p-4 md:px-8 md:pt-2 md:pb-8 max-w-full mx-auto transition-colors",
         isDark ? "bg-[#0a0a0a] text-white" : "bg-gray-50 text-gray-900",
       )}
     >
@@ -117,7 +117,7 @@ const RequestDetailPage = () => {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="relative z-10 max-w-6xl mx-auto"
+        className="relative z-10 max-w-full mx-auto"
       >
         {/* Navigation Header */}
         <Group justify="space-between" mb={40} align="center">

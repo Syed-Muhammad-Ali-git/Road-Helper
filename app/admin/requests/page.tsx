@@ -135,7 +135,7 @@ const RequestsPage = () => {
   return (
     <Box
       className={cn(
-        "relative min-h-screen overflow-hidden p-4 md:p-8 font-satoshi",
+        "relative min-h-screen overflow-hidden p-4 md:px-8 md:pt-0 md:pb-8 font-satoshi transition-colors",
         isDark ? "bg-[#0a0a0a] text-white" : "bg-gray-50 text-gray-900",
       )}
     >
@@ -157,10 +157,10 @@ const RequestsPage = () => {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="relative z-10 max-w-7xl mx-auto"
+        className="relative z-10 max-w-full mx-auto"
       >
         {/* Header */}
-        <Group justify="space-between" mb={45} align="flex-end">
+        <Group justify="space-between" mb={32} align="flex-end">
           <Box>
             <motion.div
               variants={itemVariants}
@@ -168,7 +168,7 @@ const RequestsPage = () => {
             >
               <IconTruck size={16} className="text-brand-red" />
               <Text className="text-brand-red font-black uppercase tracking-[0.3em] text-[10px]">
-                Fleet Operations
+                {dict.admin.fleet_operations}
               </Text>
             </motion.div>
             <Title
@@ -178,13 +178,15 @@ const RequestsPage = () => {
                 isDark ? "text-white" : "text-gray-900",
               )}
             >
-              Service{" "}
+              {dict.admin.service_logistics.split(" ")[0]}{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500">
-                Logistics
+                {dict.admin.service_logistics.split(" ").length > 1
+                  ? dict.admin.service_logistics.split(" ").slice(1).join(" ")
+                  : ""}
               </span>
             </Title>
             <Text className="text-gray-500 mt-2 font-bold uppercase tracking-tight text-xs">
-              Live deployment monitoring & history
+              {dict.admin.deployment_monitoring}
             </Text>
           </Box>
           <motion.div variants={itemVariants}>
@@ -198,7 +200,7 @@ const RequestsPage = () => {
               }
               onClick={handleDownloadReport}
             >
-              Export Intelligence
+              {dict.admin.export_intelligence}
             </Button>
           </motion.div>
         </Group>
@@ -231,25 +233,25 @@ const RequestsPage = () => {
             >
               <Tabs.List>
                 <Tabs.Tab value="all" leftSection={<IconReceipt2 size={14} />}>
-                  Total Fleet
+                  {dict.admin.total_fleet}
                 </Tabs.Tab>
                 <Tabs.Tab
                   value="pending"
                   leftSection={<IconAlertCircle size={14} />}
                 >
-                  Pending Allocation
+                  {dict.admin.pending_allocation}
                 </Tabs.Tab>
                 <Tabs.Tab
                   value="inprogress"
                   leftSection={<IconClock size={14} />}
                 >
-                  Active Duty
+                  {dict.admin.active_duty}
                 </Tabs.Tab>
                 <Tabs.Tab
                   value="completed"
                   leftSection={<IconChecks size={14} />}
                 >
-                  Fulfillment
+                  {dict.admin.fulfillment}
                 </Tabs.Tab>
               </Tabs.List>
             </Tabs>
@@ -260,7 +262,7 @@ const RequestsPage = () => {
               className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-brand-red transition-all"
             />
             <input
-              placeholder="Search requests..."
+              placeholder={dict.admin.search_requests}
               className={cn(
                 "w-full h-15 border-2 rounded-2xl pl-14 pr-6 font-bold text-sm outline-none focus:border-brand-red transition-all",
                 isDark
@@ -310,29 +312,29 @@ const RequestsPage = () => {
                 >
                   <Table.Tr>
                     <Table.Th className="text-gray-600 font-black uppercase text-[10px] tracking-widest border-none py-6">
-                      Reference ID
+                      {dict.admin.reference_id}
                     </Table.Th>
                     <Table.Th className="text-gray-600 font-black uppercase text-[10px] tracking-widest border-none">
-                      Requester Profile
+                      {dict.admin.requester_profile}
                     </Table.Th>
                     <Table.Th className="text-gray-600 font-black uppercase text-[10px] tracking-widest border-none">
-                      Deployment Detail
+                      {dict.admin.deployment_detail}
                     </Table.Th>
                     <Table.Th className="text-gray-600 font-black uppercase text-[10px] tracking-widest border-none">
-                      Operational Area
+                      {dict.admin.operational_area}
                     </Table.Th>
                     <Table.Th className="text-gray-600 font-black uppercase text-[10px] tracking-widest border-none">
-                      Duty Status
+                      {dict.admin.duty_status}
                     </Table.Th>
                     <Table.Th className="text-gray-600 font-black uppercase text-[10px] tracking-widest border-none">
-                      Financials
+                      {dict.admin.financials}
                     </Table.Th>
                     <Table.Th className="border-none"></Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
                   <AnimatePresence mode="popLayout">
-                    {filteredRequests.map((req: any, idx) => (
+                    {filteredRequests.map((req, idx) => (
                       <motion.tr
                         key={req.id}
                         layout
@@ -481,7 +483,7 @@ const RequestsPage = () => {
               <div className="flex flex-col items-center justify-center py-32 opacity-30">
                 <IconFileText size={60} stroke={1} />
                 <Text className="mt-4 font-black text-xl uppercase tracking-widest">
-                  No signals found
+                  {dict.admin.no_signals_found}
                 </Text>
               </div>
             )}

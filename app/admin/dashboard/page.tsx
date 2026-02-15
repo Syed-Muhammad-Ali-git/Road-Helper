@@ -48,6 +48,7 @@ import {
   getRevenueData,
 } from "@/lib/services/adminService";
 import { useLanguage } from "@/app/context/LanguageContext";
+import type { RideRequestDoc } from "@/types";
 
 import { auth } from "@/lib/firebase/config";
 import { getUserByUid } from "@/lib/services/userService";
@@ -80,16 +81,42 @@ const itemVariants: Variants = {
   },
 };
 
+interface AdminStatItem {
+  title: string;
+  value: string;
+  subtitle: string;
+  change: string;
+  icon: React.ElementType;
+  color: string;
+  gradient: string;
+}
+
+interface RevenueDataPoint {
+  day: string;
+  total: number;
+  platform: number;
+}
+
+interface AdminStatsData {
+  totalUsers: number;
+  activeHelpers: number;
+  completedJobs: number;
+  pendingRequests: number;
+}
+
 const AdminDashboard = () => {
   const { isDark } = useAppTheme();
   const { dict } = useLanguage();
   const [isLoaded, setIsLoaded] = useState(false);
-  const [stats, setStats] = useState<any[]>([]);
-  const [revenueData, setRevenueData] = useState<any[]>([]);
-  const [recentRequests, setRecentRequests] = useState<any[]>([]);
-  const [adminStats, setAdminStats] = useState<any>(null);
+  const [stats, setStats] = useState<AdminStatItem[]>([]);
+  const [revenueData, setRevenueData] = useState<RevenueDataPoint[]>([]);
+  const [recentRequests, setRecentRequests] = useState<RideRequestDoc[]>([]);
+  const [adminStats, setAdminStats] = useState<AdminStatsData | null>(null);
 
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<{
+    displayName: string;
+    email: string;
+  } | null>(null);
 
   // Load Firebase data
   useEffect(() => {
@@ -108,9 +135,9 @@ const AdminDashboard = () => {
     // Load stats
     const loadStats = async () => {
       try {
-        const stats = await getAdminStats();
+        const statsData = await getAdminStats();
         if (!mounted) return;
-        setAdminStats(stats);
+        setAdminStats(statsData);
       } catch (error) {
         console.error("Error loading admin stats:", error);
       }
@@ -147,7 +174,7 @@ const AdminDashboard = () => {
   // Build stats array from Firebase data
   useEffect(() => {
     if (!adminStats) return;
-    const builtStats = [
+    const builtStats: AdminStatItem[] = [
       {
         title: dict.admin.total_users,
         value: adminStats.totalUsers.toString(),
@@ -186,7 +213,7 @@ const AdminDashboard = () => {
       },
     ];
     setStats(builtStats);
-  }, [adminStats]);
+  }, [adminStats, dict]);
 
   const [particles] = useState<
     Array<{ x: string; y_target: string; duration: number }>
@@ -201,7 +228,8 @@ const AdminDashboard = () => {
   const totalCommission = useMemo(
     () =>
       recentRequests.reduce(
-        (sum: number, r: any) => sum + (r.amount || 0) * 0.2,
+        (sum: number, r: RideRequestDoc) =>
+          sum + ((r as any).amount || 0) * 0.2,
         0,
       ),
     [recentRequests],
@@ -209,8 +237,12 @@ const AdminDashboard = () => {
   const paidCommission = useMemo(
     () =>
       recentRequests
-        .filter((r: any) => r.hasCommissionPaid)
-        .reduce((sum: number, r: any) => sum + (r.amount || 0) * 0.2, 0),
+        .filter((r: RideRequestDoc) => (r as any).hasCommissionPaid)
+        .reduce(
+          (sum: number, r: RideRequestDoc) =>
+            sum + ((r as any).amount || 0) * 0.2,
+          0,
+        ),
     [recentRequests],
   );
   const pendingCommission = useMemo(
@@ -259,7 +291,7 @@ const AdminDashboard = () => {
   return (
     <Box
       className={cn(
-        "relative min-h-screen overflow-hidden p-4 md:p-8 font-satoshi transition-colors",
+        "relative min-h-screen overflow-hidden p-4 md:px-8 md:pt-0 md:pb-8 font-satoshi transition-colors",
         isDark ? "bg-[#0a0a0a]" : "bg-gray-50",
       )}
     >
@@ -310,10 +342,10 @@ const AdminDashboard = () => {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="relative z-10 max-w-7xl mx-auto"
+        className="relative z-10 max-w-full mx-auto"
       >
         {/* HEADER SECTION */}
-        <Group justify="space-between" mb={40} align="flex-end">
+        <Group justify="space-between" align="flex-end" mb={24}>
           <Box>
             <motion.div
               variants={itemVariants}
@@ -366,7 +398,7 @@ const AdminDashboard = () => {
 
         {/* Stats Grid */}
         {stats.length > 0 && (
-          <SimpleGrid cols={{ base: 1, md: 4 }} spacing={20} mb={40}>
+          <SimpleGrid cols={{ base: 1, md: 4 }} spacing={16} mb={24}>
             {stats.map((stat) => (
               <motion.div key={stat.title} variants={itemVariants}>
                 <Paper
@@ -386,7 +418,7 @@ const AdminDashboard = () => {
                     )}
                   />
 
-                  <Group justify="space-between" mb={24}>
+                  <Group justify="space-between" mb={16}>
                     <div
                       className={cn(
                         "h-12 w-12 rounded-2xl flex items-center justify-center border transition-transform group-hover:scale-110",
@@ -445,11 +477,11 @@ const AdminDashboard = () => {
         )}
 
         {/* Charts & Map Grid */}
-        <SimpleGrid cols={{ base: 1, lg: 3 }}>
+        <SimpleGrid cols={{ base: 1, lg: 3 }} spacing={24} mb={40}>
           {/* Revenue Chart */}
           <motion.div variants={itemVariants} className="lg:col-span-2">
             <Paper
-              p={40}
+              p={32}
               radius="32px"
               className={cn(
                 "border h-full flex flex-col relative overflow-hidden shadow-2xl",
@@ -484,8 +516,11 @@ const AdminDashboard = () => {
                 </Box>
               </Group>
 
-              <Box className="h-[350px] mb-10 relative z-10 w-full">
-                <ResponsiveContainer width="100%" height="100%">
+              <Box
+                className="h-[350px] mb-8 relative z-10 w-full"
+                style={{ minHeight: 350 }}
+              >
+                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                   <AreaChart data={revenueData}>
                     <defs>
                       <linearGradient id="total" x1="0" y1="0" x2="0" y2="1">
@@ -578,7 +613,7 @@ const AdminDashboard = () => {
               <SimpleGrid
                 cols={{ base: 1, sm: 3 }}
                 spacing={16}
-                className="mt-auto"
+                className="mt-6"
               >
                 {[
                   {

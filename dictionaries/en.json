@@ -436,6 +436,22 @@
     "last_interaction": "Last Interaction",
     "operational_id": "Operational ID",
     "mission_telemetry": "Mission Telemetry",
-    "deployment_specification": "Deployment Specification"
+    "deployment_specification": "Deployment Specification",
+    "fleet_operations": "Fleet Operations",
+    "service_logistics": "Service Logistics",
+    "deployment_monitoring": "Live deployment monitoring & history",
+    "export_intelligence": "Export Intelligence",
+    "total_fleet": "Total Fleet",
+    "pending_allocation": "Pending Allocation",
+    "active_duty": "Active Duty",
+    "fulfillment": "Fulfillment",
+    "search_requests": "Search requests...",
+    "reference_id": "Reference ID",
+    "requester_profile": "Requester Profile",
+    "deployment_detail": "Deployment Detail",
+    "operational_area": "Operational Area",
+    "duty_status": "Duty Status",
+    "financials": "Financials",
+    "no_signals_found": "No signals found"
   }
 }

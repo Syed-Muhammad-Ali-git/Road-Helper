@@ -98,7 +98,10 @@ export default function AdminProfilePage() {
       // Update Firestore
       await updateUserProfile(uid, { displayName, email });
 
-      setProfile((prev: any) => ({ ...prev, displayName, email }));
+      setProfile((prev: any) => {
+        if (!prev) return null;
+        return { ...prev, displayName, email };
+      });
       setEditing(false);
       setPassword("");
       await showSuccess(
@@ -137,7 +140,7 @@ export default function AdminProfilePage() {
   return (
     <Box
       className={cn(
-        "min-h-screen p-4 md:p-8 max-w-2xl mx-auto pt-24 transition-colors",
+        "min-h-screen p-4 md:px-8 md:pt-4 md:pb-8 max-w-full mx-auto transition-colors",
         isDark ? "bg-[#0a0a0a] text-white" : "bg-gray-50 text-gray-900",
       )}
     >

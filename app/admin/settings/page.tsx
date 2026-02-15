@@ -58,7 +58,7 @@ export default function SettingsPage() {
   return (
     <Center
       className={cn(
-        "min-h-screen transition-colors p-4 md:p-8 pt-20",
+        "min-h-screen transition-colors p-4 md:px-8 md:pt-4 md:pb-8",
         isDark ? "bg-[#0a0a0a]" : "bg-gray-50",
       )}
     >
@@ -75,10 +75,7 @@ export default function SettingsPage() {
               isDark ? "text-white" : "text-gray-900",
             )}
           >
-            {dict.admin.settings_title.split(" ")[0]}{" "}
-            <span className="text-brand-red">
-              {dict.admin.settings_title.split(" ")[1]}
-            </span>
+            {dict.admin.settings_title}
           </Title>
           <Text className="text-gray-500 font-medium">
             {dict.admin.platform_configuration}

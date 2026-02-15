@@ -200,7 +200,6 @@ export async function getRevenueData(): Promise<RevenueDataPoint[]> {
     const q = query(
       collection(db, COLLECTIONS.RIDE_REQUESTS),
       where("createdAt", ">=", Timestamp.fromDate(eighthDayAgo)),
-      where("status", "==", "completed"),
       orderBy("createdAt", "desc"),
     );
 
@@ -209,6 +208,7 @@ export async function getRevenueData(): Promise<RevenueDataPoint[]> {
 
     snapshot.forEach((doc) => {
       const data = doc.data() as any;
+      if (data.status !== "completed") return; // Filter in memory to avoid index requirement
       const date = data.createdAt?.toDate?.() || new Date();
       const dayName = days[date.getDay()];
       dataByDay[dayName] = (dataByDay[dayName] || 0) + (data.cost || 0);
