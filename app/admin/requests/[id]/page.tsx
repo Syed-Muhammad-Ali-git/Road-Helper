@@ -530,7 +530,7 @@ const RequestDetailPage = () => {
                 </Stack>
 
                 <Button className="w-full mt-10 bg-white/5 hover:bg-white/10 text-white h-14 rounded-2xl border border-white/5 font-black uppercase text-[10px] tracking-widest">
-                  Access Personnel File
+                  Access Person File
                 </Button>
               </Paper>
             </motion.div>

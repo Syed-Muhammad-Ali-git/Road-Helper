@@ -184,7 +184,7 @@ export default function AdminProfilePage() {
             {profile?.displayName ?? "Admin"}
           </Title>
           <Text className="text-brand-red font-bold text-xs uppercase tracking-widest mt-1">
-            Authorized Personnel
+            Authorized Person
           </Text>
         </Paper>
 

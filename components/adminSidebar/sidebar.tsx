@@ -26,7 +26,7 @@ const AdminSideBar = ({ open, setOpen }: SideBarProps) => {
         icon: LayoutDashboard,
         path: "/admin/dashboard",
       },
-      { text: "Ops Users", icon: Users, path: "/admin/users" },
+      { text: "All Users", icon: Users, path: "/admin/users" },
       {
         text: "Deployments",
         icon: Receipt,
