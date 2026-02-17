@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export interface LiveCoords {
   lat: number;
@@ -20,18 +20,24 @@ export interface LiveLocationState {
   stop: () => void;
 }
 
-export function useLiveLocation(options?: UseLiveLocationOptions): LiveLocationState {
+export function useLiveLocation(
+  options?: UseLiveLocationOptions,
+): LiveLocationState {
   const [coords, setCoords] = useState<LiveCoords | null>(null);
-  const [permission, setPermission] = useState<
-    LiveLocationState["permission"]
-  >("prompt");
+  const [permission, setPermission] =
+    useState<LiveLocationState["permission"]>("prompt");
   const [error, setError] = useState<string | null>(null);
   const [isWatching, setIsWatching] = useState(false);
   const watchIdRef = useRef<number | null>(null);
   const optionsRef = useRef(options);
-  optionsRef.current = options;
 
-  const supported = typeof navigator !== "undefined" && "geolocation" in navigator;
+  // Update options ref in useEffect to avoid ref access during render
+  useEffect(() => {
+    optionsRef.current = options;
+  }, [options]);
+
+  const supported =
+    typeof navigator !== "undefined" && "geolocation" in navigator;
 
   const stop = useCallback(() => {
     if (!supported) return;
@@ -88,4 +94,3 @@ export function useLiveLocation(options?: UseLiveLocationOptions): LiveLocationS
 
   return { coords, permission, isWatching, error, requestPermission, stop };
 }
-

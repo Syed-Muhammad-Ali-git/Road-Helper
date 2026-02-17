@@ -16,6 +16,7 @@ import {
   ScrollArea,
   Button,
 } from "@mantine/core";
+import { Menu } from "@mantine/core"; // Explicitly import Menu
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
   IconEye,
@@ -78,7 +79,7 @@ const RequestsPage = () => {
 
       return matchesTab && matchesSearch;
     });
-  }, [activeTab, search]);
+  }, [activeTab, search, requests]);
 
   const handleDownloadReport = useCallback(async () => {
     const headers = [
@@ -101,7 +102,7 @@ const RequestsPage = () => {
         req.serviceType ?? "",
         locLabel,
         req.status,
-        (req as any).amount ?? "",
+        req.amount ?? "",
         req.createdAt instanceof Date ? req.createdAt.toISOString() : "",
       ].join(",");
     });
@@ -477,18 +478,18 @@ const RequestsPage = () => {
                               }
                             >
                               {/* Amount not yet in schema, standard placeholder */}
-                              Rs {(req as any).amount || "0"}
+                              Rs {req.amount || "0"}
                             </Text>
                             <Text
                               size="xs"
                               className={cn(
                                 "font-black text-[9px]",
-                                (req as any).paymentStatus === "Paid"
+                                req.paymentStatus === "Paid"
                                   ? "text-emerald-500"
                                   : "text-brand-red",
                               )}
                             >
-                              {(req as any).paymentStatus || "Pending"}
+                              {req.paymentStatus || "Pending"}
                             </Text>
                           </div>
                         </Table.Td>

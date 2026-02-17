@@ -23,7 +23,8 @@
     "urdu": "اردو",
     "roman": "رومن",
     "home": "گھر",
-    "back_to_portal": "پورٹل پر واپس"
+    "back_to_portal": "پورٹل پر واپس",
+    "success": "کامیابی"
   },
   "roles": {
     "admin": "ایڈمن",
@@ -293,7 +294,8 @@
     "full_name": "پورا نام",
     "phone_number": "فون نمبر",
     "email_address": "ای میل ایڈریس",
-    "customer_badge": "کسٹمر"
+    "customer_badge": "کسٹمر",
+    "back": "واپس"
   },
   "helper_requests": {
     "job_requests": "نوکری کی درخواستیں",

@@ -36,7 +36,7 @@ import { cn } from "@/lib/utils";
 import { useAppTheme } from "@/app/context/ThemeContext";
 import { useLanguage } from "@/app/context/LanguageContext";
 import { subscribeRideRequest } from "@/lib/services/requestService";
-import type { RideRequestDoc } from "@/types";
+import type { RideRequestDoc, TimelineItem } from "@/types";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -221,7 +221,7 @@ const RequestDetailPage = () => {
                     radius="md"
                     className={cn(
                       "px-6 h-9 font-black uppercase text-[10px]",
-                      request.status === "In Progress"
+                      request.status === "in_progress"
                         ? "bg-blue-600 shadow-lg shadow-blue-500/20"
                         : "bg-emerald-600 shadow-lg shadow-emerald-500/20",
                     )}
@@ -236,7 +236,7 @@ const RequestDetailPage = () => {
                   lineWidth={3}
                   color="brand-red"
                 >
-                  {request.timeline.map((item: any, idx: any) => (
+                  {request.timeline.map((item: TimelineItem, idx: number) => (
                     <Timeline.Item
                       key={idx}
                       bullet={
@@ -339,8 +339,8 @@ const RequestDetailPage = () => {
                       icon: IconReceipt2,
                       label: "Estimated Value",
                       value: `Rs ${
-                        (request as any).amount
-                          ? Number((request as any).amount).toLocaleString()
+                        request.amount
+                          ? Number(request.amount).toLocaleString()
                           : "0"
                       }`,
                       color: "emerald",

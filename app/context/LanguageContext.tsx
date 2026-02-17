@@ -28,11 +28,11 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
 
 const applyLanguageToDOM = (lang: Language) => {
   if (typeof window === "undefined") return;
-  
+
   const htmlElement = document.documentElement;
   htmlElement.dir = lang === "ur" ? "rtl" : "ltr";
   htmlElement.lang = lang;
-  
+
   if (lang === "ur") {
     htmlElement.classList.add("rtl");
     htmlElement.classList.remove("ltr");
@@ -43,18 +43,25 @@ const applyLanguageToDOM = (lang: Language) => {
 };
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguageState] = useState<Language>("en");
-  const [dict, setDict] = useState<Dictionary>(en);
+  // Lazy initialization to avoid setState in useEffect
+  const [language, setLanguageState] = useState<Language>(() => {
+    if (typeof window === "undefined") return "en";
+    return (localStorage.getItem("rh_lang") || "en") as Language;
+  });
+
+  const [dict, setDict] = useState<Dictionary>(() => {
+    if (typeof window === "undefined") return en;
+    const savedLang = (localStorage.getItem("rh_lang") || "en") as Language;
+    return savedLang === "ur" ? ur : savedLang === "roman" ? roman : en;
+  });
+
   const [mounted, setMounted] = useState(false);
 
-  // Initialize language from localStorage
+  // Apply language to DOM on mount
   useEffect(() => {
-    const savedLang = (localStorage.getItem("rh_lang") || "en") as Language;
-    setLanguageState(savedLang);
-    setDict(savedLang === "ur" ? ur : savedLang === "roman" ? roman : en);
-    applyLanguageToDOM(savedLang);
+    applyLanguageToDOM(language);
     setMounted(true);
-  }, []);
+  }, [language]);
 
   // Update when language changes
   useEffect(() => {

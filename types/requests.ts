@@ -1,4 +1,5 @@
 import type { UserRole } from "./auth";
+import React from "react"; // Added for React.ElementType
 
 export type ServiceType =
   | "mechanic"
@@ -31,12 +32,30 @@ export interface FeedbackDoc {
   createdAt: Date;
 }
 
+export interface TimelineItem {
+  icon: React.ElementType;
+  active: boolean;
+  title: string;
+  time: string;
+}
+
+export interface RequestUser {
+  name: string;
+  phone: string;
+  email: string;
+}
+
+export interface RequestHelper {
+  name: string;
+  phone: string;
+}
+
 export interface RideRequestDoc {
   id: string;
-  timeline: any;
-  notes: any;
-  user:any;
-  helper: any;
+  timeline: TimelineItem[]; // Changed from any to TimelineItem[]
+  notes: string; // Changed from any to string
+  user: RequestUser; // Changed from any to RequestUser
+  helper: RequestHelper; // Changed from any to RequestHelper
   customerId: string;
   customerName?: string;
   customerPhone?: string | null;
@@ -55,6 +74,8 @@ export interface RideRequestDoc {
   completedAt?: Date;
   customerRating?: number | null;
   helperRating?: number | null;
+  amount?: number; // Added to address the 'any' cast in page.tsx
+  paymentStatus?: string; // Added to address the 'any' cast in page.tsx
 }
 
 export interface UserLocationDoc {

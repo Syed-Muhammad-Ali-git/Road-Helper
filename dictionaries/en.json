@@ -23,7 +23,8 @@
     "urdu": "Urdu",
     "roman": "Roman English",
     "home": "Home",
-    "back_to_portal": "Back to Portal"
+    "back_to_portal": "Back to Portal",
+    "success": "Success"
   },
   "roles": {
     "admin": "Admin",

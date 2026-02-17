@@ -23,7 +23,8 @@
     "urdu": "Urdu",
     "roman": "Roman English",
     "home": "Ghar",
-    "back_to_portal": "Portal par wapas"
+    "back_to_portal": "Portal par wapas",
+    "success": "Success"
   },
   "roles": {
     "admin": "Admin",
@@ -139,6 +140,7 @@
     "helper": "Helper",
     "email_address": "Email address",
     "password": "Password",
+    "login": "Admin Authentication",
     "forgot_password": "Password bhool gaye?",
     "sign_in": "Sign in",
     "signing_in": "Signing in...",
@@ -292,7 +294,8 @@
     "full_name": "Pura Naam",
     "phone_number": "Phone Number",
     "email_address": "Email Address",
-    "customer_badge": "CUSTOMER"
+    "customer_badge": "CUSTOMER",
+    "back": "Back"
   },
   "helper_requests": {
     "job_requests": "Job Ki Darkhwasten",

@@ -134,6 +134,22 @@ export default function LoginPage() {
     [loginType],
   );
 
+  // Generate particles once using useMemo to avoid impure function calls during render
+  const particles = useMemo(() => {
+    if (typeof window === "undefined") return [];
+
+    return [...Array(20)].map((_, i) => ({
+      id: i,
+      initialX: Math.random() * window.innerWidth,
+      initialY: Math.random() * window.innerHeight,
+      initialScale: Math.random() * 0.5 + 0.5,
+      targetY: Math.random() * window.innerHeight,
+      targetX: Math.random() * window.innerWidth,
+      targetScale: Math.random() * 1.5 + 0.5,
+      duration: Math.random() * 10 + 10,
+    }));
+  }, []);
+
   return (
     <div
       className={cn(
@@ -147,23 +163,23 @@ export default function LoginPage() {
       {/* Animated Background Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {isClient &&
-          [...Array(20)].map((_, i) => (
+          particles.map((particle) => (
             <motion.div
-              key={i}
+              key={particle.id}
               className="absolute w-2 h-2 bg-brand-red/30 rounded-full"
               initial={{
-                x: Math.random() * window.innerWidth,
-                y: Math.random() * window.innerHeight,
-                scale: Math.random() * 0.5 + 0.5,
+                x: particle.initialX,
+                y: particle.initialY,
+                scale: particle.initialScale,
               }}
               animate={{
-                y: [null, Math.random() * window.innerHeight],
-                x: [null, Math.random() * window.innerWidth],
+                y: [null, particle.targetY],
+                x: [null, particle.targetX],
                 opacity: [0.2, 0.8, 0.2],
-                scale: [null, Math.random() * 1.5 + 0.5],
+                scale: [null, particle.targetScale],
               }}
               transition={{
-                duration: Math.random() * 10 + 10,
+                duration: particle.duration,
                 repeat: Infinity,
                 ease: "linear",
               }}

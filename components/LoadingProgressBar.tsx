@@ -20,8 +20,9 @@ export const LoadingProgressBar: React.FC<LoadingProgressBarProps> = ({
 
   useEffect(() => {
     if (!isVisible) {
-      setProgress(0);
-      return;
+      // Use a timer to reset progress instead of direct setState
+      const resetTimer = setTimeout(() => setProgress(0), 0);
+      return () => clearTimeout(resetTimer);
     }
 
     let currentProgress = 0;

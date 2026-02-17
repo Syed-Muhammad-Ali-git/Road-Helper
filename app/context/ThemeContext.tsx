@@ -23,17 +23,17 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 const applyThemeToDOM = (newTheme: Theme) => {
   if (typeof window === "undefined") return;
-  
+
   const htmlElement = document.documentElement;
   const bodyElement = document.body;
 
   // Set data attribute for CSS selectors
   htmlElement.setAttribute("data-theme", newTheme);
-  
+
   // Remove all theme classes first
   htmlElement.classList.remove("light", "dark");
   bodyElement.classList.remove("light", "dark");
-  
+
   // Add the correct theme class
   htmlElement.classList.add(newTheme);
   bodyElement.classList.add(newTheme);
@@ -48,17 +48,21 @@ const applyThemeToDOM = (newTheme: Theme) => {
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const { setColorScheme } = useMantineColorScheme();
-  const [theme, setThemeState] = useState<Theme>("dark");
+
+  // Lazy initialization to avoid setState in useEffect
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window === "undefined") return "dark";
+    return (localStorage.getItem("rh_theme") || "dark") as Theme;
+  });
+
   const [mounted, setMounted] = useState(false);
 
-  // Initialize theme from localStorage
+  // Initialize theme on mount
   useEffect(() => {
-    const savedTheme = (localStorage.getItem("rh_theme") || "dark") as Theme;
-    setThemeState(savedTheme);
-    setColorScheme(savedTheme);
-    applyThemeToDOM(savedTheme);
+    setColorScheme(theme);
+    applyThemeToDOM(theme);
     setMounted(true);
-  }, [setColorScheme]);
+  }, [theme, setColorScheme]);
 
   // Update theme when it changes
   useEffect(() => {
@@ -81,7 +85,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem("rh_theme", newTheme);
       applyThemeToDOM(newTheme);
     },
-    [setColorScheme]
+    [setColorScheme],
   );
 
   const isDark = theme === "dark";

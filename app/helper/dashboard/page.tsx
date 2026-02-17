@@ -47,7 +47,7 @@ import type { RideRequestDoc } from "@/types";
 
 const HelperDashboard = () => {
   const { isDark } = useAppTheme();
-  const { dict, isRTL } = useLanguage();
+  const { dict, isRTL, language } = useLanguage();
   const [isOnline, setIsOnline] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
   const [helperName, setHelperName] = useState("Helper");
