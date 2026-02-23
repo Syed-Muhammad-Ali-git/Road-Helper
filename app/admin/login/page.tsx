@@ -105,7 +105,7 @@ export default function AdminLoginPage() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 1 }}
         className={cn(
-          "hidden lg:flex w-1/2 relative flex-col justify-between p-16 z-10 border-r transition-colors",
+          "hidden lg:flex w-1/2 relative flex-col justify-center p-16 z-10 border-r transition-colors",
           isDark ? "border-white/5 bg-black" : "border-gray-200 bg-white",
         )}
       >
@@ -129,99 +129,102 @@ export default function AdminLoginPage() {
           />
         </div>
 
-        <div className="relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-4 mb-12"
-          >
-            <div className="w-12 h-12 relative bg-white rounded-xl p-2 shadow-2xl">
-              <Image
-                src="/assets/images/logo.png"
-                alt="Logo"
-                fill
-                sizes="48px"
-                className="object-contain"
-              />
-            </div>
-            <span className="font-manrope font-black text-2xl tracking-tighter">
-              Road<span className="text-brand-red">Helper</span>{" "}
-              <span className="text-gray-500 text-sm font-bold ml-2 uppercase tracking-[0.3em]">
-                HQ
+        <div className="flex flex-col items-center justify-center text-center">
+          <div className="relative z-10 flex flex-col items-center">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-4 mb-12"
+            >
+              <div className="w-12 h-12 relative bg-white rounded-xl p-2 shadow-2xl">
+                <Image
+                  src="/assets/images/logo.png"
+                  alt="Logo"
+                  fill
+                  sizes="48px"
+                  className="object-contain"
+                />
+              </div>
+              <span className="font-manrope font-black text-2xl tracking-tighter">
+                Road<span className="text-brand-red">Helper</span>{" "}
+                <span className="text-gray-500 text-sm font-bold ml-2 uppercase tracking-[0.3em]">
+                  HQ
+                </span>
               </span>
-            </span>
-          </motion.div>
+            </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <h1
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="mb-12"
+            >
+              <h1
+                className={cn(
+                  "text-7xl font-black leading-[1.1] mb-8 tracking-tighter",
+                  isDark ? "text-white" : "text-gray-900",
+                )}
+              >
+                Central <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500">
+                  Command
+                </span>
+                <br /> Center.
+              </h1>
+              <p className="text-gray-400 text-xl max-w-md leading-relaxed font-medium mx-auto">
+                Enterprise-grade infrastructure management and real-time
+                operational oversight for the world&apos;s most reliable rescue
+                network.
+              </p>
+            </motion.div>
+          </div>
+
+          <div className="relative z-10 flex gap-6">
+            <div
               className={cn(
-                "text-7xl font-black leading-[1.1] mb-8 tracking-tighter",
-                isDark ? "text-white" : "text-gray-900",
+                "flex items-center gap-4 px-6 py-4 rounded-2xl border backdrop-blur-xl",
+                isDark
+                  ? "bg-white/5 border-white/10"
+                  : "bg-gray-50 border-gray-100",
               )}
             >
-              Central <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500">
-                Command
-              </span>
-              <br /> Center.
-            </h1>
-            <p className="text-gray-400 text-xl max-w-md leading-relaxed font-medium">
-              Enterprise-grade infrastructure management and real-time
-              operational oversight for the world&apos;s most reliable rescue
-              network.
-            </p>
-          </motion.div>
-        </div>
-
-        <div className="relative z-10 flex gap-6">
-          <div
-            className={cn(
-              "flex items-center gap-4 px-6 py-4 rounded-2xl border backdrop-blur-xl",
-              isDark
-                ? "bg-white/5 border-white/10"
-                : "bg-gray-50 border-gray-100",
-            )}
-          >
-            <Shield className="text-brand-red" size={24} />
-            <div>
-              <p
-                className={cn(
-                  "font-black text-xl leading-none mb-1",
-                  isDark ? "text-white" : "text-gray-900",
-                )}
-              >
-                SECURED
-              </p>
-              <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
-                Encrypted Access
-              </p>
+              <Shield className="text-brand-red" size={24} />
+              <div>
+                <p
+                  className={cn(
+                    "font-black text-xl leading-none mb-1",
+                    isDark ? "text-white" : "text-gray-900",
+                  )}
+                >
+                  SECURED
+                </p>
+                <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+                  Encrypted Access
+                </p>
+              </div>
             </div>
-          </div>
-          <div
-            className={cn(
-              "flex items-center gap-4 px-6 py-4 rounded-2xl border backdrop-blur-xl",
-              isDark
-                ? "bg-white/5 border-white/10"
-                : "bg-gray-50 border-gray-100",
-            )}
-          >
-            <Activity className="text-orange-500" size={24} />
-            <div>
-              <p
-                className={cn(
-                  "font-black text-xl leading-none mb-1",
-                  isDark ? "text-white" : "text-gray-900",
-                )}
-              >
-                SYSTEMS
-              </p>
-              <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
-                100% Operational
-              </p>
+            <div
+              className={cn(
+                "flex items-center gap-4 px-6 py-4 rounded-2xl border backdrop-blur-xl",
+                isDark
+                  ? "bg-white/5 border-white/10"
+                  : "bg-gray-50 border-gray-100",
+              )}
+            >
+              <Activity className="text-orange-500" size={24} />
+              <div>
+                <p
+                  className={cn(
+                    "font-black text-xl leading-none mb-1",
+                    isDark ? "text-white" : "text-gray-900",
+                  )}
+                >
+                  SYSTEMS
+                </p>
+                <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+                  100% Operational
+                </p>
+              </div>
             </div>
           </div>
         </div>

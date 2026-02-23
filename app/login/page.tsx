@@ -222,91 +222,93 @@ export default function LoginPage() {
         initial={{ opacity: 0, x: isRTL ? 100 : -100 }} // Support RTL animation
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 1, ease: "easeOut" }}
-        className="hidden lg:flex w-1/2 relative flex-col justify-between p-12 z-10"
+        className="hidden lg:flex w-1/2 relative flex-col justify-center p-12 z-10"
       >
         <div className="absolute inset-0 z-0 bg-gradient-to-br from-black via-brand-charcoal to-transparent">
           {/* Background image removed as requested by user */}
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/95 to-transparent" />
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-          className="relative z-10"
-        >
-          <div className="flex items-center gap-3 mb-8">
-            <motion.div
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              className="w-14 h-14 relative bg-white rounded-2xl overflow-hidden shadow-2xl shadow-brand-red/30 p-2"
-            >
-              <Image
-                src="/assets/images/logo.png"
-                alt="Road Helper Logo"
-                fill
-                sizes="56px"
-                className="object-contain"
-              />
-            </motion.div>
-            <span className="font-manrope font-bold text-3xl tracking-tighter">
-              Road<span className="text-brand-red">Helper</span>
-            </span>
-          </div>
-
-          <motion.h1
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="text-7xl font-bold leading-tight mb-6"
+        <div className="flex flex-col items-center justify-center text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="relative z-10 mb-8 flex flex-col items-center"
           >
-            Roadside <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red via-orange-500 to-yellow-500 animate-pulse">
-              Assistance
-            </span>
-            <br />
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            className="text-gray-300 text-xl max-w-md leading-relaxed"
-          >
-            {dict.auth.connect_verified}
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1 }}
-          className="relative z-10 flex gap-4"
-        >
-          {[
-            {
-              icon: Sparkles,
-              label: dict.auth.support_24_7,
-              value: dict.auth.always_on,
-            },
-            { icon: Zap, label: dict.auth.avg_eta, value: "15 mins" },
-          ].map((stat, i) => (
-            <motion.div
-              key={i}
-              whileHover={{ scale: 1.05, y: -5 }}
-              className="glass-dark px-6 py-4 rounded-2xl border border-white/10 backdrop-blur-xl cursor-pointer group"
-            >
-              <div className="flex items-center gap-3 mb-2">
-                <stat.icon
-                  className="text-brand-red group-hover:animate-spin"
-                  size={24}
+            <div className="flex items-center gap-3 mb-8">
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                className="w-14 h-14 relative bg-white rounded-2xl overflow-hidden shadow-2xl shadow-brand-red/30 p-2"
+              >
+                <Image
+                  src="/assets/images/logo.png"
+                  alt="Road Helper Logo"
+                  fill
+                  sizes="56px"
+                  className="object-contain"
                 />
-                <p className="text-2xl font-bold text-white">{stat.value}</p>
-              </div>
-              <p className="text-xs text-gray-400 uppercase tracking-widest">
-                {stat.label}
-              </p>
-            </motion.div>
-          ))}
-        </motion.div>
+              </motion.div>
+              <span className="font-manrope font-bold text-3xl tracking-tighter">
+                Road<span className="text-brand-red">Helper</span>
+              </span>
+            </div>
+
+            <motion.h1
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="text-7xl font-bold leading-tight mb-6"
+            >
+              Roadside <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red via-orange-500 to-yellow-500 animate-pulse">
+                Assistance
+              </span>
+              <br />
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              className="text-gray-300 text-xl max-w-md leading-relaxed"
+            >
+              {dict.auth.connect_verified}
+            </motion.p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1 }}
+            className="relative z-10 flex gap-4"
+          >
+            {[
+              {
+                icon: Sparkles,
+                label: dict.auth.support_24_7,
+                value: dict.auth.always_on,
+              },
+              { icon: Zap, label: dict.auth.avg_eta, value: "15 mins" },
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                whileHover={{ scale: 1.05, y: -5 }}
+                className="glass-dark px-6 py-4 rounded-2xl border border-white/10 backdrop-blur-xl cursor-pointer group"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <stat.icon
+                    className="text-brand-red group-hover:animate-spin"
+                    size={24}
+                  />
+                  <p className="text-2xl font-bold text-white">{stat.value}</p>
+                </div>
+                <p className="text-xs text-gray-400 uppercase tracking-widest">
+                  {stat.label}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
       </motion.div>
 
       {/* Right Side - Form */}

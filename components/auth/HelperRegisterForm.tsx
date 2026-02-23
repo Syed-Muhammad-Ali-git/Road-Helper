@@ -137,25 +137,6 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
     defaultValues: { services: [] },
   });
 
-  const handleImageUpload = async (file: File | null) => {
-    if (!file) return;
-    const validation = validateImageFile(file);
-    if (!validation.valid) {
-      alert(validation.error);
-      return;
-    }
-
-    try {
-      setUploading(true);
-      const url = await uploadImageToCloudinary(file);
-      setProfileImage(url);
-    } catch (e) {
-      console.error("Cloudinary upload failed", e);
-    } finally {
-      setUploading(false);
-    }
-  };
-
   const handleFormSubmit = useCallback(
     async (data: HelperFormData) => {
       await onSubmit({ ...data, profileImage });
@@ -187,52 +168,6 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
       onSubmit={handleSubmit(handleFormSubmit)}
       className={cn("space-y-4", isRTL && "text-right")}
     >
-      {/* Profile Image Upload */}
-      <div className="flex flex-col items-center justify-center mb-6">
-        <div className="relative group cursor-pointer">
-          <Avatar
-            src={profileImage}
-            size={100}
-            radius="100%"
-            className={cn(
-              "border-4 transition-all duration-300 shadow-2xl",
-              isDark
-                ? "border-white/10 bg-white/5"
-                : "border-gray-200 bg-gray-50",
-              uploading && "opacity-50",
-            )}
-          >
-            {uploading ? (
-              <Loader2 className="animate-spin text-brand-red" />
-            ) : (
-              <User size={40} className="text-gray-400" />
-            )}
-          </Avatar>
-          <div
-            className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={() =>
-              document.getElementById("helper-profile-upload")?.click()
-            }
-          >
-            <Camera size={24} className="text-white" />
-          </div>
-          <input
-            id="helper-profile-upload"
-            type="file"
-            className="hidden"
-            accept="image/*"
-            onChange={(e) => handleImageUpload(e.target.files?.[0] || null)}
-          />
-        </div>
-        <Text
-          size="xs"
-          mt="xs"
-          fw={700}
-          className="text-gray-500 uppercase tracking-widest"
-        >
-          {uploading ? "Uploading..." : "Upload Profile Photo"}
-        </Text>
-      </div>
       {/* Full Name */}
       <FormField
         label={dict.auth.full_name}

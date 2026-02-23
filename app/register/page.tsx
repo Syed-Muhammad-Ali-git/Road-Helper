@@ -21,7 +21,14 @@ import {
   HelperRegisterForm,
   type HelperFormData,
 } from "@/components/auth/HelperRegisterForm";
-import { ArrowLeft, ArrowRight, Sparkles, Zap, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Sparkles,
+  Zap,
+  Loader2,
+  Shield,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -210,110 +217,112 @@ function RegisterPageContent() {
         initial={{ opacity: 0, x: isRTL ? 100 : -100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 1, ease: "easeOut" }}
-        className="hidden lg:flex w-1/2 relative flex-col justify-between p-12 z-10"
+        className="hidden lg:flex w-1/2 relative flex-col justify-center p-12 z-10"
       >
         <div className="absolute inset-0 z-0 bg-gradient-to-br from-black via-brand-charcoal to-transparent">
           {/* Background image removed as requested by user */}
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/95 to-transparent" />
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-          className="relative z-10"
-        >
-          <div className="flex items-center gap-3 mb-8">
-            <motion.div
-              animate={{
-                rotate: [0, 10, -10, 0],
-                scale: [1, 1.05, 1],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              className="w-14 h-14 relative bg-white rounded-2xl overflow-hidden shadow-2xl shadow-brand-red/30 p-2"
-            >
-              <Image
-                src="/assets/images/logo.png"
-                alt="Road Helper Logo"
-                fill
-                sizes="56px"
-                className="object-contain"
-              />
-            </motion.div>
-            <span className="font-manrope font-bold text-3xl tracking-tighter">
-              Road<span className="text-brand-red">Helper</span>
-            </span>
-          </div>
-
-          <motion.h1
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="text-7xl font-bold leading-tight mb-6"
+        <div className="flex flex-col items-center justify-center text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="relative z-10 mb-8 flex flex-col items-center"
           >
-            Start Your <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red via-orange-500 to-yellow-500 animate-pulse">
-              Journey
-            </span>
-            <br />
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            className="text-gray-300 text-xl max-w-md leading-relaxed"
-          >
-            {dict.auth.join_roadhelper}
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1 }}
-          className="relative z-10 flex gap-4"
-        >
-          {[
-            {
-              icon: Sparkles,
-              label: dict.auth.verified,
-              value: "100%",
-            },
-            { icon: Zap, label: dict.auth.fast, value: "< 2 min" },
-          ].map((stat, i) => (
-            <motion.div
-              key={i}
-              whileHover={{ scale: 1.05, y: -5 }}
-              className={cn(
-                "px-6 py-4 rounded-2xl border backdrop-blur-xl cursor-pointer group transition-all",
-                isDark
-                  ? "glass-dark border-white/10 bg-white/5"
-                  : "bg-white/50 border-gray-200",
-              )}
-            >
-              <div className="flex items-center gap-3 mb-2">
-                <stat.icon
-                  className="text-brand-red group-hover:animate-spin"
-                  size={24}
-                />
-                <p
-                  className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}
-                >
-                  {stat.value}
-                </p>
-              </div>
-              <p
-                className={`text-xs uppercase tracking-widest ${isDark ? "text-gray-400" : "text-gray-600"}`}
+            <div className="flex items-center gap-3 mb-8">
+              <motion.div
+                animate={{
+                  rotate: [0, 10, -10, 0],
+                  scale: [1, 1.05, 1],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="w-14 h-14 relative bg-white rounded-2xl overflow-hidden shadow-2xl shadow-brand-red/30 p-2"
               >
-                {stat.label}
-              </p>
-            </motion.div>
-          ))}
-        </motion.div>
+                <Image
+                  src="/assets/images/logo.png"
+                  alt="Road Helper Logo"
+                  fill
+                  sizes="56px"
+                  className="object-contain"
+                />
+              </motion.div>
+              <span className="font-manrope font-bold text-3xl tracking-tighter">
+                Road<span className="text-brand-red">Helper</span>
+              </span>
+            </div>
+
+            <motion.h1
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="text-7xl font-bold leading-tight mb-6"
+            >
+              Start Your <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red via-orange-500 to-yellow-500 animate-pulse">
+                Journey
+              </span>
+              <br />
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              className="text-gray-300 text-xl max-w-md leading-relaxed"
+            >
+              {dict.auth.join_roadhelper}
+            </motion.p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1 }}
+            className="relative z-10 flex gap-4"
+          >
+            {[
+              {
+                icon: Sparkles,
+                label: dict.auth.verified,
+                value: "100%",
+              },
+              { icon: Zap, label: dict.auth.fast, value: "< 2 min" },
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                whileHover={{ scale: 1.05, y: -5 }}
+                className={cn(
+                  "px-6 py-4 rounded-2xl border backdrop-blur-xl cursor-pointer group transition-all",
+                  isDark
+                    ? "glass-dark border-white/10 bg-white/5"
+                    : "bg-white/50 border-gray-200",
+                )}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <stat.icon
+                    className="text-brand-red group-hover:animate-spin"
+                    size={24}
+                  />
+                  <p
+                    className={`text-2xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}
+                  >
+                    {stat.value}
+                  </p>
+                </div>
+                <p
+                  className={`text-xs uppercase tracking-widest ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                >
+                  {stat.label}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
       </motion.div>
 
       {/* Right Side - Form */}
@@ -496,6 +505,28 @@ function RegisterPageContent() {
               {dict.auth.sign_in}
             </Link>
           </p>
+
+          {/* Admin Signup Link */}
+          <div className="text-center pt-4 border-t border-white/10 mt-6">
+            <Link
+              href="/admin/signup"
+              className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brand-red transition-all group cursor-pointer px-4 py-2 rounded-xl hover:bg-white/5"
+            >
+              <Shield size={16} className="group-hover:animate-pulse" />
+              <span>Are you an Admin? Register here</span>
+              {isRTL ? (
+                <ArrowLeft
+                  size={14}
+                  className="group-hover:-translate-x-1 transition-transform"
+                />
+              ) : (
+                <ArrowRight
+                  size={14}
+                  className="group-hover:translate-x-1 transition-transform"
+                />
+              )}
+            </Link>
+          </div>
         </motion.div>
       </div>
     </div>

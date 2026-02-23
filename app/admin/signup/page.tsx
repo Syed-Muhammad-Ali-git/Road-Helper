@@ -128,47 +128,49 @@ const AdminSignup = () => {
           isDark ? "bg-[#0A0A0A] border-white/5" : "bg-white border-gray-200",
         )}
       >
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-          className="relative z-10 text-center"
-        >
+        <div className="flex flex-col items-center justify-center text-center">
           <motion.div
-            animate={{
-              rotate: [0, 5, -5, 0],
-              y: [0, -10, 0],
-            }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className={cn(
-              "inline-block p-8 rounded-[40px] border-2 shadow-2xl mb-12 backdrop-blur-3xl",
-              isDark
-                ? "bg-white/5 border-brand-red/20"
-                : "bg-white border-brand-red/10",
-            )}
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="relative z-10 text-center"
           >
-            <IconShieldLock
-              size={80}
-              className="text-brand-red animate-pulse"
-            />
+            <motion.div
+              animate={{
+                rotate: [0, 5, -5, 0],
+                y: [0, -10, 0],
+              }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+              className={cn(
+                "inline-block p-8 rounded-[40px] border-2 shadow-2xl mb-12 backdrop-blur-3xl",
+                isDark
+                  ? "bg-white/5 border-brand-red/20"
+                  : "bg-white border-brand-red/10",
+              )}
+            >
+              <IconShieldLock
+                size={80}
+                className="text-brand-red animate-pulse"
+              />
+            </motion.div>
+            <Title
+              className={cn(
+                "text-6xl font-black font-manrope tracking-tighter mb-6 transition-colors",
+                isDark
+                  ? "bg-gradient-to-br from-white to-gray-500 bg-clip-text text-transparent"
+                  : "text-gray-900",
+              )}
+            >
+              SECURE ACCESS
+              <br />
+              CONTROL
+            </Title>
+            <Text className="text-gray-400 text-xl font-medium max-w-md mx-auto leading-relaxed">
+              Join the elite task force managing roadside infrastructure and
+              helper networks.
+            </Text>
           </motion.div>
-          <Title
-            className={cn(
-              "text-6xl font-black font-manrope tracking-tighter mb-6 transition-colors",
-              isDark
-                ? "bg-gradient-to-br from-white to-gray-500 bg-clip-text text-transparent"
-                : "text-gray-900",
-            )}
-          >
-            SECURE ACCESS
-            <br />
-            CONTROL
-          </Title>
-          <Text className="text-gray-400 text-xl font-medium max-w-md mx-auto leading-relaxed">
-            Join the elite task force managing roadside infrastructure and
-            helper networks.
-          </Text>
-        </motion.div>
+        </div>
 
         {/* Abstract Deco */}
         <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-brand-red/5 to-transparent z-0" />
