@@ -1,0 +1,61 @@
+{
+  "nav": {
+    "features": "Features",
+    "howItWorks": "Kaise Kaam Karta Hai",
+    "about": "Hamare Baare Mein",
+    "login": "Log In Karein",
+    "getHelp": "Madad Haasil Karein"
+  },
+  "hero": {
+    "badge": "24/7 Hangami Madad — Abhi Live",
+    "title": "Sarak Par Phans Gaye Hain?",
+    "titleHighlight": "Fikar Na Karein, Hum Sath Hain.",
+    "subtitle": "Flat tire, dead battery, ya khali tank — madad sirf ek tap ki doori par hai.",
+    "ctaPrimary": "Abhi Madad Ki Darkhwast Karein",
+    "ctaSecondary": "Emergency Call"
+  },
+  "loader": {
+    "text": "Aapka tajarba tayyar ho raha hai..."
+  },
+  "auth": {
+    "login": "Log In Karein",
+    "register": "Account Banayein",
+    "email": "Email Addres",
+    "password": "Password",
+    "forgotPassword": "Password Bhool Gaye?",
+    "noAccount": "Kya aapka account nahi hai?",
+    "haveAccount": "Kya aapka pehle se account hai?",
+    "loginAs": "Login Karien As",
+    "customer": "Customer",
+    "helper": "Helper"
+  },
+  "dashboard": {
+    "welcome": "Welcome back",
+    "requestHelp": "Madad Ki Darkhwast Karein",
+    "activeJob": "Active Kaam",
+    "history": "History",
+    "earnings": "Amdani",
+    "profile": "Profile"
+  },
+  "requestHelp": {
+    "title": "Aapko kis cheez ki zaroorat hai?",
+    "selectService": "Service chunein",
+    "towing": "Towing",
+    "tireChange": "Tire Change",
+    "fuelDelivery": "Fuel Delivery",
+    "batteryJump": "Battery Jump Start",
+    "lockout": "Tala khulwane mien madad",
+    "yourLocation": "Aapki Location",
+    "detecting": "Aapki location dhoondi ja rahi hai...",
+    "confirm": "Darkhwast Confirm Karein",
+    "searching": "Qareebi helpers ko dhoonda ja raha hai..."
+  },
+  "status": {
+    "pending": "Pending",
+    "accepted": "Accept ho gaya",
+    "enRoute": "Raste mein hai",
+    "arrived": "Pahanch gaya",
+    "completed": "Mukammal",
+    "cancelled": "Cancel ho gaya"
+  }
+}

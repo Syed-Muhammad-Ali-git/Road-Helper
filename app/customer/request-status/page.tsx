@@ -1,248 +1,256 @@
 "use client";
-
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  Title,
-  Text,
-  Paper,
-  Stack,
-  Box,
-  Group,
-  Button,
-  Badge,
-  ThemeIcon,
-} from "@mantine/core";
-import {
-  IconArrowLeft,
-  IconEye,
-  IconCar,
-  IconMapPin,
-  IconClock,
-} from "@tabler/icons-react";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { requestOps, type HelpRequest } from "@/lib/firestore";
+import { useAuthStore } from "@/store/authStore";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { auth } from "@/lib/firebase/config";
-import { subscribeCustomerRequests } from "@/lib/services/requestService";
-import { useLanguage } from "@/app/context/LanguageContext";
-import { useAppTheme } from "@/app/context/ThemeContext";
-import { cn } from "@/lib/utils";
-import type { RideRequestDoc } from "@/types";
 
-/* ---------------- TYPES ---------------- */
+function StatusContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const reqId = searchParams.get("id");
 
-interface Request {
-  id: string;
-  serviceType: string;
-  status: string;
-  helperName: string | null;
-  location: string;
-  createdAt: Date | undefined;
-}
-
-/* ---------------- COMPONENT ---------------- */
-
-export default function RequestStatusList() {
-  const [requests, setRequests] = useState<Request[]>([]);
-  const [uid, setUid] = useState<string | null>(null);
-  const { dict } = useLanguage();
-  const { isDark } = useAppTheme();
+  const [req, setReq] = useState<HelpRequest | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showRating, setShowRating] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [review, setReview] = useState("");
 
   useEffect(() => {
-    const unsub = auth.onAuthStateChanged((u) => setUid(u?.uid ?? null));
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    if (!uid) return;
-    const unsub = subscribeCustomerRequests({
-      customerId: uid,
-      cb: (reqs) => {
-        setRequests(
-          reqs.map((r: RideRequestDoc & { id: string }) => ({
-            id: r.id,
-            serviceType: r.serviceType,
-            status: r.status,
-            helperName: r.helperName ?? r.customerName ?? null,
-            location: r.location?.address ?? "Live location",
-            createdAt: r.createdAt,
-          })),
-        );
-      },
+    if (!reqId) return;
+    const unsub = requestOps.subscribeToRequest(reqId, (data) => {
+      if (data) setReq(data);
+      setLoading(false);
+      if (data?.status === "completed" && !data.rating) {
+        setShowRating(true);
+      }
     });
     return () => unsub();
-  }, [uid]);
+  }, [reqId]);
 
-  const toDateLabel = useMemo(() => {
-    return (createdAt: Date | undefined): string => {
-      if (!createdAt || !(createdAt instanceof Date)) return "Just now";
-      return `${createdAt.toLocaleDateString()} at ${createdAt.toLocaleTimeString(
-        [],
-        {
-          hour: "2-digit",
-          minute: "2-digit",
-        },
-      )}`;
-    };
-  }, []);
+  if (loading)
+    return (
+      <div className="py-32 flex justify-center">
+        <div className="w-8 h-8 rounded-full border-[3px] border-primary border-t-transparent animate-spin" />
+      </div>
+    );
+  if (!req)
+    return (
+      <div className="text-center py-20 text-white">
+        Request not found.{" "}
+        <Link href="/customer/dashboard" className="text-primary underline">
+          Go Home
+        </Link>
+      </div>
+    );
+
+  const handleCancel = async () => {
+    if (confirm("Cancel this request?")) {
+      await requestOps.cancel(req.id!);
+      router.push("/customer/dashboard");
+    }
+  };
+
+  const handleRate = async () => {
+    if (rating === 0) return;
+    await requestOps.rate(req.id!, rating, review, req.helperId!);
+    setShowRating(false);
+    router.push("/customer/dashboard");
+  };
+
+  const stepIndex = [
+    "pending",
+    "accepted",
+    "en-route",
+    "arrived",
+    "completed",
+  ].indexOf(req.status);
 
   return (
-    <Box className={cn("min-h-screen p-4 md:p-8 transition-colors", isDark ? "bg-gray-950" : "bg-gray-50")}>
-      <Stack gap="xl" className="max-w-5xl mx-auto">
-        <Group justify="space-between">
-          <Group>
-            <Button
-              variant="subtle"
-              leftSection={<IconArrowLeft size={20} />}
-              component={Link}
-              href="/customer/dashboard"
-              className={cn("hover:scale-105 transition-transform", isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900")}
-            >
-              {dict.request_status.back}
-            </Button>
-            <Title
-              order={1}
-              className={cn(
-                "font-manrope text-3xl font-bold bg-gradient-to-r bg-clip-text text-transparent",
-                isDark ? "from-white to-gray-400" : "from-gray-900 to-gray-600"
-              )}
-            >
-              {dict.request_status.my_requests}
-            </Title>
-          </Group>
-        </Group>
+    <div className="max-w-4xl mx-auto relative z-10 animate-fade-in grid md:grid-cols-2 gap-8">
+      {/* Tracker Column */}
+      <div className="card glass p-8">
+        <div className="flex items-center justify-between mb-8 pb-4 border-b border-dark-border">
+          <h1 className="font-display text-2xl font-bold">Request Status</h1>
+          <div className="text-xs font-mono text-dark-muted py-1 px-2 bg-dark-surface rounded">
+            ID: {req.id?.slice(0, 8)}
+          </div>
+        </div>
 
-        {requests.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            <Paper
-              p="xl"
-              radius="xl"
-              className={cn(
-                "text-center border transition-colors",
-                isDark ? "bg-brand-charcoal border-gray-800" : "bg-white border-gray-200"
-              )}
-            >
-              <Text className={cn("mb-4", isDark ? "text-gray-400" : "text-gray-600")}>
-                {dict.request_status.no_requests}
-              </Text>
-              <Button
-                component={Link}
-                href="/customer/request-help"
-                mt="md"
-                variant="light"
-                color="red"
-                className="hover:scale-105 active:scale-95 transition-transform"
+        <div className="space-y-8 relative">
+          <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-dark-border z-0" />
+          <div
+            className="absolute left-4 top-4 w-0.5 bg-primary transition-all duration-1000 z-0"
+            style={{ height: `${Math.max(0, stepIndex) * 25}%` }}
+          />
+
+          {[
+            {
+              id: "pending",
+              title: "Finding Helper",
+              sub: "Searching area...",
+            },
+            {
+              id: "accepted",
+              title: "Helper Accepted",
+              sub: "Preparing to dispatch",
+            },
+            { id: "en-route", title: "On the Way", sub: "Helper is en route" },
+            {
+              id: "arrived",
+              title: "Arrived",
+              sub: "Helper is at your location",
+            },
+            {
+              id: "completed",
+              title: "Job Complete",
+              sub: "Payment processed",
+            },
+          ].map((s, i) => {
+            const isPast = stepIndex >= i;
+            const isCurrent = stepIndex === i;
+            return (
+              <div
+                key={s.id}
+                className={`flex gap-6 relative z-10 ${isPast ? "opacity-100" : "opacity-40"}`}
               >
-                {dict.request_status.request_help_now}
-              </Button>
-            </Paper>
-          </motion.div>
-        ) : (
-          <Stack gap="lg">
-            {requests.map((request, index) => (
-              <motion.div
-                key={request.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-              >
-                <Paper
-                  p="lg"
-                  radius="lg"
-                  className={cn(
-                    "border transition-all shadow-lg hover:shadow-xl hover:-translate-y-1",
-                    isDark ? "bg-brand-charcoal border-gray-800 hover:border-brand-red/50" : "bg-white border-gray-200 hover:border-brand-red/40"
-                  )}
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border-2 transition-all ${isPast ? "bg-primary border-primary text-white shadow-glow-primary" : "bg-dark-surface border-dark-border"}`}
                 >
-                  <Group
-                    justify="space-between"
-                    align="start"
-                    wrap="nowrap"
-                    className="flex-col md:flex-row"
+                  {isPast ? "✓" : i + 1}
+                </div>
+                <div>
+                  <div
+                    className={`font-bold ${isCurrent ? "text-primary" : "text-white"}`}
                   >
-                    <Group align="start" className="w-full md:w-auto">
-                      <ThemeIcon
-                        size={50}
-                        radius="md"
-                        color="red"
-                        variant="light"
-                        className="bg-brand-red/10 text-brand-red"
-                      >
-                        <IconCar size={28} />
-                      </ThemeIcon>
+                    {s.title}
+                  </div>
+                  <div className="text-sm text-dark-muted">{s.sub}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
-                      <Box>
-                        <Text
-                          fw={700}
-                          size="lg"
-                          className="capitalize text-white"
-                        >
-                          {request.serviceType.replace("_", " ")}
-                        </Text>
-                        <Group gap={6} mt={4}>
-                          <IconMapPin size={14} className="text-gray-500" />
-                          <Text size="sm" className="text-gray-400">
-                            {request.location}
-                          </Text>
-                        </Group>
-                        <Group gap={6} mt={2}>
-                          <IconClock size={14} className="text-gray-500" />
-                          <Text size="xs" className="text-gray-500">
-                            {toDateLabel(request.createdAt)}
-                          </Text>
-                        </Group>
-                      </Box>
-                    </Group>
+        {req.status === "pending" || req.status === "accepted" ? (
+          <button
+            onClick={handleCancel}
+            className="mt-8 w-full p-3 rounded-xl border border-error/50 text-error hover:bg-error/10 font-bold transition-colors"
+          >
+            Cancel Request
+          </button>
+        ) : null}
+      </div>
 
-                    <Stack
-                      align="flex-end"
-                      className="w-full md:w-auto mt-4 md:mt-0"
-                      gap="xs"
-                    >
-                      <Badge
-                        size="lg"
-                        variant="light"
-                        color={
-                          request.status === "completed"
-                            ? "green"
-                            : request.status === "in_progress"
-                              ? "blue"
-                              : "yellow"
-                        }
-                        className="capitalize"
-                      >
-                        {request.status.replace("_", " ")}
-                      </Badge>
-                      {request.helperName && (
-                        <Text size="sm" className={cn(isDark ? "text-gray-400" : "text-gray-600")}>
-                          {dict.request_status.helper}:{" "}
-                          <span className={cn("font-semibold", isDark ? "text-white" : "text-gray-900")}>
-                            {request.helperName}
-                          </span>
-                        </Text>
-                      )}
-                      <Button
-                        variant="gradient"
-                        gradient={{ from: "red", to: "orange", deg: 90 }}
-                        leftSection={<IconEye size={16} />}
-                        component={Link}
-                        href={`/journey/${request.id}`}
-                        size="sm"
-                        className="mt-2 w-full md:w-auto shadow-md hover:shadow-xl transition-all hover:scale-105 active:scale-95"
-                      >
-                        {dict.request_status.live_view}
-                      </Button>
-                    </Stack>
-                  </Group>
-                </Paper>
-              </motion.div>
-            ))}
-          </Stack>
+      {/* Helper Info & Map Column */}
+      <div className="space-y-6">
+        <div className="card glass p-2 overflow-hidden aspect-video rounded-3xl relative">
+          {/* Fake Map */}
+          <div className="absolute inset-0 bg-dark-surface opacity-50 bg-[url('https://www.transparenttextures.com/patterns/map.png')]" />
+          {req.status !== "pending" && req.status !== "cancelled" && (
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 relative w-10 h-10">
+              <div className="absolute inset-0 bg-primary/30 rounded-full animate-ping" />
+              <div className="relative w-full h-full bg-white rounded-full flex items-center justify-center shadow-glow-primary">
+                🚗
+              </div>
+            </div>
+          )}
+        </div>
+
+        {req.helperId ? (
+          <div className="card glass p-6 border-l-4 border-l-secondary">
+            <h3 className="section-label mb-4">Assigned Professional</h3>
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-gradient-brand flex items-center justify-center text-2xl shadow-glow-primary">
+                👨‍🔧
+              </div>
+              <div>
+                <div className="font-bold text-xl text-white block mb-1">
+                  {req.helperName}
+                </div>
+                <div className="text-dark-muted text-sm font-medium pt-1">
+                  Distance: <span className="text-white">Est. 5 miles</span>
+                </div>
+              </div>
+            </div>
+
+            {req.price && (
+              <div className="mt-4 pt-4 border-t border-dark-border flex justify-between items-center">
+                <span className="text-dark-muted font-medium">
+                  Agreed Price
+                </span>
+                <span className="text-xl font-bold font-mono text-primary">
+                  ${req.price}
+                </span>
+              </div>
+            )}
+          </div>
+        ) : req.status === "cancelled" ? (
+          <div className="card glass p-6 border border-error/30 text-center">
+            <div className="text-error font-bold mb-2">Request Cancelled</div>
+            <Link href="/customer/request-help" className="btn-primary">
+              Request Again
+            </Link>
+          </div>
+        ) : (
+          <div className="card glass p-6 text-center text-dark-muted">
+            <div className="w-8 h-8 rounded-full border-[3px] border-dark-muted border-t-transparent animate-spin mx-auto mb-3" />
+            Waiting for a helper to accept...
+          </div>
         )}
-      </Stack>
-    </Box>
+      </div>
+
+      {/* Rating Modal */}
+      {showRating && (
+        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="card glass max-w-sm w-full p-8 text-center animate-slide-up bg-dark-surface">
+            <div className="text-5xl mb-4">🌟</div>
+            <h2 className="font-display text-2xl font-bold mb-2 text-white">
+              Rate Your Experience
+            </h2>
+            <p className="text-dark-muted text-sm mb-6">
+              How was the service provided by {req.helperName}?
+            </p>
+
+            <div className="flex justify-center gap-2 mb-6">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  onClick={() => setRating(star)}
+                  className={`text-4xl transition-all hover:scale-110 ${rating >= star ? "text-accent drop-shadow-[0_0_10px_rgba(255,179,71,0.5)]" : "text-dark-muted/30 grayscale"}`}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+
+            <textarea
+              value={review}
+              onChange={(e) => setReview(e.target.value)}
+              placeholder="Leave a review... (Optional)"
+              className="input-field mb-6 min-h-[80px] text-center resize-none"
+            />
+
+            <button
+              onClick={handleRate}
+              disabled={rating === 0}
+              className="btn-primary w-full justify-center"
+            >
+              Submit Feedback
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function RequestStatusPage() {
+  return (
+    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-white bg-grid noise-overlay">
+      <Suspense fallback={<div>Loading...</div>}>
+        <StatusContent />
+      </Suspense>
+    </div>
   );
 }

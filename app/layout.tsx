@@ -1,175 +1,40 @@
-/* ---------------- IMPORTS ---------------- */
 import type { Metadata } from "next";
-import React, { ReactNode } from "react";
+import { Syne, DM_Sans } from "next/font/google";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import "./globals.css";
-import "@mantine/core/styles.css";
-import "@mantine/dates/styles.css";
-import {
-  ColorSchemeScript,
-  MantineProvider,
-  mantineHtmlProps,
-} from "@mantine/core";
-import { SearchProvider } from "./context/searchContext";
-import { LayoutProvider } from "./context/layoutContext";
-import { ReduxProvider } from "@/components/providers/ReduxProvider";
-import { LanguageProvider } from "./context/LanguageContext";
-import { ThemeProvider } from "./context/ThemeContext";
-import ClientLayout from "./client-layout";
 
-/* ---------------- METADATA ---------------- */
+const syne = Syne({
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "800"],
+  variable: "--font-display",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-body",
+});
+
 export const metadata: Metadata = {
-  title: "Road Helper | Instant Roadside Assistance",
+  title: "Road Helper | Premium Roadside Assistance",
   description:
-    "Road Helper provides instant roadside assistance and vehicle support anywhere. Quick, reliable, and trusted service.",
-  keywords: [
-    "Roadside Assistance",
-    "Car Repair",
-    "Tow Service",
-    "Emergency Road Help",
-    "Vehicle Assistance",
-  ],
-  authors: [
-    {
-      name: "Syed Muhammad Ali",
-      url: "https://ali-portfolio-nine.vercel.app/",
-    },
-  ],
-  creator: "Syed Muhammad Ali",
-  publisher: "Road Helper",
-  robots: "index, follow",
-  openGraph: {
-    title: "Road Helper | Instant Roadside Assistance",
-    description:
-      "Road Helper provides instant roadside assistance and vehicle support anywhere. Quick, reliable, and trusted service.",
-    url: "https://roadhelper.vercel.app",
-    siteName: "Road Helper",
-    type: "website",
-    images: [
-      {
-        url: "https://roadhelper.vercel.app/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Road Helper - Instant Roadside Assistance",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Road Helper | Instant Roadside Assistance",
-    description:
-      "Quick, reliable, and trusted roadside assistance and vehicle support anywhere.",
-    site: "@RoadHelper",
-    creator: "@RoadHelper",
-    images: ["https://roadhelper.vercel.app/og-image.png"],
-  },
+    "Stuck on the Road? We've Got You. Flat tire, dead battery, or empty tank — help is just a tap away.",
 };
 
-/* ---------------- COMPONENT ---------------- */
-const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="en"
-      {...mantineHtmlProps}
-      data-scroll-behavior="smooth"
+      className={`dark ${syne.variable} ${dmSans.variable}`}
       suppressHydrationWarning
     >
-      <head>
-        <meta charSet="UTF-8" />
-        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="icon" href="/favicon.ico" />
-        <ColorSchemeScript defaultColorScheme="dark" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  const theme = localStorage.getItem('rh_theme') || 'dark';
-                  const lang = localStorage.getItem('rh_lang') || 'en';
-                  
-                  const html = document.documentElement;
-                  const body = document.body;
-                  
-                  html.setAttribute('data-theme', theme);
-                  html.classList.remove('light', 'dark');
-                  html.classList.add(theme);
-                  
-                  if (theme === 'dark') {
-                    body.classList.add('dark');
-                    body.classList.remove('light');
-                  } else {
-                    body.classList.add('light');
-                    body.classList.remove('dark');
-                  }
-                  
-                  html.dir = lang === 'ur' ? 'rtl' : 'ltr';
-                  html.lang = lang;
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
-      </head>
-      <body
-        className="antialiased font-satoshi bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100"
-        style={{ margin: "0 auto" }}
-      >
-        <ReduxProvider>
-          <MantineProvider
-            defaultColorScheme="dark"
-            theme={{
-              fontFamily: "Satoshi, sans-serif",
-              primaryColor: "yellow",
-              colors: {
-                yellow: [
-                  "#FFFBEB",
-                  "#FEF3C7",
-                  "#FDE68A",
-                  "#FCD34D",
-                  "#FBBF24",
-                  "#F59E0B",
-                  "#D97706",
-                  "#B45309",
-                  "#92400E",
-                  "#78350F",
-                ],
-                dark: [
-                  "#C1C2C5",
-                  "#A6A7AB",
-                  "#909296",
-                  "#5c5f66",
-                  "#373A40",
-                  "#2C2E33",
-                  "#1F1F1F", // brand-charcoal
-                  "#171717", // brand-dark-gray
-                  "#0A0A0A", // brand-black
-                  "#000000",
-                ],
-              },
-              components: {
-                Button: {
-                  defaultProps: {
-                    fw: 700,
-                    radius: "md",
-                  },
-                },
-              },
-            }}
-          >
-            <ThemeProvider>
-              <LanguageProvider>
-                <LayoutProvider>
-                  <SearchProvider>
-                    <ClientLayout>{children}</ClientLayout>
-                  </SearchProvider>
-                </LayoutProvider>
-              </LanguageProvider>
-            </ThemeProvider>
-          </MantineProvider>
-        </ReduxProvider>
+      <body className="antialiased font-body min-h-screen bg-transparent relative">
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );
-};
-
-export default RootLayout;
+}

@@ -1,817 +1,200 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
-import {
-  Title,
-  Text,
-  SimpleGrid,
-  Paper,
-  Stack,
-  Button,
-  Box,
-  Group,
-  Avatar,
-  Badge,
-  ActionIcon,
-  Loader,
-} from "@mantine/core";
-import {
-  IconCar,
-  IconDroplet,
-  IconTruck,
-  IconMapPin,
-  IconPhoneCall,
-  IconHistory,
-  IconArrowRight,
-  IconSparkles,
-  IconShieldCheck,
-  IconBolt,
-  IconWheel,
-  IconClock,
-} from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
-import dynamic from "next/dynamic";
-import { useLiveLocation } from "@/hooks/useLiveLocation";
-import { toast } from "react-toastify";
-import { showInfo } from "@/lib/sweetalert";
-import { useLanguage } from "@/app/context/LanguageContext";
-import { useAppTheme } from "@/app/context/ThemeContext";
-import { auth, db } from "@/lib/firebase/config";
-import { getUserByUid } from "@/lib/services/userService";
-import {
-  collection,
-  query,
-  where,
-  orderBy,
-  limit,
-  onSnapshot,
-} from "firebase/firestore";
+import { useAuthStore } from "@/store/authStore";
+import { requestOps, type HelpRequest } from "@/lib/firestore";
+import { useTranslation } from "@/hooks/useTranslation";
 
-const LiveMap = dynamic(() => import("@/components/map/LiveMap"), {
-  ssr: false,
-});
+export default function CustomerDashboard() {
+  const { user, profile } = useAuthStore();
+  const t = useTranslation();
+  const [activeRequest, setActiveRequest] = useState<HelpRequest | null>(null);
+  const [history, setHistory] = useState<HelpRequest[]>([]);
 
-// Avatars for "Helpers Nearby" - static for now as this is a visual flourish,
-// unless we want to fetch random helpers from DB (expensive for dashboard load).
-const avatars = [
-  { name: "John Smith", initials: "JS", color: "blue" },
-  { name: "Sarah Johnson", initials: "SJ", color: "green" },
-  { name: "Mike Brown", initials: "MB", color: "orange" },
-];
-
-const getServiceCategories = (dict: any) => [
-  {
-    title: dict.dashboard.mobile_mechanic,
-    icon: IconCar,
-    color: "blue",
-    desc: dict.dashboard.mechanic_desc,
-    id: "mechanic",
-    gradient: "from-blue-600/20 to-indigo-600/20",
-  },
-  {
-    title: dict.dashboard.fuel_delivery,
-    icon: IconDroplet,
-    color: "red",
-    desc: dict.dashboard.fuel_desc,
-    id: "fuel",
-    gradient: "from-red-600/20 to-rose-600/20",
-  },
-  {
-    title: dict.dashboard.tyre_puncture,
-    icon: IconWheel,
-    color: "blue",
-    desc: dict.dashboard.tyre_desc,
-    id: "Tyre Punkcher",
-    gradient: "from-blue-600/20 to-indigo-600/20",
-  },
-  {
-    title: dict.dashboard.towing_service,
-    icon: IconTruck,
-    color: "grape",
-    desc: dict.dashboard.tow_desc,
-    id: "tow",
-    gradient: "from-purple-600/20 to-pink-600/20",
-  },
-];
-
-const containerVariants: any = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
-  },
-};
-
-const itemVariants: any = {
-  hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: { type: "spring", stiffness: 100 },
-  },
-};
-
-const ClientDashboard = () => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [userName, setUserName] = useState<string | null>(null);
-  const [activeRequests, setActiveRequests] = useState<any[]>([]);
-  const [loadingRequests, setLoadingRequests] = useState(true);
-  const { dict, isRTL } = useLanguage();
-  const { isDark } = useAppTheme();
-  const serviceCategories = getServiceCategories(dict);
-
-  // Firebase: Load user from auth + Firestore
   useEffect(() => {
-    let alive = true;
-    const unsub = auth.onAuthStateChanged(async (u) => {
-      if (!alive) return;
-      if (!u) {
-        setUserName(dict.common.user);
-        setLoadingRequests(false);
-        return;
-      }
-      const p = await getUserByUid(u.uid);
-      if (!alive) return;
-      setUserName(p?.displayName ?? u.displayName ?? dict.common.user);
+    if (!user) return;
+    console.log("Fetching data for", user.uid);
 
-      // Fetch Active Requests
-      const q = query(
-        collection(db, "rideRequests"),
-        where("customerId", "==", u.uid),
-        // Limit to 20 then sort client side to avoid composite index requirement for now
-        limit(20),
+    // Subscribe to all customer requests to handle active vs history
+    const unsub = requestOps.subscribeToCustomerRequests(user.uid, (reqs) => {
+      const active = reqs.find((r) =>
+        ["pending", "accepted", "en-route", "arrived"].includes(r.status),
       );
-
-      const unsubscribeRequests = onSnapshot(
-        q,
-        (snapshot) => {
-          const reqs = snapshot.docs
-            .map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }))
-            .sort((a: any, b: any) => {
-              const tA = a.createdAt?.seconds ?? 0;
-              const tB = b.createdAt?.seconds ?? 0;
-              return tB - tA;
-            })
-            .slice(0, 3);
-          setActiveRequests(reqs);
-          setLoadingRequests(false);
-        },
-        (err) => {
-          console.error("Error fetching requests:", err);
-          setLoadingRequests(false);
-        },
-      );
-
-      return () => unsubscribeRequests();
+      setActiveRequest(active || null);
+      setHistory(reqs.filter((r) => r.id !== active?.id).slice(0, 3));
     });
-    return () => {
-      alive = false;
-      unsub();
-    };
-  }, [dict.common.user]);
 
-  useEffect(() => {
-    setIsLoaded(true);
-  }, []);
-
-  // Removed toast onSuccess to avoid repeated toasts on tab switch
-  const live = useLiveLocation();
-
-  const [particles, setParticles] = useState<any[]>([]);
-
-  useEffect(() => {
-    setParticles(
-      [...Array(15)].map((_, i) => ({
-        x: Math.random() * 100 + "%",
-        y_target: Math.random() * 100 + "%",
-        duration: Math.random() * 10 + 10,
-      })),
-    );
-  }, []);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "yellow";
-      case "accepted":
-        return "blue";
-      case "completed":
-        return "green";
-      case "cancelled":
-        return "red";
-      default:
-        return "gray";
-    }
-  };
+    return () => unsub();
+  }, [user]);
 
   return (
-    <Box
-      className={cn(
-        "relative min-h-screen overflow-hidden p-4 md:p-8 transition-colors duration-300",
-        isDark ? "bg-[#0a0a0a]" : "bg-gray-50",
-      )}
-    >
-      {/* --- Premium Background Elements --- */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 90, 0],
-            opacity: [0.1, 0.2, 0.1],
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-[10%] -left-[10%] w-[60%] h-[60%] bg-blue-600/20 blur-[120px] rounded-full"
-        />
-        <motion.div
-          animate={{
-            scale: [1.2, 1, 1.2],
-            rotate: [0, -90, 0],
-            opacity: [0.1, 0.15, 0.1],
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute -bottom-[10%] -right-[10%] w-[60%] h-[60%] bg-brand-red/10 blur-[120px] rounded-full"
-        />
-
-        {/* Particles */}
-        {isLoaded &&
-          particles.map((p, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-white/20 rounded-full"
-              initial={{
-                x: p.x,
-                y: "100%",
-              }}
-              animate={{
-                y: [null, p.y_target],
-                opacity: [0, 0.5, 0],
-              }}
-              transition={{
-                duration: p.duration,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            />
-          ))}
-      </div>
-
-      <motion.div
-        variants={containerVariants as any}
-        initial="hidden"
-        animate="visible"
-        className="relative z-10 max-w-7xl mx-auto"
-      >
-        {/* --- HEADER SECTION --- */}
-        <Group
-          justify="space-between"
-          mb={40}
-          align="flex-end"
-          className={isRTL ? "flex-row-reverse" : ""}
-        >
-          <Box className={isRTL ? "text-right" : "text-left"}>
-            <motion.div
-              variants={itemVariants as any}
-              className={`flex items-center gap-2 mb-2 ${isRTL ? "flex-row-reverse" : ""}`}
-            >
-              <div className="h-px w-8 bg-brand-red" />
-              <Text className="text-brand-red font-bold uppercase tracking-[0.2em] text-[10px]">
-                {dict.dashboard.member_area}
-              </Text>
-            </motion.div>
-            <Title
-              order={1}
-              className={cn(
-                "font-manrope font-extrabold text-4xl md:text-5xl tracking-tight",
-                isDark ? "text-white" : "text-gray-900",
-              )}
-            >
-              {dict.dashboard.welcome_back},{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">
-                {userName ?? dict.common.user}
-              </span>
-            </Title>
-            <Text
-              className={cn(
-                "mt-2 font-medium",
-                isDark ? "text-gray-400" : "text-gray-600",
-              )}
-            >
-              {dict.dashboard.ready_for_journey}
-            </Text>
-          </Box>
-          <motion.div
-            variants={itemVariants as any}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <Button
-              variant="filled"
-              className="bg-brand-red text-white shadow-2xl shadow-brand-red/20 hover:bg-brand-dark-red transition-all font-manrope font-bold rounded-2xl h-14 px-8 border border-white/10 group hover:shadow-brand-red/30"
-              leftSection={
-                <IconPhoneCall
-                  size={20}
-                  className="group-hover:animate-bounce"
-                />
-              }
-            >
-              {dict.dashboard.emergency_sos}
-            </Button>
-          </motion.div>
-        </Group>
-
-        <SimpleGrid cols={{ base: 1, lg: 3 }} spacing={24} mb={40}>
-          {/* --- MAP SECTION --- */}
-          <motion.div variants={itemVariants as any} className="lg:col-span-2">
-            <Paper
-              radius="32px"
-              className={cn(
-                "relative overflow-hidden h-[30rem] md:h-[40rem] shadow-2xl group border transition-colors",
-                isDark
-                  ? "border-white/10 glass-dark"
-                  : "border-gray-200/80 bg-white/80 backdrop-blur",
-              )}
-            >
-              <LiveMap
-                customer={
-                  live.coords
-                    ? {
-                        lat: live.coords.lat,
-                        lng: live.coords.lng,
-                        label: dict.common.you,
-                      }
-                    : null
-                }
-                helper={null}
-                className="absolute inset-0 z-0"
-              />
-
-              {/* Map Controls */}
-              <div
-                className={cn(
-                  "absolute bottom-8 left-8 right-8 p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between z-10 gap-4",
-                  isDark
-                    ? "glass-dark border border-white/20"
-                    : "bg-white/90 border border-gray-200/80",
-                )}
-              >
-                <div
-                  className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse text-right" : ""}`}
-                >
-                  <div className="h-12 w-12 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
-                    <IconMapPin size={24} />
-                  </div>
-                  <div>
-                    <Text
-                      className={cn(
-                        "font-bold text-lg leading-tight",
-                        isDark ? "text-white" : "text-gray-900",
-                      )}
-                    >
-                      {dict.dashboard.live_location}
-                    </Text>
-                    <Text
-                      className={cn(
-                        "text-sm",
-                        isDark ? "text-gray-400" : "text-gray-600",
-                      )}
-                    >
-                      {live.coords
-                        ? `${live.coords.lat.toFixed(5)}, ${live.coords.lng.toFixed(5)}`
-                        : dict.dashboard.turn_on_gps}
-                    </Text>
-                  </div>
-                </div>
-                <Button
-                  className={cn(
-                    "rounded-xl px-8 h-12 font-bold transition-all w-full md:w-auto hover:scale-105 active:scale-95",
-                    isDark
-                      ? "bg-white text-black hover:bg-gray-200"
-                      : "bg-brand-red text-white hover:bg-brand-dark-red",
-                  )}
-                  onClick={async () => {
-                    await showInfo(
-                      "Enable Location",
-                      "Allow location access to show your position on the map and enable live tracking for faster assistance.",
-                    );
-                    live.requestPermission();
-                  }}
-                  rightSection={<IconArrowRight size={18} />}
-                >
-                  {dict.dashboard.enable_gps}
-                </Button>
-              </div>
-            </Paper>
-          </motion.div>
-
-          {/* --- SIDE STATS --- */}
-          <Stack gap={24}>
-            <motion.div variants={itemVariants as any}>
-              <Paper
-                p={32}
-                radius="32px"
-                className="bg-gradient-to-br from-blue-600/20 to-indigo-600/20 text-white relative overflow-hidden shadow-2xl border border-blue-500/20 min-h-[210px] flex flex-col justify-between"
-              >
-                <div className="absolute top-[-20px] right-[-20px] opacity-10">
-                  <IconShieldCheck size={180} />
-                </div>
-                <div>
-                  <Group justify="space-between" mb={12}>
-                    <Text className="text-blue-400 text-[10px] font-bold uppercase tracking-[0.2em]">
-                      {dict.dashboard.membership_status}
-                    </Text>
-                    <Badge
-                      color="blue"
-                      variant="filled"
-                      className="bg-blue-500"
-                    >
-                      {dict.dashboard.pro}
-                    </Badge>
-                  </Group>
-                  <Title
-                    order={2}
-                    className="font-manrope text-3xl font-black italic text-white"
-                  >
-                    {dict.dashboard.premium_plan}
-                  </Title>
-                </div>
-                <div className="flex items-center gap-2 text-gray-400 text-xs font-medium">
-                  <IconBolt size={14} className="text-yellow-500" />
-                  {dict.dashboard.expires_in_days.replace("{days}", "312")}
-                </div>
-              </Paper>
-            </motion.div>
-
-            <motion.div variants={itemVariants as any}>
-              <Paper
-                p={24}
-                radius="32px"
-                className={cn(
-                  "min-h-[210px] shadow-2xl flex flex-col justify-between border transition-colors",
-                  isDark
-                    ? "glass-dark border-white/10"
-                    : "bg-white border-gray-200/80",
-                )}
-              >
-                <div>
-                  <Group justify="space-between" mb={8}>
-                    <Text
-                      className={cn(
-                        "font-bold text-lg",
-                        isDark ? "text-white" : "text-gray-900",
-                      )}
-                    >
-                      {dict.dashboard.helpers_nearby}
-                    </Text>
-                    <div className="px-3 py-1 bg-green-500/10 text-green-400 text-[10px] font-bold rounded-full border border-green-500/20 uppercase">
-                      {dict.dashboard.online_count.replace("{count}", "8")}
-                    </div>
-                  </Group>
-                  <Text
-                    size="xs"
-                    className={cn(
-                      "font-medium mb-6",
-                      isDark ? "text-gray-500" : "text-gray-600",
-                    )}
-                  >
-                    {dict.dashboard.verified_in_radius}
-                  </Text>
-                </div>
-
-                <Group justify="space-between">
-                  <Avatar.Group spacing="lg">
-                    {avatars.map((avatar, idx) => (
-                      <Avatar
-                        key={idx}
-                        radius="xl"
-                        size="lg"
-                        color={avatar.color}
-                        className="border-2 border-brand-black"
-                      >
-                        {avatar.initials}
-                      </Avatar>
-                    ))}
-                    <Avatar
-                      radius="xl"
-                      size="lg"
-                      className="bg-white/5 text-gray-400 text-sm font-bold border-2 border-brand-black"
-                    >
-                      +5
-                    </Avatar>
-                  </Avatar.Group>
-                  <ActionIcon
-                    size={48}
-                    radius="xl"
-                    className={cn(
-                      "transition-all hover:scale-110",
-                      isDark
-                        ? "bg-white/5 border border-white/10 text-white hover:bg-white/10"
-                        : "bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-200",
-                    )}
-                  >
-                    <IconArrowRight size={20} />
-                  </ActionIcon>
-                </Group>
-              </Paper>
-            </motion.div>
-          </Stack>
-        </SimpleGrid>
-
-        {/* --- SERVICES GRID --- */}
-        <div className="mb-40">
-          <Group
-            justify="space-between"
-            mb={24}
-            align="flex-end"
-            className={isRTL ? "flex-row-reverse" : ""}
-          >
-            <Title
-              order={3}
-              className={cn(
-                "font-manrope text-2xl font-bold tracking-tight",
-                isDark ? "text-white" : "text-gray-900",
-              )}
-            >
-              {dict.dashboard.select_service}
-            </Title>
-            <Text
-              className={cn(
-                "font-medium text-sm hidden sm:block",
-                isDark ? "text-gray-500" : "text-gray-600",
-              )}
-            >
-              {dict.dashboard.choose_best_match}
-            </Text>
-          </Group>
-
-          <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing={20}>
-            {serviceCategories.map((service) => (
-              <motion.div
-                key={service.id}
-                variants={itemVariants as any}
-                whileHover={{
-                  y: -10,
-                  transition: { type: "spring", stiffness: 300 },
-                }}
-                className="h-full"
-              >
-                <Link
-                  href={`/customer/request-help?service=${service.id}`}
-                  className="no-underline block h-full"
-                >
-                  <Paper
-                    p={32}
-                    radius="32px"
-                    className={cn(
-                      "relative h-full border transition-all duration-300 group overflow-hidden shadow-xl hover:shadow-2xl",
-                      isDark
-                        ? "border-white/10 glass-dark"
-                        : "border-gray-200/80 bg-white hover:border-brand-red/30",
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500",
-                        service.gradient,
-                      )}
-                    />
-
-                    <div className="relative z-10 flex flex-col h-full">
-                      <div
-                        className={cn(
-                          "h-16 w-16 rounded-2xl flex items-center justify-center mb-8 transition-all duration-500 group-hover:scale-110",
-                          `bg-${service.color}-500/10 text-${service.color}-400 group-hover:bg-${service.color}-500/20 group-hover:text-${service.color}-300 border border-white/5`,
-                        )}
-                      >
-                        <service.icon size={32} stroke={1.5} />
-                      </div>
-
-                      <Text
-                        fw={800}
-                        size="xl"
-                        className={cn(
-                          "mb-3 tracking-tight group-hover:text-brand-red transition-colors font-manrope",
-                          isDark ? "text-white" : "text-gray-900",
-                        )}
-                      >
-                        {service.title}
-                      </Text>
-                      <Text
-                        size="sm"
-                        className={cn(
-                          "leading-relaxed font-medium mb-8",
-                          isDark ? "text-gray-400" : "text-gray-600",
-                        )}
-                      >
-                        {service.desc}
-                      </Text>
-
-                      <div
-                        className={cn(
-                          "mt-auto flex items-center gap-2 font-bold text-sm",
-                          isDark ? "text-white" : "text-gray-900",
-                        )}
-                      >
-                        <span>{dict.dashboard.get_support}</span>
-                        <IconArrowRight
-                          size={16}
-                          className="group-hover:translate-x-2 transition-transform duration-300"
-                        />
-                      </div>
-                    </div>
-                  </Paper>
-                </Link>
-              </motion.div>
-            ))}
-          </SimpleGrid>
+    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-white bg-grid noise-overlay">
+      <div className="max-w-5xl mx-auto space-y-8 animate-fade-in relative z-10">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h1 className="font-display text-3xl font-bold mb-2">
+              {t("dashboard.welcome")},{" "}
+              <span className="text-primary">{profile?.name || "Driver"}</span>{" "}
+              👋
+            </h1>
+            <p className="text-dark-muted">
+              Manage your active requests and view your history.
+            </p>
+          </div>
+          <Link href="/customer/profile" className="btn-ghost px-4 py-2">
+            Edit Profile
+          </Link>
         </div>
 
-        {/* --- RECENT ACTIVITY --- */}
-        <motion.div variants={itemVariants as any}>
-          <Paper
-            p={40}
-            radius="32px"
-            className={cn(
-              "shadow-2xl relative overflow-hidden border transition-colors",
-              isDark
-                ? "glass-dark border-white/10"
-                : "bg-white border-gray-200/80",
-            )}
-          >
-            <div className="absolute top-[-50px] left-[-50px] w-40 h-40 bg-blue-600/5 blur-[100px] rounded-full" />
-
-            <Group
-              justify="space-between"
-              mb={40}
-              className={isRTL ? "flex-row-reverse" : ""}
-            >
-              <div
-                className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse" : ""}`}
+        {/* Quick Actions Grid */}
+        <div>
+          <h2 className="section-label">Quick Actions</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { id: "towing", label: "Towing", icon: "🚙", color: "#FF2D2D" },
+              {
+                id: "tire-change",
+                label: "Flat Tire",
+                icon: "🛞",
+                color: "#FF6B35",
+              },
+              {
+                id: "fuel-delivery",
+                label: "Out of Fuel",
+                icon: "⛽",
+                color: "#FFB347",
+              },
+              {
+                id: "battery-jump",
+                label: "Dead Battery",
+                icon: "🔋",
+                color: "#22C55E",
+              },
+            ].map((svc) => (
+              <Link
+                key={svc.id}
+                href={`/customer/request-help?type=${svc.id}`}
+                className="card glass p-6 flex flex-col items-center justify-center text-center group hover:border-primary/50 transition-all cursor-pointer"
               >
-                <div
-                  className={cn(
-                    "h-10 w-10 rounded-xl flex items-center justify-center",
-                    isDark
-                      ? "bg-white/5 text-gray-400"
-                      : "bg-gray-100 text-gray-600",
-                  )}
-                >
-                  <IconHistory size={20} />
+                <div className="w-16 h-16 rounded-full bg-dark-surface border border-dark-border flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform shadow-glow-primary">
+                  {svc.icon}
                 </div>
-                <Title
-                  order={4}
-                  className={cn(
-                    "font-manrope text-2xl font-bold tracking-tight",
-                    isDark ? "text-white" : "text-gray-900",
-                  )}
-                >
-                  {dict.dashboard.recent_activity}
-                </Title>
-              </div>
-              <Button
-                variant="subtle"
-                color="gray"
-                className={cn(
-                  "font-bold hover:scale-105 transition-transform",
-                  isDark
-                    ? "hover:bg-white/5 text-gray-400"
-                    : "hover:bg-gray-100 text-gray-600",
-                )}
-                rightSection={<IconArrowRight size={14} />}
-                component={Link}
-                href="/customer/history"
-              >
-                {dict.sidebar.history}
-              </Button>
-            </Group>
+                <span className="font-semibold text-white">{svc.label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
 
-            <AnimatePresence>
-              {loadingRequests ? (
-                <div className="flex justify-center py-20">
-                  <Loader color="red" />
-                </div>
-              ) : activeRequests.length === 0 ? (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className={cn(
-                    "flex flex-col items-center justify-center py-20 rounded-[24px] border",
-                    isDark
-                      ? "bg-white/5 border-white/5"
-                      : "bg-gray-50 border-gray-200/80",
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "h-20 w-20 rounded-[28px] flex items-center justify-center mb-6 border",
-                      isDark
-                        ? "bg-white/5 border-white/10 text-gray-600"
-                        : "bg-gray-100 border-gray-200 text-gray-500",
-                    )}
-                  >
-                    <IconSparkles size={40} />
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Active Request Card */}
+          <div className="md:col-span-2">
+            <h2 className="section-label mb-4">Current Status</h2>
+            {activeRequest ? (
+              <div className="card glass p-6 border-l-4 border-l-primary relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10 blur-[40px] bg-primary w-32 h-32" />
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h3 className="font-bold text-xl mb-1 capitalize text-white">
+                      {activeRequest.service.replace("-", " ")}
+                    </h3>
+                    <div className="text-sm text-dark-muted">
+                      Requested today
+                    </div>
                   </div>
-                  <Text
-                    className={cn(
-                      "font-bold text-xl mb-2",
-                      isDark ? "text-white" : "text-gray-900",
-                    )}
+                  <span
+                    className={`badge-${activeRequest.status === "completed" ? "success" : activeRequest.status === "cancelled" ? "error" : "warning"} px-3 py-1 font-bold text-sm tracking-wide capitalize`}
                   >
-                    {dict.dashboard.no_active_requests}
-                  </Text>
-                  <Text
-                    className={cn(
-                      "font-medium mb-8 text-center max-w-sm px-6",
-                      isDark ? "text-gray-500" : "text-gray-600",
-                    )}
+                    {activeRequest.status.replace("-", " ")}
+                  </span>
+                </div>
+
+                {activeRequest.helperName && (
+                  <div className="flex items-center gap-4 bg-dark-surface p-4 rounded-xl mb-6 border border-dark-border">
+                    <div className="w-12 h-12 rounded-full bg-dark-bg flex items-center justify-center font-bold text-lg border border-dark-border">
+                      {activeRequest.helperName.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="text-sm text-dark-muted font-medium">
+                        Assigned Helper
+                      </div>
+                      <div className="font-bold text-white tracking-wide">
+                        {activeRequest.helperName}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-3">
+                  <Link
+                    href={`/customer/request-status?id=${activeRequest.id}`}
+                    className="btn-primary py-2.5 px-6"
                   >
-                    {dict.dashboard.activity_empty_msg}
-                  </Text>
-                  <Button
-                    className="bg-brand-red hover:bg-brand-dark-red rounded-xl h-12 px-8 font-bold transition-all shadow-xl shadow-brand-red/20 hover:scale-105 active:scale-95"
-                    component={Link}
-                    href="/customer/request-help"
-                  >
-                    {dict.dashboard.start_new_request}
-                  </Button>
-                </motion.div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {activeRequests.map((req: any, index: number) => (
-                    <motion.div
-                      key={req.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                    >
-                      <Link
-                        href={`/journey/${req.id}`}
-                        className="no-underline"
+                    Track Live
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div className="card glass p-8 flex flex-col items-center justify-center border-dashed border-2 border-dark-border py-16 text-center">
+                <div className="text-4xl mb-4 opacity-50">🛤️</div>
+                <h3 className="font-bold text-lg mb-2 text-white">
+                  No Active Requests
+                </h3>
+                <p className="text-dark-muted mb-6 max-w-sm">
+                  You're all safe right now! Use the quick actions above if you
+                  need roadside assistance.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Recent History */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="section-label mb-0">Recent History</h2>
+              <Link
+                href="/customer/history"
+                className="text-xs text-primary hover:text-primary-hover font-semibold"
+              >
+                View All
+              </Link>
+            </div>
+
+            <div className="space-y-4">
+              {history.length > 0 ? (
+                history.map((req) => (
+                  <div key={req.id} className="card glass p-4 group">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-bold capitalize text-white text-sm">
+                        {req.service.replace("-", " ")}
+                      </span>
+                      <span className="text-xs font-semibold text-dark-muted">
+                        {new Date(
+                          req.createdAt?.seconds * 1000,
+                        ).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span
+                        className={`badge-${req.status === "completed" ? "success" : "error"} text-[10px]`}
                       >
-                        <Paper
-                          p="xl"
-                          radius="xl"
-                          className={cn(
-                            "border transition-all hover:scale-[1.02]",
-                            isDark
-                              ? "glass-dark border-white/10 hover:border-brand-red/30"
-                              : "bg-white border-gray-200 hover:border-brand-red/30 shadow-sm",
-                          )}
-                        >
-                          <Group justify="space-between" mb="xs">
-                            <Text size="sm" c="dimmed">
-                              {new Date(
-                                req.createdAt?.seconds * 1000,
-                              ).toLocaleDateString()}
-                            </Text>
-                            <Badge color={getStatusColor(req.status)}>
-                              {req.status}
-                            </Badge>
-                          </Group>
-                          <Title
-                            order={4}
-                            className={isDark ? "text-white" : "text-gray-900"}
-                          >
-                            {req.serviceType?.replace("_", " ")}
-                          </Title>
-                          <Group mt="md" gap="xs">
-                            <IconMapPin
-                              size={16}
-                              className={
-                                isDark ? "text-gray-400" : "text-gray-500"
-                              }
-                            />
-                            <Text
-                              size="sm"
-                              lineClamp={1}
-                              className={
-                                isDark ? "text-gray-300" : "text-gray-600"
-                              }
-                            >
-                              {typeof req.location === "object"
-                                ? req.location.address
-                                : req.location}
-                            </Text>
-                          </Group>
-                        </Paper>
-                      </Link>
-                    </motion.div>
-                  ))}
+                        {req.status}
+                      </span>
+                      <span className="font-mono text-dark-muted font-bold">
+                        ${req.price || "--"}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="card glass p-6 text-center border-dashed text-dark-muted border-dark-border">
+                  No history found.
                 </div>
               )}
-            </AnimatePresence>
-          </Paper>
-        </motion.div>
-
-        {/* --- SPACER --- */}
-        <div className="h-20" />
-      </motion.div>
-    </Box>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
-};
-
-export default ClientDashboard;
+}

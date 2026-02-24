@@ -1,346 +1,168 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
-import {
-  Title,
-  Text,
-  Paper,
-  Stack,
-  Box,
-  Group,
-  Button,
-  Badge,
-  ThemeIcon,
-  Avatar,
-  Divider,
-  Timeline,
-} from "@mantine/core";
-import {
-  IconPhone,
-  IconCircleCheck,
-  IconClock,
-  IconNavigation,
-  IconCheck,
-  IconBrandWhatsapp,
-} from "@tabler/icons-react";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { requestOps, type HelpRequest } from "@/lib/firestore";
+import { useAuthStore } from "@/store/authStore";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { auth } from "@/lib/firebase/config";
-import { useRouter } from "next/navigation";
-import {
-  subscribeHelperActiveJobs,
-  updateRideStatus,
-} from "@/lib/services/requestService";
-import { showError } from "@/lib/sweetalert";
-import { toast } from "react-toastify";
-import type { RideRequestDoc } from "@/types";
-import { useLanguage } from "@/app/context/LanguageContext";
 
-export default function ActiveJobUI() {
-  const [activeJobs, setActiveJobs] = useState<
-    Array<{ id: string } & RideRequestDoc>
-  >([]);
-  const [updating, setUpdating] = useState(false);
-  const [uid, setUid] = useState<string | null>(null);
-  const { dict, isRTL } = useLanguage();
+function ActiveJobContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const reqId = searchParams.get("id");
+
+  const { user } = useAuthStore();
+  const [req, setReq] = useState<HelpRequest | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = auth.onAuthStateChanged((u) => setUid(u?.uid ?? null));
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    if (!uid) return;
-    const unsub = subscribeHelperActiveJobs({
-      helperId: uid,
-      cb: setActiveJobs,
+    if (!reqId) return;
+    const unsub = requestOps.subscribeToRequest(reqId, (data) => {
+      setReq(data);
+      setLoading(false);
+      if (data?.status === "completed") {
+        setTimeout(() => router.push("/helper/dashboard"), 3000);
+      }
     });
     return () => unsub();
-  }, [uid]);
+  }, [reqId, router]);
 
-  const activeJob = activeJobs[0] ?? null;
+  if (loading)
+    return (
+      <div className="py-20 flex justify-center">
+        <div className="w-8 h-8 rounded-full border-[3px] border-primary border-t-transparent animate-spin" />
+      </div>
+    );
+  if (!req)
+    return <div className="text-center py-20 text-white">Job not found.</div>;
 
-  const updateStatus = async (status: string) => {
-    if (!activeJob) return;
-    setUpdating(true);
-    try {
-      await updateRideStatus({
-        requestId: activeJob.id,
-        status: status as "in_progress" | "completed",
-      });
-      toast.success(`Status updated to ${status.replace("_", " ")}`);
-      if (status === "in_progress") {
-        router.push(`/journey/${activeJob.id}`);
-      }
-    } catch (e: unknown) {
-      await showError(
-        "Update failed",
-        e instanceof Error ? e.message : "Unable to update status.",
-      );
-    } finally {
-      setUpdating(false);
+  const updateStatus = async (status: "en-route" | "arrived" | "completed") => {
+    if (status === "completed") {
+      await requestOps.complete(req.id!, req.customerId, user!.uid);
+    } else {
+      await requestOps.update(req.id!, { status });
     }
   };
 
-  const customerPhone = activeJob?.customerPhone ?? null;
-  const phoneClean = customerPhone
-    ? String(customerPhone).replace(/[^\d+]/g, "")
-    : "";
-  const whatsappHref = phoneClean
-    ? `https://wa.me/${phoneClean}?text=${encodeURIComponent("RoadHelper: I'm on my way to assist you.")}`
-    : "#";
-  const telHref = phoneClean ? `tel:${phoneClean}` : "#";
-
-  if (!activeJob) {
-    return (
-      <Box className="p-4 md:p-8 flex items-center justify-center min-h-[70vh]">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-        >
-          <Paper
-            p="xl"
-            radius="xl"
-            withBorder
-            className="text-center max-w-md bg-slate-50 dark:bg-gray-900 border-dashed dark:border-gray-700"
-          >
-            <ThemeIcon
-              size={80}
-              radius="xl"
-              color="gray"
-              variant="light"
-              mb="md"
-            >
-              <IconClock size={40} />
-            </ThemeIcon>
-            <Title order={3} mb="xs">
-              {dict.active_job.no_active_job_title}
-            </Title>
-            <Text c="dimmed" mb="xl">
-              {dict.active_job.no_active_job_desc}
-            </Text>
-            <Button
-              color="red"
-              size="lg"
-              radius="md"
-              component={Link}
-              href="/helper/requests"
-              className="hover:scale-105 transition-transform"
-            >
-              {dict.active_job.find_jobs}
-            </Button>
-          </Paper>
-        </motion.div>
-      </Box>
-    );
-  }
-
-  const loc = activeJob.location;
-  const locationStr =
-    loc?.address ??
-    (loc?.lat && loc?.lng
-      ? `${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)}`
-      : "Live location");
-  const mapsHref =
-    loc?.lat && loc?.lng
-      ? `https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lng}`
-      : "#";
-
   return (
-    <Box className="p-4 md:p-8 max-w-4xl mx-auto">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        <Stack gap="xl">
-          <Group
-            justify="space-between"
-            className={isRTL ? "flex-row-reverse" : ""}
-          >
-            <Title order={1} className="text-3xl font-bold">
-              {dict.active_job.title}
-            </Title>
-            <Badge
-              size="xl"
-              color={activeJob.status === "accepted" ? "blue" : "green"}
-              variant="filled"
-              p="lg"
+    <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 relative z-10 animate-fade-in">
+      {/* Action panel */}
+      <div className="space-y-6">
+        <div className="card glass p-8 border-t-4 border-t-secondary">
+          <div className="flex justify-between items-start mb-6">
+            <h1 className="font-display text-3xl font-bold">Mission Control</h1>
+            <div
+              className={`badge-warning px-3 py-1 text-xs font-bold capitalize`}
             >
-              {activeJob.status === "accepted"
-                ? dict.active_job.timeline_accepted.toUpperCase()
-                : dict.active_job.timeline_progress.toUpperCase()}
-            </Badge>
-          </Group>
+              {req.status.replace("-", " ")}
+            </div>
+          </div>
 
-          <Paper p="xl" radius="xl" withBorder shadow="sm">
-            <Group justify="space-between" mb="xl">
-              <Group gap="md">
-                <Avatar size="xl" radius="md" color="blue">
-                  {(activeJob.customerName ?? "C").charAt(0)}
-                </Avatar>
-                <Box>
-                  <Title order={3}>
-                    {activeJob.customerName ?? "Customer"}
-                  </Title>
-                  <Group gap="xs">
-                    <IconPhone size={14} className="text-slate-400" />
-                    <Text size="sm" c="dimmed">
-                      {customerPhone ?? "Phone not available"}
-                    </Text>
-                  </Group>
-                </Box>
-              </Group>
-              <Button
-                variant="light"
-                color="blue"
-                leftSection={<IconNavigation size={18} />}
-                component="a"
-                href={mapsHref}
-                target="_blank"
-                className="hover:scale-105 transition-transform"
+          <div className="bg-dark-surface p-4 rounded-xl border border-dark-border space-y-4 mb-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-5 blur-[20px] bg-white w-32 h-32" />
+            <div>
+              <div className="text-xs text-dark-muted font-semibold uppercase tracking-wider">
+                Customer
+              </div>
+              <div className="font-bold text-white text-xl">
+                {req.customerName}
+              </div>
+              <a
+                href={`tel:${req.customerPhone}`}
+                className="text-primary font-mono font-bold mt-1 inline-flex items-center gap-1 hover:underline"
               >
-                {dict.active_job.get_directions}
-              </Button>
-            </Group>
+                📞 {req.customerPhone}
+              </a>
+            </div>
+            <div className="pt-4 border-t border-dark-border">
+              <div className="text-xs text-dark-muted font-semibold uppercase tracking-wider mb-1">
+                Location
+              </div>
+              <div className="text-sm text-white/90">
+                {req.location.address}
+              </div>
+            </div>
+            {req.notes && (
+              <div className="pt-4 border-t border-dark-border">
+                <div className="text-xs text-dark-muted font-semibold uppercase tracking-wider mb-1">
+                  Notes
+                </div>
+                <div className="text-sm italic text-warning">{req.notes}</div>
+              </div>
+            )}
+            <div className="pt-4 border-t border-dark-border flex justify-between">
+              <span className="text-dark-muted text-sm font-semibold">
+                Agreed Price
+              </span>
+              <span className="font-mono text-xl text-success font-bold">
+                ${req.price}
+              </span>
+            </div>
+          </div>
 
-            <Divider my="xl" />
-
-            <Stack gap="lg">
-              <Box className={isRTL ? "text-right" : ""}>
-                <Text fw={700} size="sm" c="dimmed">
-                  {dict.active_job.location}
-                </Text>
-                <Text fw={600}>{locationStr}</Text>
-              </Box>
-              <Box className={isRTL ? "text-right" : ""}>
-                <Text fw={700} size="sm" c="dimmed">
-                  {dict.active_job.vehicle_details}
-                </Text>
-                <Text>{activeJob.vehicleDetails ?? "—"}</Text>
-              </Box>
-              <Box className={isRTL ? "text-right" : ""}>
-                <Text fw={700} size="sm" c="dimmed">
-                  {dict.active_job.issue_description}
-                </Text>
-                <Text className="bg-slate-50 dark:bg-gray-800 p-4 rounded-xl italic">
-                  {activeJob.issueDescription ?? "No description provided."}
-                </Text>
-              </Box>
-            </Stack>
-
-            <Divider my="xl" />
-
-            <Group grow>
-              <Button
-                variant="outline"
-                leftSection={<IconPhone size={18} />}
-                component="a"
-                href={telHref}
-                disabled={!customerPhone}
-              >
-                {dict.helper_requests.call}
-              </Button>
-              <Button
-                variant="outline"
-                color="green"
-                leftSection={<IconBrandWhatsapp size={18} />}
-                component="a"
-                href={whatsappHref}
-                target="_blank"
-                disabled={!customerPhone}
-              >
-                {dict.helper_requests.whatsapp}
-              </Button>
-            </Group>
-
-            <Timeline
-              active={
-                activeJob.status === "accepted"
-                  ? 0
-                  : activeJob.status === "in_progress"
-                    ? 1
-                    : 2
-              }
-              bulletSize={30}
-              lineWidth={2}
-              mt="xl"
+          <div className="space-y-3">
+            <button
+              onClick={() => updateStatus("en-route")}
+              disabled={req.status !== "accepted"}
+              className={`w-full p-4 rounded-xl font-bold transition-all ${req.status === "accepted" ? "bg-info/20 text-info border border-info/50 hover:bg-info/30" : "bg-dark-surface text-dark-muted border border-dark-border cursor-not-allowed"}`}
             >
-              <Timeline.Item
-                bullet={<IconCheck size={16} />}
-                title={dict.active_job.timeline_accepted}
-              >
-                <Text
-                  size="xs"
-                  c="dimmed"
-                  className={isRTL ? "text-right" : ""}
-                >
-                  {isRTL
-                    ? "آپ نے یہ درخواست قبول کی"
-                    : "You accepted this request"}
-                </Text>
-              </Timeline.Item>
-              <Timeline.Item
-                bullet={<IconNavigation size={16} />}
-                title={dict.active_job.timeline_progress}
-              >
-                <Text
-                  size="xs"
-                  c="dimmed"
-                  className={isRTL ? "text-right" : ""}
-                >
-                  {isRTL
-                    ? "کام شروع ہو چکا ہے یا آپ راستے میں ہیں"
-                    : "Work started or you are on your way"}
-                </Text>
-              </Timeline.Item>
-              <Timeline.Item
-                bullet={<IconCircleCheck size={16} />}
-                title={dict.active_job.timeline_completed}
-              >
-                <Text
-                  size="xs"
-                  c="dimmed"
-                  className={isRTL ? "text-right" : ""}
-                >
-                  {isRTL
-                    ? "سروس کامیابی سے فراہم کر دی گئی"
-                    : "Service delivered successfully"}
-                </Text>
-              </Timeline.Item>
-            </Timeline>
+              1. Mark En Route
+            </button>
+            <button
+              onClick={() => updateStatus("arrived")}
+              disabled={req.status !== "en-route"}
+              className={`w-full p-4 rounded-xl font-bold transition-all ${req.status === "en-route" ? "bg-warning/20 text-warning border border-warning/50 hover:bg-warning/30" : "bg-dark-surface text-dark-muted border border-dark-border cursor-not-allowed"}`}
+            >
+              2. Arrived at Location
+            </button>
+            <button
+              onClick={() => updateStatus("completed")}
+              disabled={req.status !== "arrived"}
+              className={`w-full p-4 rounded-xl font-bold transition-all ${req.status === "arrived" ? "bg-success/20 text-success border border-success/50 hover:bg-success/30 shadow-[0_0_20px_rgba(34,197,94,0.2)]" : "bg-dark-surface text-dark-muted border border-dark-border cursor-not-allowed"}`}
+            >
+              3. Complete Job
+            </button>
+          </div>
+        </div>
+      </div>
 
-            <Group grow mt="xl">
-              {activeJob.status === "accepted" && (
-                <Button
-                  color="blue"
-                  size="lg"
-                  radius="md"
-                  loading={updating}
-                  onClick={() => updateStatus("in_progress")}
-                  className="hover:scale-105 transition-transform"
-                >
-                  {dict.active_job.start_service}
-                </Button>
-              )}
-              {activeJob.status === "in_progress" && (
-                <Button
-                  color="green"
-                  size="lg"
-                  radius="md"
-                  loading={updating}
-                  onClick={() => updateStatus("completed")}
-                  className="hover:scale-105 transition-transform"
-                >
-                  {dict.active_job.mark_completed}
-                </Button>
-              )}
-            </Group>
-          </Paper>
-        </Stack>
-      </motion.div>
-    </Box>
+      {/* Map visual */}
+      <div className="card glass relative overflow-hidden min-h-[400px] flex items-center justify-center border-dark-border p-6 rounded-[2rem]">
+        <div className="absolute inset-0 bg-dark-bg opacity-70 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
+
+        {req.status === "completed" ? (
+          <div className="relative z-10 text-center animate-slide-up">
+            <div className="w-24 h-24 bg-success/20 border-4 border-success text-success rounded-full flex items-center justify-center text-5xl mx-auto mb-6 shadow-[0_0_40px_rgba(34,197,94,0.4)]">
+              ✓
+            </div>
+            <h2 className="font-display text-3xl font-bold text-white mb-2">
+              Job Done!
+            </h2>
+            <p className="text-dark-muted">
+              Earnings added to your wallet. Redirecting...
+            </p>
+          </div>
+        ) : (
+          <div className="relative z-10 w-full h-full bg-dark-surface/50 border border-dark-border rounded-xl backdrop-blur-md flex flex-col items-center justify-center">
+            <div className="animate-pulse mb-4 text-4xl">🗺️</div>
+            <span className="text-dark-muted font-bold tracking-wide uppercase text-sm">
+              Navigation Active
+            </span>
+            <div className="mt-8 text-xs text-dark-text-secondary">
+              (Live map preview omitted for demo)
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function ActiveJobPage() {
+  return (
+    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-white bg-grid noise-overlay">
+      <Suspense fallback={<div className="text-center">Loading...</div>}>
+        <ActiveJobContent />
+      </Suspense>
+    </div>
   );
 }

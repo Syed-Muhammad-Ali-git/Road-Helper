@@ -1,396 +1,259 @@
 "use client";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
+import { requestOps, type ServiceType } from "@/lib/firestore";
 
-import React, { useEffect, useState, Suspense } from "react";
-import {
-  Title,
-  Text,
-  Paper,
-  Stack,
-  TextInput,
-  Textarea,
-  Button,
-  Box,
-  Group,
-  Select,
-  Stepper,
-  rem,
-  ThemeIcon,
-  SimpleGrid,
-  Loader,
-} from "@mantine/core";
-import {
-  IconMapPin,
-  IconCar,
-  IconMessage2,
-  IconCheck,
-  IconCircleCheck,
-  IconCurrentLocation,
-} from "@tabler/icons-react";
-import { useForm } from "@mantine/form";
-import z from "zod";
-import { showSuccess, showError } from "@/lib/sweetalert";
-import { toast } from "react-toastify";
-import { zodResolver } from "mantine-form-zod-resolver";
-import { auth } from "@/lib/firebase/config";
-import { useRouter } from "next/navigation";
-import { useLiveLocation } from "@/hooks/useLiveLocation";
-import { useLanguage } from "@/app/context/LanguageContext";
-import dynamic from "next/dynamic";
-import {
-  createRideRequest,
-  subscribeRideRequest,
-} from "@/lib/services/requestService";
-
-const LiveMap = dynamic(() => import("@/components/map/LiveMap"), {
-  ssr: false,
-});
-import type { ServiceType } from "@/types";
-
-const requestHelpSchema = z.object({
-  serviceType: z.string().min(1, "Service type is required"),
-  location: z.string().min(1, "Location is required"),
-  vehicleDetails: z.string().min(1, "Vehicle details are required"),
-  issueDescription: z.string().min(1, "Issue description is required"),
-});
+const SERVICES: {
+  id: ServiceType;
+  label: string;
+  icon: string;
+  desc: string;
+}[] = [
+  {
+    id: "towing",
+    label: "Towing",
+    icon: "🚙",
+    desc: "Need your vehicle moved",
+  },
+  {
+    id: "tire-change",
+    label: "Flat Tire",
+    icon: "🛞",
+    desc: "Spare replacement",
+  },
+  {
+    id: "fuel-delivery",
+    label: "Fuel Delivery",
+    icon: "⛽",
+    desc: "Out of gas",
+  },
+  {
+    id: "battery-jump",
+    label: "Battery Jump",
+    icon: "🔋",
+    desc: "Dead battery",
+  },
+  {
+    id: "lockout",
+    label: "Lockout Help",
+    icon: "🔑",
+    desc: "Keys locked inside",
+  },
+];
 
 function RequestHelpContent() {
-  const [active, setActive] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [requestId, setRequestId] = useState<string | null>(null);
-  const [requestStatus, setRequestStatus] = useState<string | null>(null);
-  const [uid, setUid] = useState<string | null>(null);
   const router = useRouter();
-  const { dict } = useLanguage();
-  const live = useLiveLocation({
-    onSuccess: (coords) => {
-      form.setFieldValue(
-        "location",
-        `Current location (${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)})`,
-      );
-      toast.success("Location captured! Coordinates filled in.");
-    },
-  });
+  const searchParams = useSearchParams();
+  const initType = searchParams.get("type") as ServiceType;
+
+  const { user, profile } = useAuthStore();
+
+  const [step, setStep] = useState(1);
+  const [service, setService] = useState<ServiceType | "">(initType || "");
+  const [location, setLocation] = useState({ lat: 0, lng: 0, address: "" });
+  const [notes, setNotes] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [locLoading, setLocLoading] = useState(false);
+
   useEffect(() => {
-    const unsub = auth.onAuthStateChanged((u) => setUid(u?.uid ?? null));
-    return () => unsub();
-  }, []);
-
-  const form = useForm({
-    initialValues: {
-      serviceType: "",
-      location: "",
-      vehicleDetails: "",
-      issueDescription: "",
-    },
-    validate: zodResolver(requestHelpSchema),
-  });
-
-  const nextStep = () => setActive((prev) => prev + 1);
-  const prevStep = () => setActive((prev) => prev - 1);
-  const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    if (!form.validate().hasErrors) {
-      setLoading(true);
-      const values = form.values;
-      try {
-        const uid = auth.currentUser?.uid;
-        if (!uid) {
-          await showError("Not signed in", "Please log in to send a request.");
-          setLoading(false);
-          return;
-        }
-
-        const serviceType = values.serviceType as ServiceType;
-        const location = live.coords
-          ? {
-              lat: live.coords.lat,
-              lng: live.coords.lng,
-              address: values.location,
-            }
-          : { lat: 24.8607, lng: 67.0011, address: values.location };
-
-        const displayName =
-          auth.currentUser?.displayName ??
-          auth.currentUser?.email?.split("@")[0] ??
-          "Customer";
-        const { getUserByUid } = await import("@/lib/services/userService");
-        const customerProfile = await getUserByUid(uid);
-        const id = await createRideRequest({
-          customerId: uid,
-          customerName: displayName,
-          customerPhone: customerProfile?.phone ?? null,
-          serviceType,
-          location,
-          vehicleDetails: values.vehicleDetails,
-          issueDescription: values.issueDescription,
+    if (step === 2 && !location.lat) {
+      setLocLoading(true);
+      // Fake location detect for demo
+      setTimeout(() => {
+        setLocation({
+          lat: 31.5204,
+          lng: 74.3587,
+          address: "Ferozepur Road, Lahore",
         });
-        setRequestId(id);
-        setRequestStatus("pending");
-        setActive(3);
-        await showSuccess(
-          "Request sent",
-          "We’re notifying nearby helpers. Keep this screen open for live updates.",
-        );
-      } catch (err: unknown) {
-        const msg =
-          err instanceof Error ? err.message : "Unable to create request.";
-        await showError("Request Failed", msg);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      await showError(
-        "Validation Error",
-        "Please fill in all required fields correctly.",
-      );
+        setLocLoading(false);
+      }, 1500);
+    }
+  }, [step, location.lat]);
+
+  const handleSubmit = async () => {
+    if (!user || !profile || !service) return;
+    setLoading(true);
+    try {
+      const id = await requestOps.create({
+        customerId: user.uid,
+        customerName: profile.name || "Customer",
+        customerPhone: profile.phone || "N/A",
+        service,
+        location,
+        notes,
+      });
+      router.push(`/customer/request-status?id=${id}`);
+    } catch (e) {
+      alert("Failed to request help");
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (!requestId) return;
-    const unsub = subscribeRideRequest(requestId, (req) => {
-      if (!req) return;
-      setRequestStatus((req as any).status ?? null);
-      if ((req as any).status === "accepted" && (req as any).helperId) {
-        toast.dismiss(); // Dismiss any existing toasts
-        toast.success(dict.request_help_page.request_sent); // Optional: notify acceptance
-        router.push(`/journey/${requestId}`);
-      }
-    });
-    return () => unsub();
-  }, [requestId, router]);
-
   return (
-    <Box className="p-4 md:p-8 max-w-4xl mx-auto">
-      <Paper p="xl" radius="xl" withBorder>
-        <Stepper active={active} allowNextStepsSelect={false}>
-          {/* STEP 1 */}
-          <Stepper.Step
-            label={dict.request_help_page.service_step_title}
-            description={dict.request_help_page.service_step_desc}
-            icon={<IconCar size={18} />}
-            className="w-full"
+    <div className="max-w-3xl mx-auto space-y-8 relative z-10 animate-fade-in">
+      <div className="text-center mb-10">
+        <h1 className="font-display text-3xl font-bold mb-2">
+          Request Assistance
+        </h1>
+        <p className="text-dark-muted">
+          Get a trusted professional to your location instantly.
+        </p>
+      </div>
+
+      <div className="flex justify-between items-center relative mb-12">
+        <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-dark-border -translate-y-1/2 z-0" />
+        <div
+          className="absolute top-1/2 left-0 h-[2px] bg-primary transition-all duration-500 z-0"
+          style={{ width: step === 1 ? "0%" : step === 2 ? "50%" : "100%" }}
+        />
+        {[1, 2, 3].map((s) => (
+          <div
+            key={s}
+            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold relative z-10 transition-all duration-300 ${step >= s ? "bg-primary text-white shadow-glow-primary" : "bg-dark-surface border-2 border-dark-border text-dark-muted"}`}
           >
-            <Stack mt="xl">
-              <Select
-                label={dict.request_help_page.emergency_service_type}
-                placeholder={dict.request_help_page.select_service_placeholder}
-                required
-                data={[
-                  {
-                    value: "mechanic",
-                    label: dict.request_help_page.mobile_mechanic,
-                  },
-                  { value: "tow", label: dict.request_help_page.towing_truck },
-                  {
-                    value: "fuel",
-                    label: dict.request_help_page.fuel_delivery,
-                  },
-                  {
-                    value: "battery",
-                    label: dict.request_help_page.battery_jump,
-                  },
-                  {
-                    value: "lockout",
-                    label: dict.request_help_page.lockout_service,
-                  },
-                ]}
-                {...form.getInputProps("serviceType")}
-              />
-              <TextInput
-                label={dict.request_help_page.current_location}
-                required
-                leftSection={<IconMapPin size={18} />}
-                rightSection={
-                  <Button
-                    variant="subtle"
-                    size="xs"
-                    loading={live.isWatching && !live.coords && !live.error}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      live.requestPermission();
-                    }}
-                    leftSection={<IconCurrentLocation size={14} />}
-                  >
-                    {dict.request_help_page.use_gps}
-                  </Button>
-                }
-                {...form.getInputProps("location")}
-              />
-              {live.error && (
-                <Text size="xs" c="dimmed">
-                  Location: {live.error}
-                </Text>
-              )}
-            </Stack>
-          </Stepper.Step>
+            {s}
+          </div>
+        ))}
+      </div>
 
-          {/* STEP 2 */}
-          <Stepper.Step
-            label={dict.request_help_page.details_step_title}
-            description={dict.request_help_page.details_step_desc}
-            icon={<IconMessage2 size={18} />}
-            className="w-full"
-          >
-            <Stack mt="xl">
-              <TextInput
-                label={dict.request_help_page.vehicle_information}
-                required
-                {...form.getInputProps("vehicleDetails")}
-              />
-              <Textarea
-                label={dict.request_help_page.issue_description}
-                required
-                minRows={4}
-                {...form.getInputProps("issueDescription")}
-              />
-            </Stack>
-          </Stepper.Step>
-
-          {/* STEP 3 */}
-          <Stepper.Step
-            label={dict.request_help_page.review_step_title}
-            description={dict.request_help_page.review_step_desc}
-            icon={<IconCheck size={18} />}
-            className="w-full"
-          >
-            <Stack mt="xl">
-              <Title order={4}>
-                {dict.request_help_page.review_your_request}
-              </Title>
-              <SimpleGrid cols={2}>
-                <Box>
-                  <Text fw={600}>
-                    {dict.request_help_page.service_step_title}
-                  </Text>
-                  <Text>{form.values.serviceType.replace("_", " ")}</Text>
-                </Box>
-                <Box>
-                  <Text fw={600}>
-                    {dict.request_help_page.current_location}
-                  </Text>
-                  <Text>{form.values.location}</Text>
-                </Box>
-              </SimpleGrid>
-              <Box>
-                <Text fw={600}>
-                  {dict.request_help_page.vehicle_information}
-                </Text>
-                <Text>{form.values.vehicleDetails}</Text>
-              </Box>
-              <Box>
-                <Text fw={600}>{dict.request_help_page.issue_description}</Text>
-                <Text>{form.values.issueDescription}</Text>
-              </Box>
-            </Stack>
-          </Stepper.Step>
-
-          {/* DONE */}
-          <Stepper.Completed>
-            <Stack gap="md" className="py-6">
-              <Group justify="space-between" align="center">
-                <Group>
-                  <ThemeIcon
-                    size="xl"
-                    radius="xl"
-                    color="green"
-                    variant="light"
-                  >
-                    <IconCircleCheck size={32} />
-                  </ThemeIcon>
-                  <Box>
-                    <Title order={3}>
-                      {dict.request_help_page.request_sent}
-                    </Title>
-                    <Text c="dimmed">
-                      Status:{" "}
-                      <strong>
-                        {(requestStatus ?? "pending").replace("_", " ")}
-                      </strong>
-                    </Text>
-                  </Box>
-                </Group>
-                <Button
-                  variant="light"
-                  color="blue"
-                  onClick={() =>
-                    requestId && router.push(`/journey/${requestId}`)
-                  }
-                  disabled={!requestId}
-                >
-                  {dict.request_help_page.open_live_view}
-                </Button>
-              </Group>
-
-              <Paper
-                p="md"
-                radius="xl"
-                className="bg-black/20 border border-white/10"
-              >
-                <Text fw={700} className="text-white mb-1">
-                  {dict.request_help_page.waiting_for_helper}
-                </Text>
-                <Text size="sm" c="dimmed">
-                  {dict.request_help_page.keep_open_msg}
-                </Text>
-              </Paper>
-
-              <LiveMap
-                customer={
-                  live.coords
-                    ? {
-                        lat: live.coords.lat,
-                        lng: live.coords.lng,
-                        label: "You",
-                      }
-                    : null
-                }
-                helper={null}
-              />
-
-              <Group justify="center">
-                <Button
-                  variant="light"
-                  color="gray"
+      <div className="card glass p-8">
+        {step === 1 && (
+          <div className="animate-fade-in">
+            <h2 className="text-xl font-bold mb-6">
+              1. What do you need help with?
+            </h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {SERVICES.map((s) => (
+                <button
+                  key={s.id}
                   onClick={() => {
-                    setActive(0);
-                    setRequestId(null);
-                    setRequestStatus(null);
-                    form.reset();
+                    setService(s.id);
+                    setStep(2);
                   }}
+                  className={`text-left p-4 rounded-xl border transition-all ${service === s.id ? "bg-primary/10 border-primary shadow-glow-primary" : "bg-dark-surface border-dark-border hover:border-primary/50"}`}
                 >
-                  {dict.request_help_page.make_another_request}
-                </Button>
-              </Group>
-            </Stack>
-          </Stepper.Completed>
-        </Stepper>
-
-        {active < 3 && (
-          <Group justify="center" mt="xl">
-            {active > 0 && (
-              <Button variant="default" onClick={prevStep}>
-                {dict.request_help_page.back}
-              </Button>
-            )}
-            {active < 2 ? (
-              <Button onClick={nextStep}>{dict.request_help_page.next}</Button>
-            ) : (
-              <Button loading={loading} onClick={handleSubmit} type="submit">
-                {dict.request_help_page.send_request}
-              </Button>
-            )}
-          </Group>
+                  <div className="text-3xl mb-3">{s.icon}</div>
+                  <div className="font-bold text-lg mb-1">{s.label}</div>
+                  <div className="text-sm text-dark-muted">{s.desc}</div>
+                </button>
+              ))}
+            </div>
+          </div>
         )}
-      </Paper>
-    </Box>
+
+        {step === 2 && (
+          <div className="animate-fade-in">
+            <h2 className="text-xl font-bold mb-6">
+              2. Where are you located?
+            </h2>
+            {locLoading ? (
+              <div className="py-20 flex flex-col items-center justify-center text-dark-muted">
+                <div className="w-8 h-8 rounded-full border-[3px] border-primary border-t-transparent animate-spin mb-4" />
+                Detecting GPS Location...
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="h-48 rounded-xl bg-dark-surface border border-dark-border flex items-center justify-center overflow-hidden relative">
+                  <div className="absolute inset-0 opacity-40 bg-[url('https://www.transparenttextures.com/patterns/map.png')]" />
+                  <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center animate-pulse">
+                    <div className="w-4 h-4 bg-primary rounded-full" />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-dark-muted">
+                    Identified Address
+                  </label>
+                  <input
+                    type="text"
+                    value={location.address}
+                    onChange={(e) =>
+                      setLocation({ ...location, address: e.target.value })
+                    }
+                    className="input-field"
+                    placeholder="Enter landmark or street address"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-dark-muted">
+                    Any details for the helper? (Optional)
+                  </label>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    className="input-field min-h-[100px] resize-none"
+                    placeholder="E.g. I am parked near the gas station."
+                  />
+                </div>
+
+                <div className="flex justify-between pt-4">
+                  <button onClick={() => setStep(1)} className="btn-ghost">
+                    Back
+                  </button>
+                  <button onClick={() => setStep(3)} className="btn-primary">
+                    Continue
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="animate-fade-in">
+            <h2 className="text-xl font-bold mb-6">3. Confirm Request</h2>
+            <div className="bg-dark-surface rounded-xl p-6 border border-dark-border space-y-4 mb-8">
+              <div className="flex items-center justify-between pb-4 border-b border-dark-border">
+                <span className="text-dark-muted">Service</span>
+                <span className="font-bold text-lg capitalize">
+                  {service.replace("-", " ")}
+                </span>
+              </div>
+              <div className="flex items-center justify-between pb-4 border-b border-dark-border">
+                <span className="text-dark-muted">Location</span>
+                <span className="font-semibold text-right max-w-[200px]">
+                  {location.address}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-dark-muted">Estimated Cost</span>
+                <span className="font-bold text-xl text-primary">
+                  $40 - $80
+                </span>
+              </div>
+            </div>
+
+            <div className="flex justify-between">
+              <button
+                disabled={loading}
+                onClick={() => setStep(2)}
+                className="btn-ghost"
+              >
+                Edit
+              </button>
+              <button
+                disabled={loading}
+                onClick={handleSubmit}
+                className="btn-primary px-10"
+              >
+                {loading ? "Submitting..." : "Confirm Request"}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
 export default function RequestHelpPage() {
   return (
-    <Suspense fallback={<Loader size="lg" />}>
-      <RequestHelpContent />
-    </Suspense>
+    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-white bg-grid noise-overlay">
+      <Suspense fallback={<div className="text-center">Loading...</div>}>
+        <RequestHelpContent />
+      </Suspense>
+    </div>
   );
 }
