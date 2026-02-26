@@ -3,10 +3,17 @@ import { useEffect } from "react";
 import { useThemeStore } from "@/store/themeStore";
 import { useLangStore } from "@/store/langStore";
 import { applyLangToDocument } from "@/lib/i18n";
+import { useAuthStore } from "@/store/authStore";
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { theme } = useThemeStore();
   const { lang } = useLangStore();
+
+  useEffect(() => {
+    // Initialize Auth Session
+    const unsubscribe = useAuthStore.getState().init();
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     // Apply theme class to html element

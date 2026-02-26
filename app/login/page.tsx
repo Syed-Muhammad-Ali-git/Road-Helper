@@ -33,12 +33,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-dark-bg text-white bg-grid noise-overlay">
+    <div className="min-h-screen flex bg-dark-bg text-[var(--text)] bg-grid noise-overlay">
       {/* Brand Panel */}
       <div className="hidden lg:flex w-[40%] bg-dark-surface border-r border-dark-border flex-col justify-between p-12 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-[300px] bg-gradient-brand opacity-10 blur-[100px]" />
 
-        <div className="relative z-10">
+        <div className="relative z-10 text-white">
           <Link href="/" className="flex items-center gap-2 mb-12">
             <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center text-xl shadow-glow-primary">
               🚗
@@ -48,12 +48,11 @@ export default function LoginPage() {
             </span>
           </Link>
           <h1 className="font-display text-4xl font-bold mb-6 text-balance leading-tight">
-            Welcome back to your{" "}
-            <span className="gradient-text">Safe Journey</span>.
+            {t("auth.welcomeTitle")}{" "}
+            <span className="gradient-text">{t("auth.welcomeHighlight")}</span>.
           </h1>
           <p className="text-dark-muted max-w-sm text-lg">
-            Login to request help instantly or manage your active rescue
-            missions.
+            {t("auth.welcomeSubtitle")}
           </p>
         </div>
 
@@ -71,9 +70,11 @@ export default function LoginPage() {
             </div>
             <div className="text-sm">
               <span className="text-white font-bold block">
-                5K+ active users
+                {t("auth.trustingUsers")}
               </span>
-              <span className="text-dark-muted">Trusting our service</span>
+              <span className="text-dark-muted">
+                {t("auth.trustingSubtitle")}
+              </span>
             </div>
           </div>
         </div>
@@ -83,7 +84,7 @@ export default function LoginPage() {
       <div className="flex-1 flex flex-col justify-center items-center p-[5%] relative z-10">
         <div className="w-full max-w-[420px] animate-fade-in">
           <div className="text-center mb-10">
-            <h2 className="font-display text-3xl font-bold mb-2">
+            <h2 className="font-display text-3xl font-bold mb-2 text-white">
               {t("auth.login")}
             </h2>
             <p className="text-dark-muted">
@@ -92,7 +93,7 @@ export default function LoginPage() {
                 href="/register"
                 className="text-primary hover:text-primary-hover font-semibold transition-colors"
               >
-                Register here
+                {t("auth.register")}
               </Link>
             </p>
           </div>
@@ -113,7 +114,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input-field"
+                className="input-field text-white"
                 placeholder="hello@example.com"
               />
             </div>
@@ -125,7 +126,7 @@ export default function LoginPage() {
                 </label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs text-primary hover:text-primary-hover"
+                  className="text-xs text-primary hover:text-primary-hover font-bold"
                 >
                   {t("auth.forgotPassword")}
                 </Link>
@@ -135,7 +136,7 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input-field"
+                className="input-field text-white"
                 placeholder="••••••••"
               />
             </div>

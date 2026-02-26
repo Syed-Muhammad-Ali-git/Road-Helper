@@ -30,7 +30,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   profile: null,
   role: null,
-  loading: true,
+  loading: false,
   initialized: false,
 
   setUser: (user) => set({ user }),

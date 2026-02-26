@@ -27,7 +27,20 @@
     "haveAccount": "Kya aapka pehle se account hai?",
     "loginAs": "Login Karien As",
     "customer": "Customer",
-    "helper": "Helper"
+    "helper": "Helper",
+    "welcomeTitle": "Phir se khush amdeed aapke",
+    "welcomeHighlight": "Mehfooz Safar mien",
+    "welcomeSubtitle": "Fauri madad ki darkhwast ke liye log in karein ya apne active rescue missions ko manage karein.",
+    "trustingUsers": "5K+ active users",
+    "trustingSubtitle": "Hamari service par bharosa",
+    "createAccount": "Account Banayein",
+    "joinTitle": "Shamil houn",
+    "joinHighlight": "Tezi se",
+    "joinSubtitle": "Barhta hua Network",
+    "joinDescription": "Fauri road madad haasil karne ke liye account banayein ya doosron ki madad kar ke paise kamayein.",
+    "fullName": "Poora Naam",
+    "phoneNumber": "Phone Number",
+    "legalAgreement": "Account bana kar, aap hamari Terms of Service aur Privacy Policy se ittefaq karte hain."
   },
   "dashboard": {
     "welcome": "Welcome back",

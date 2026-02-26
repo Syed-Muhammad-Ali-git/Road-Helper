@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import type { UserRole } from "@/lib/firestore";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -15,6 +16,8 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  const t = useTranslation();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,12 +35,12 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-dark-bg text-white bg-grid noise-overlay">
+    <div className="min-h-screen flex bg-dark-bg text-[var(--text)] bg-grid noise-overlay">
       {/* Brand Panel */}
       <div className="hidden lg:flex w-[40%] bg-dark-surface border-r border-dark-border flex-col justify-between p-12 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-[300px] bg-gradient-brand opacity-10 blur-[100px]" />
 
-        <div className="relative z-10">
+        <div className="relative z-10 text-white">
           <Link href="/" className="flex items-center gap-2 mb-12">
             <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center text-xl shadow-glow-primary">
               🚗
@@ -46,13 +49,15 @@ export default function RegisterPage() {
               RoadHelper
             </span>
           </Link>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-bold mb-6">
+            ✨ {t("auth.joinTitle")}
+          </div>
           <h1 className="font-display text-4xl font-bold mb-6 text-balance leading-tight">
-            Join the <span className="gradient-text">Fastest</span> Growing
-            Network
+            {t("auth.joinHighlight")}{" "}
+            <span className="gradient-text">{t("auth.joinSubtitle")}</span>.
           </h1>
           <p className="text-dark-muted max-w-sm text-lg">
-            Create an account to get instant roadside assistance or earn money
-            by helping others.
+            {t("auth.joinDescription")}
           </p>
         </div>
       </div>
@@ -61,16 +66,16 @@ export default function RegisterPage() {
       <div className="flex-1 flex flex-col justify-center items-center p-[5%] relative z-10">
         <div className="w-full max-w-[420px] animate-fade-in py-8">
           <div className="text-center mb-8">
-            <h2 className="font-display text-3xl font-bold mb-2">
-              Create Account
+            <h2 className="font-display text-3xl font-bold mb-2 text-white">
+              {t("auth.createAccount")}
             </h2>
             <p className="text-dark-muted">
-              Already have an account?{" "}
+              {t("auth.haveAccount")}{" "}
               <Link
                 href="/login"
                 className="text-primary hover:text-primary-hover font-semibold transition-colors"
               >
-                Login here
+                {t("auth.login")}
               </Link>
             </p>
           </div>
@@ -83,7 +88,7 @@ export default function RegisterPage() {
                 onClick={() => setRole(r)}
                 className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all capitalize ${role === r ? "bg-primary text-white shadow-glow-primary" : "text-dark-muted hover:text-white"}`}
               >
-                {r}
+                {t(`auth.${r}`)}
               </button>
             ))}
           </div>
@@ -97,49 +102,49 @@ export default function RegisterPage() {
 
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-dark-text-secondary px-1">
-                Full Name
+                {t("auth.fullName")}
               </label>
               <input
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="input-field"
+                className="input-field text-white"
                 placeholder="John Doe"
               />
             </div>
 
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-dark-text-secondary px-1">
-                Email Address
+                {t("auth.email")}
               </label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input-field"
+                className="input-field text-white"
                 placeholder="hello@example.com"
               />
             </div>
 
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-dark-text-secondary px-1">
-                Phone Number
+                {t("auth.phoneNumber")}
               </label>
               <input
                 type="tel"
                 required
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="input-field"
+                className="input-field text-white"
                 placeholder="+92 300 0000000"
               />
             </div>
 
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-dark-text-secondary px-1">
-                Password
+                {t("auth.password")}
               </label>
               <input
                 type="password"
@@ -147,7 +152,7 @@ export default function RegisterPage() {
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input-field"
+                className="input-field text-white"
                 placeholder="••••••••"
               />
             </div>
@@ -160,13 +165,12 @@ export default function RegisterPage() {
               {loading ? (
                 <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
-                "Create Account"
+                t("auth.createAccount")
               )}
             </button>
 
             <p className="text-xs text-center text-dark-muted mt-4">
-              By creating an account, you agree to our Terms of Service &
-              Privacy Policy.
+              {t("auth.legalAgreement")}
             </p>
           </form>
         </div>

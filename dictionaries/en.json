@@ -27,7 +27,20 @@
     "haveAccount": "Already have an account?",
     "loginAs": "Login as",
     "customer": "Customer",
-    "helper": "Helper"
+    "helper": "Helper",
+    "welcomeTitle": "Welcome back to your",
+    "welcomeHighlight": "Safe Journey",
+    "welcomeSubtitle": "Login to request help instantly or manage your active rescue missions.",
+    "trustingUsers": "5K+ active users",
+    "trustingSubtitle": "Trusting our service",
+    "createAccount": "Create Account",
+    "joinTitle": "Join the",
+    "joinHighlight": "Fastest",
+    "joinSubtitle": "Growing Network",
+    "joinDescription": "Create an account to get instant roadside assistance or earn money by helping others.",
+    "fullName": "Full Name",
+    "phoneNumber": "Phone Number",
+    "legalAgreement": "By creating an account, you agree to our Terms of Service & Privacy Policy."
   },
   "dashboard": {
     "welcome": "Welcome back",
