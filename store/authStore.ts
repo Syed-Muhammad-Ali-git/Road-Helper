@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { User } from "firebase/auth";
 import { authOps } from "@/lib/auth";
 import { userOps, type UserProfile, type UserRole } from "@/lib/firestore";
+import { setCookie, deleteCookie } from "cookies-next";
 
 interface AuthState {
   user: User | null;
@@ -22,6 +23,7 @@ interface AuthState {
     phone: string,
     role: UserRole,
   ) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   init: () => () => void;
 }
@@ -63,10 +65,14 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ loading: true });
     try {
       const result = await authOps.login(email, password);
+      const token = await (result.user as User).getIdToken();
+      const userRole = result.profile?.role || "customer";
+      setCookie("auth-token", token);
+      setCookie("user-role", userRole);
       set({
         user: result.user as User,
         profile: result.profile as UserProfile,
-        role: result.profile?.role ?? null,
+        role: userRole,
         loading: false,
       });
       return {
@@ -98,6 +104,28 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: async () => {
     await authOps.logout();
+    deleteCookie("auth-token");
+    deleteCookie("user-role");
     set({ user: null, profile: null, role: null });
+  },
+
+  loginWithGoogle: async () => {
+    set({ loading: true });
+    try {
+      const result = await authOps.loginWithGoogle();
+      const token = await (result.user as User).getIdToken();
+      const userRole = result.profile?.role || "customer";
+      setCookie("auth-token", token);
+      setCookie("user-role", userRole);
+      set({
+        user: result.user as User,
+        profile: result.profile as UserProfile,
+        role: userRole,
+        loading: false,
+      });
+    } catch (e) {
+      set({ loading: false });
+      throw e;
+    }
   },
 }));

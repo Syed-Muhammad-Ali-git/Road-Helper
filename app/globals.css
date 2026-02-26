@@ -204,6 +204,12 @@
       color 0.35s var(--ease);
   }
 
+  button,
+  a,
+  [role="button"] {
+    cursor: pointer;
+  }
+
   /* RTL / Urdu Support */
   [dir="rtl"] {
     font-family: 'Noto Nastaliq Urdu', 'DM Sans', sans-serif;

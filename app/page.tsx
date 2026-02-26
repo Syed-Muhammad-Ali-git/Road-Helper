@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import Link from "next/link";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { MapPin } from "lucide-react";
 
 export default function HomePage() {
   const [showLoader, setShowLoader] = useState(false);
@@ -103,11 +104,11 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Info Overlay */}
                 <div className="absolute bottom-6 left-6 right-6">
                   <div className="card glass p-4 flex items-center justify-between">
                     <div>
-                      <div className="text-sm font-semibold text-white mb-1">
+                      <div className="text-sm font-semibold text-white mb-1 flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-primary animate-bounce" />
                         Finding nearest helper...
                       </div>
                       <div className="text-xs text-dark-muted">

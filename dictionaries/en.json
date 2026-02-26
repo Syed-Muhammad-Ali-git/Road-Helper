@@ -40,7 +40,11 @@
     "joinDescription": "Create an account to get instant roadside assistance or earn money by helping others.",
     "fullName": "Full Name",
     "phoneNumber": "Phone Number",
-    "legalAgreement": "By creating an account, you agree to our Terms of Service & Privacy Policy."
+    "legalAgreement": "By creating an account, you agree to our Terms of Service & Privacy Policy.",
+    "adminLogin": "Admin Login",
+    "adminRegister": "Admin Register",
+    "loginWithGoogle": "Continue with Google",
+    "backToHome": "Back to Home"
   },
   "dashboard": {
     "welcome": "Welcome back",

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useThemeStore } from "@/store/themeStore";
 import { useLangStore } from "@/store/langStore";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -12,6 +13,7 @@ export function Navbar() {
   const { theme, toggleTheme } = useThemeStore();
   const { lang, setLang } = useLangStore();
   const t = useTranslation();
+  const pathname = usePathname();
   const { user, role } = useAuthStore();
 
   useEffect(() => {
@@ -24,7 +26,7 @@ export function Navbar() {
     <nav
       className={`fixed top-0 inset-x-0 z-50 h-[68px] px-[5%] flex items-center justify-between transition-all duration-300 ${
         scrolled ? "glass border-b" : "bg-transparent border-transparent"
-      }`}
+      } ${pathname.startsWith("/customer") || pathname.startsWith("/helper") || pathname.startsWith("/admin/dashboard") ? "lg:left-64" : "left-0"}`}
       style={{
         borderBottom: scrolled
           ? "1px solid var(--border)"

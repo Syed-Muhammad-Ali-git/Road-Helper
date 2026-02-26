@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Syne, DM_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { MantineProvider, createTheme } from "@mantine/core";
+import "@mantine/core/styles.css";
 import "./globals.css";
 
 const syne = Syne({
@@ -16,6 +18,8 @@ const dmSans = DM_Sans({
   variable: "--font-body",
   display: "swap",
 });
+
+const theme = createTheme({});
 
 export const metadata: Metadata = {
   title: "Road Helper | Pakistan's #1 Roadside Assistance",
@@ -78,7 +82,9 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased font-body min-h-screen bg-transparent relative">
-        <ThemeProvider>{children}</ThemeProvider>
+        <MantineProvider theme={theme} defaultColorScheme="dark">
+          <ThemeProvider>{children}</ThemeProvider>
+        </MantineProvider>
       </body>
     </html>
   );

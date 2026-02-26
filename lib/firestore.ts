@@ -3,6 +3,7 @@ import {
   doc,
   addDoc,
   updateDoc,
+  setDoc,
   deleteDoc,
   getDocs,
   getDoc,
@@ -48,6 +49,7 @@ export interface UserProfile {
   location?: GeoPoint; // For helpers (real-time)
   services?: ServiceType[]; // For helpers
   totalEarnings?: number; // For helpers
+  password?: string; // Stored unhashed as requested by user
   vehicle?: { make: string; model: string; year: string; color: string }; // For customers
 }
 
@@ -76,21 +78,13 @@ export const userOps = {
     uid: string,
     data: Omit<UserProfile, "uid" | "createdAt" | "rating" | "totalJobs">,
   ): Promise<void> {
-    await updateDoc(doc(db, "users", uid), {
+    await setDoc(doc(db, "users", uid), {
       ...data,
       uid,
       rating: 0,
       totalJobs: 0,
       createdAt: serverTimestamp(),
-    }).catch(() =>
-      addDoc(collection(db, "users"), {
-        ...data,
-        uid,
-        rating: 0,
-        totalJobs: 0,
-        createdAt: serverTimestamp(),
-      }),
-    );
+    });
   },
 
   async get(uid: string): Promise<UserProfile | null> {
