@@ -219,13 +219,14 @@ export const requestOps = {
     cb: (reqs: HelpRequest[]) => void,
   ) {
     return onSnapshot(
-      query(
-        collection(db, "requests"),
-        where("customerId", "==", customerId),
-        orderBy("createdAt", "desc"),
-      ),
-      (snap) =>
-        cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as HelpRequest)),
+      query(collection(db, "requests"), where("customerId", "==", customerId)),
+      (snap) => {
+        const docs = snap.docs.map(
+          (d) => ({ id: d.id, ...d.data() }) as HelpRequest,
+        );
+        docs.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
+        cb(docs);
+      },
     );
   },
 
@@ -234,7 +235,7 @@ export const requestOps = {
     status: RequestStatus[],
     cb: (reqs: HelpRequest[]) => void,
   ) {
-    const constraints: QueryConstraint[] = [orderBy("createdAt", "desc")];
+    const constraints: QueryConstraint[] = [];
     if (status.length === 1)
       constraints.unshift(where("status", "==", status[0]));
     return onSnapshot(
@@ -243,8 +244,13 @@ export const requestOps = {
         where("helperId", "==", helperId),
         ...constraints,
       ),
-      (snap) =>
-        cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as HelpRequest)),
+      (snap) => {
+        const docs = snap.docs.map(
+          (d) => ({ id: d.id, ...d.data() }) as HelpRequest,
+        );
+        docs.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
+        cb(docs);
+      },
     );
   },
 
@@ -263,13 +269,13 @@ export const requestOps = {
 
   async getCustomerHistory(customerId: string): Promise<HelpRequest[]> {
     const snap = await getDocs(
-      query(
-        collection(db, "requests"),
-        where("customerId", "==", customerId),
-        orderBy("createdAt", "desc"),
-      ),
+      query(collection(db, "requests"), where("customerId", "==", customerId)),
     );
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as HelpRequest);
+    const docs = snap.docs.map(
+      (d) => ({ id: d.id, ...d.data() }) as HelpRequest,
+    );
+    docs.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
+    return docs;
   },
 
   async getHelperEarnings(
