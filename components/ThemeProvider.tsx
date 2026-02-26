@@ -9,13 +9,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { lang } = useLangStore();
 
   useEffect(() => {
-    // Apply theme
+    // Apply theme class to html element
     const html = document.documentElement;
     html.classList.remove("dark", "light");
     html.classList.add(theme);
-    // Apply lang/dir
+  }, [theme]);
+
+  useEffect(() => {
+    // Apply language and direction
     applyLangToDocument(lang);
-  }, [theme, lang]);
+  }, [lang]);
 
   return <>{children}</>;
 }
