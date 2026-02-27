@@ -232,7 +232,7 @@ export default function CustomerDashboard() {
                         {req.status}
                       </span>
                       <span className="font-mono text-dark-muted font-bold">
-                        ${req.price || "--"}
+                        Rs.{req.price || "--"}
                       </span>
                     </div>
                   </motion.div>

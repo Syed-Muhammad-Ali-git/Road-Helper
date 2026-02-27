@@ -43,7 +43,7 @@ export function Loader({ onComplete }: LoaderProps) {
           ? "opacity-0 scale-105 pointer-events-none"
           : "opacity-100 scale-100"
       }`}
-      style={{ background: "#080A0E" }}
+      style={{ background: "var(--bg)" }}
     >
       {/* Background glow */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">

@@ -10,7 +10,7 @@ export default function HelperLayout({
   return (
     <div className="flex min-h-screen bg-dark-bg">
       <Sidebar role="helper" />
-      <div className="flex-1 flex flex-col lg:pl-64">
+      <div className="flex-1 flex flex-col lg:ps-64">
         <Navbar />
         <main className="flex-1">{children}</main>
       </div>

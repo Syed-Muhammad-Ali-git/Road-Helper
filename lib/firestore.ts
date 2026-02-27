@@ -259,11 +259,15 @@ export const requestOps = {
       query(
         collection(db, "requests"),
         where("status", "==", "pending"),
-        orderBy("createdAt", "desc"),
         limit(20),
       ),
-      (snap) =>
-        cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as HelpRequest)),
+      (snap) => {
+        const docs = snap.docs.map(
+          (d) => ({ id: d.id, ...d.data() }) as HelpRequest,
+        );
+        docs.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
+        cb(docs);
+      },
     );
   },
 

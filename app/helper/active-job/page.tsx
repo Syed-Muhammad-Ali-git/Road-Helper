@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { requestOps, type HelpRequest } from "@/lib/firestore";
 import { useAuthStore } from "@/store/authStore";
 import Link from "next/link";
+import { MapPreview } from "@/components/map/MapPreview";
 
 function ActiveJobContent() {
   const router = useRouter();
@@ -94,7 +95,7 @@ function ActiveJobContent() {
                 Agreed Price
               </span>
               <span className="font-mono text-xl text-success font-bold">
-                ${req.price}
+                Rs.{req.price}
               </span>
             </div>
           </div>
@@ -142,15 +143,11 @@ function ActiveJobContent() {
             </p>
           </div>
         ) : (
-          <div className="relative z-10 w-full h-full bg-dark-surface/50 border border-dark-border rounded-xl backdrop-blur-md flex flex-col items-center justify-center">
-            <div className="animate-pulse mb-4 text-4xl">🗺️</div>
-            <span className="text-dark-muted font-bold tracking-wide uppercase text-sm">
-              Navigation Active
-            </span>
-            <div className="mt-8 text-xs text-dark-text-secondary">
-              (Live map preview omitted for demo)
-            </div>
-          </div>
+          <MapPreview
+            customerLoc={req.location}
+            helperLoc={req.helperLoc}
+            zoom={14}
+          />
         )}
       </div>
     </div>

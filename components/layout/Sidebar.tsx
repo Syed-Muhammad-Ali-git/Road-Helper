@@ -17,7 +17,7 @@ import { useAuthStore } from "@/store/authStore";
 import { useUiStore } from "@/store/uiStore";
 
 interface SidebarProps {
-  role: "customer" | "helper";
+  role: "customer" | "helper" | "admin";
 }
 
 export function Sidebar({ role }: SidebarProps) {
@@ -39,7 +39,19 @@ export function Sidebar({ role }: SidebarProps) {
     { name: "Profile", href: "/helper/profile", icon: User },
   ];
 
-  const links = role === "customer" ? customerLinks : helperLinks;
+  const adminLinks = [
+    { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+    { name: "All Requests", href: "/admin/requests", icon: AlertCircle },
+    { name: "All Users", href: "/admin/users", icon: User },
+    { name: "Earnings", href: "/admin/earnings", icon: Wallet },
+  ];
+
+  const links =
+    role === "customer"
+      ? customerLinks
+      : role === "helper"
+        ? helperLinks
+        : adminLinks;
 
   return (
     <>
@@ -52,8 +64,10 @@ export function Sidebar({ role }: SidebarProps) {
       )}
 
       <aside
-        className={`fixed left-0 top-0 bottom-0 w-64 bg-dark-surface border-r border-dark-border z-[60] flex flex-col p-6 transition-transform duration-300 ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed inset-y-0 start-0 w-64 bg-dark-surface border-e border-dark-border z-[60] flex flex-col p-6 transition-transform duration-300 ${
+          isSidebarOpen
+            ? "translate-x-0"
+            : "ltr:-translate-x-full rtl:translate-x-full"
         } lg:translate-x-0`}
       >
         <div className="flex items-center gap-2.5 mb-10 px-2 relative">
@@ -68,7 +82,7 @@ export function Sidebar({ role }: SidebarProps) {
           </span>
           <button
             onClick={closeSidebar}
-            className="lg:hidden absolute right-0 p-2 text-dark-muted hover:text-white"
+            className="lg:hidden absolute end-0 p-2 text-dark-muted hover:text-white"
           >
             <X className="w-5 h-5" />
           </button>
@@ -96,7 +110,7 @@ export function Sidebar({ role }: SidebarProps) {
                 {isActive && (
                   <motion.div
                     layoutId="sidebar-active"
-                    className="absolute left-0 w-1 h-6 bg-primary rounded-r-full"
+                    className="absolute start-0 w-1 h-6 bg-primary rounded-e-full"
                   />
                 )}
               </Link>
@@ -105,15 +119,6 @@ export function Sidebar({ role }: SidebarProps) {
         </nav>
 
         <div className="pt-6 border-t border-dark-border space-y-1.5">
-          <Link
-            href={
-              role === "customer" ? "/customer/settings" : "/helper/settings"
-            }
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-dark-muted hover:text-white hover:bg-white/5 transition-all"
-          >
-            <Settings className="w-5 h-5" />
-            <span className="font-medium text-sm">Settings</span>
-          </Link>
           <button
             onClick={() => {
               logout();

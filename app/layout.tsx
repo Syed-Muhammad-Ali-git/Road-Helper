@@ -3,6 +3,7 @@ import { Syne, DM_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { MantineProvider, createTheme } from "@mantine/core";
 import "@mantine/core/styles.css";
+import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
 const syne = Syne({

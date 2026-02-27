@@ -188,9 +188,9 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-dark-border">
-                    {recentUsers.map((u) => (
+                    {recentUsers.map((u, idx) => (
                       <tr
-                        key={u.uid}
+                        key={`${u.uid}-${idx}`}
                         className="hover:bg-dark-surface/30 transition-colors"
                       >
                         <td className="p-4 font-medium text-white">

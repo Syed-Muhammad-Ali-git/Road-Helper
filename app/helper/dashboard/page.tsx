@@ -62,7 +62,7 @@ export default function HelperDashboard() {
               Total Earnings
             </div>
             <div className="font-display text-3xl font-bold text-white">
-              ${stats.totalEarnings}
+              Rs.{stats.totalEarnings}
             </div>
           </div>
           <div className="card glass p-6 border-dark-border">

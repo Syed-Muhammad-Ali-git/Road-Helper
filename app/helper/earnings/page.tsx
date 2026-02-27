@@ -44,9 +44,9 @@ export default function HelperEarnings() {
               Total Earnings
             </div>
             <div className="font-display text-5xl font-bold text-white">
-              ${data.total}{" "}
+              Rs.{data.total}{" "}
               <span className="text-lg text-dark-muted font-body font-normal tracking-wide">
-                USD
+                PKR
               </span>
             </div>
           </div>
@@ -56,7 +56,7 @@ export default function HelperEarnings() {
               This Month
             </div>
             <div className="font-display text-5xl font-bold text-white">
-              ${data.thisMonth}
+              Rs.{data.thisMonth}
             </div>
           </div>
         </div>
@@ -99,7 +99,7 @@ export default function HelperEarnings() {
                     </div>
                     <div className="text-right">
                       <div className="font-mono text-xl text-success font-bold">
-                        +${req.price}
+                        +Rs.{req.price}
                       </div>
                       <div className="text-xs text-dark-muted font-semibold">
                         Paid

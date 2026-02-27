@@ -76,7 +76,7 @@ export default function CustomerHistory() {
                       {req.status}
                     </div>
                     <div className="font-mono text-white text-lg font-bold">
-                      ${req.price || 0}
+                      Rs.{req.price || 0}
                     </div>
                   </div>
                 </div>

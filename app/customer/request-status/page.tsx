@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { requestOps, type HelpRequest } from "@/lib/firestore";
 import { useAuthStore } from "@/store/authStore";
 import Link from "next/link";
+import { MapPreview } from "@/components/map/MapPreview";
 
 function StatusContent() {
   const router = useRouter();
@@ -145,16 +146,11 @@ function StatusContent() {
       {/* Helper Info & Map Column */}
       <div className="space-y-6">
         <div className="card glass p-2 overflow-hidden aspect-video rounded-3xl relative">
-          {/* Fake Map */}
-          <div className="absolute inset-0 bg-dark-surface opacity-50 bg-[url('https://www.transparenttextures.com/patterns/map.png')]" />
-          {req.status !== "pending" && req.status !== "cancelled" && (
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 relative w-10 h-10">
-              <div className="absolute inset-0 bg-primary/30 rounded-full animate-ping" />
-              <div className="relative w-full h-full bg-white rounded-full flex items-center justify-center shadow-glow-primary">
-                🚗
-              </div>
-            </div>
-          )}
+          <MapPreview
+            customerLoc={req.location}
+            helperLoc={req.helperLoc}
+            zoom={req.status === "pending" ? 12 : 14}
+          />
         </div>
 
         {req.helperId ? (
@@ -180,7 +176,7 @@ function StatusContent() {
                   Agreed Price
                 </span>
                 <span className="text-xl font-bold font-mono text-primary">
-                  ${req.price}
+                  Rs.{req.price}
                 </span>
               </div>
             )}

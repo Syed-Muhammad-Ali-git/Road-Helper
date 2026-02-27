@@ -21,11 +21,11 @@ export default function HelperRequestsBoard() {
 
   const handleAccept = async (req: HelpRequest) => {
     if (!user || !profile) return;
-    const priceStr = prompt("Enter agreed estimated price ($):", "50");
+    const priceStr = prompt("Enter agreed estimated price (Rs.):", "1500");
     const price = parseInt(priceStr || "0", 10);
     if (!price || price <= 0) return;
 
-    if (confirm(`Accept this ${req.service} request for $${price}?`)) {
+    if (confirm(`Accept this ${req.service} request for Rs.${price}?`)) {
       await requestOps.accept(
         req.id!,
         user.uid,
