@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/lib/firebase/hooks/useTranslation";
 import { useAuthStore } from "@/store/authStore";
 import Link from "next/link";
 

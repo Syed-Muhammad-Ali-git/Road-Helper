@@ -11,25 +11,33 @@ import {
 import { db } from "@/lib/firebase";
 import { HelpRequest, UserProfile } from "@/lib/firestore";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+const MapPreview = dynamic(
+  () => import("@/components/map/MapPreview").then((mod) => mod.MapPreview),
+  { ssr: false },
+);
+import { onSnapshot } from "firebase/firestore";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
     users: 0,
     helpers: 0,
     requestsToday: 0,
+    totalCommissions: 0,
   });
   const [recentReqs, setRecentReqs] = useState<HelpRequest[]>([]);
   const [recentUsers, setRecentUsers] = useState<UserProfile[]>([]);
+  const [commissions, setCommissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       // Users
       const userSnap = await getDocs(
-        query(collection(db, "users"), orderBy("createdAt", "desc"), limit(10)),
+        query(collection(db, "users"), orderBy("createdAt", "desc"), limit(50)),
       );
       const usersList = userSnap.docs.map((d) => d.data() as UserProfile);
-      setRecentUsers(usersList);
+      setRecentUsers(usersList.slice(0, 10));
 
       const helpersCount = usersList.filter((u) => u.role === "helper").length;
 
@@ -38,24 +46,51 @@ export default function AdminDashboard() {
         query(
           collection(db, "requests"),
           orderBy("createdAt", "desc"),
-          limit(10),
+          limit(50),
         ),
       );
       const reqsList = reqSnap.docs.map(
         (d) => ({ id: d.id, ...d.data() }) as HelpRequest,
       );
-      setRecentReqs(reqsList);
 
-      // Very rough stats for demo
+      // Commissions
+      const commSnap = await getDocs(
+        query(
+          collection(db, "commissions"),
+          orderBy("createdAt", "desc"),
+          limit(50),
+        ),
+      );
+      const commList = commSnap.docs.map((d) => d.data());
+      setCommissions(commList);
+      const totalEarned = commList.reduce((acc, c) => acc + (c.amount || 0), 0);
+
       setStats({
         users: usersList.length,
         helpers: helpersCount,
-        requestsToday: reqsList.length, // Mocking today's requests
+        requestsToday: reqsList.length,
+        totalCommissions: totalEarned,
       });
 
       setLoading(false);
     }
     fetchData();
+
+    // Listen for live requests for the map
+    const unsub = onSnapshot(
+      query(
+        collection(db, "requests"),
+        where("status", "not-in", ["completed", "cancelled"]),
+      ),
+      (snap) => {
+        const docs = snap.docs.map(
+          (d) => ({ id: d.id, ...d.data() }) as HelpRequest,
+        );
+        setRecentReqs(docs);
+      },
+    );
+
+    return () => unsub();
   }, []);
 
   if (loading)
@@ -100,13 +135,37 @@ export default function AdminDashboard() {
               {stats.helpers}
             </div>
           </div>
-          <div className="card glass p-6 border-l-4 border-l-accent relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-8 opacity-10 blur-[40px] bg-accent w-24 h-24" />
+          <div className="card glass p-6 border-l-4 border-l-success relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-8 opacity-10 blur-[40px] bg-success w-24 h-24" />
             <div className="text-sm font-semibold text-dark-muted mb-1 uppercase tracking-wider">
-              Requests (Recent)
+              Total Revenue (PKR)
             </div>
             <div className="font-display text-4xl font-bold text-white">
-              {stats.requestsToday}
+              Rs.{(stats as any).totalCommissions || 0}
+            </div>
+          </div>
+        </div>
+
+        {/* Real-time Tracking Map */}
+        <div className="space-y-4">
+          <h2 className="section-label mb-2 text-primary">
+            Live Platform Pulse
+          </h2>
+          <div className="card glass p-2 h-[450px] relative overflow-hidden rounded-3xl border-primary/20 shadow-glow-primary">
+            <MapPreview
+              customerLoc={recentReqs[0]?.location}
+              helperLoc={
+                (recentReqs as any).find((r: any) => r.helperLoc)?.helperLoc
+              }
+              zoom={11}
+            />
+            <div className="absolute bottom-6 right-6 z-20">
+              <div className="card glass px-4 py-2 flex items-center gap-3 border-success/30 backdrop-blur-md">
+                <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                <span className="text-xs font-bold text-white">
+                  Monitoring {recentReqs.length} Active Missions
+                </span>
+              </div>
             </div>
           </div>
         </div>

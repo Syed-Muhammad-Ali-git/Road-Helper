@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { UserRole } from "@/types";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/lib/firebase/hooks/useTranslation";
 import Link from "next/link";
 
 export default function RegisterPage() {

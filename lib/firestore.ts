@@ -44,13 +44,19 @@ export interface UserProfile {
   avatar?: string;
   rating: number;
   totalJobs: number;
+  totalEarnings: number;
   createdAt: Timestamp;
   isAvailable?: boolean; // For helpers
   location?: GeoPoint; // For helpers (real-time)
   services?: ServiceType[]; // For helpers
-  totalEarnings?: number; // For helpers
   password?: string; // Stored unhashed as requested by user
   vehicle?: { make: string; model: string; year: string; color: string }; // For customers
+
+  // Subscription / Monetization
+  subscriptionType: "free" | "premium";
+  freeRidesRemaining: number;
+  isPremiumActive: boolean;
+  commissionRate?: number; // For helpers, e.g. 0.2 (20%)
 }
 
 export interface HelpRequest {
@@ -65,6 +71,7 @@ export interface HelpRequest {
   location: { lat: number; lng: number; address: string };
   price?: number;
   notes?: string;
+  helperLoc?: { lat: number; lng: number }; // For real-time tracking
   createdAt: Timestamp;
   acceptedAt?: Timestamp;
   completedAt?: Timestamp;
@@ -76,14 +83,29 @@ export interface HelpRequest {
 export const userOps = {
   async create(
     uid: string,
-    data: Omit<UserProfile, "uid" | "createdAt" | "rating" | "totalJobs">,
+    data: Omit<
+      UserProfile,
+      | "uid"
+      | "createdAt"
+      | "rating"
+      | "totalJobs"
+      | "totalEarnings"
+      | "subscriptionType"
+      | "freeRidesRemaining"
+      | "isPremiumActive"
+    >,
   ): Promise<void> {
     await setDoc(doc(db, "users", uid), {
       ...data,
       uid,
       rating: 0,
       totalJobs: 0,
+      totalEarnings: 0,
       createdAt: serverTimestamp(),
+      subscriptionType: "free",
+      freeRidesRemaining: 10,
+      isPremiumActive: false,
+      commissionRate: data.role === "helper" ? 0.2 : undefined,
     });
   },
 
@@ -161,18 +183,37 @@ export const requestOps = {
     ]);
     if (customerSnap.exists()) {
       const c = customerSnap.data() as UserProfile;
-      await updateDoc(doc(db, "users", customerId), {
+      const updates: any = {
         totalJobs: (c.totalJobs || 0) + 1,
-      });
+      };
+      if (c.subscriptionType === "free" && c.freeRidesRemaining > 0) {
+        updates.freeRidesRemaining = c.freeRidesRemaining - 1;
+      }
+      await updateDoc(doc(db, "users", customerId), updates);
     }
     if (helperSnap.exists()) {
       const h = helperSnap.data() as UserProfile;
       const req = (
         await getDoc(doc(db, "requests", requestId))
       ).data() as HelpRequest;
+
+      const earnings = req.price || 0;
+      const commission = h.commissionRate ? earnings * h.commissionRate : 0;
+      const netEarnings = earnings - commission;
+
       await updateDoc(doc(db, "users", helperId), {
         totalJobs: (h.totalJobs || 0) + 1,
-        totalEarnings: (h.totalEarnings || 0) + (req.price || 0),
+        totalEarnings: (h.totalEarnings || 0) + netEarnings,
+      });
+
+      // Log commission for admin
+      await addDoc(collection(db, "commissions"), {
+        requestId,
+        helperId,
+        helperName: h.name,
+        amount: commission,
+        totalPrice: earnings,
+        createdAt: serverTimestamp(),
       });
     }
   },

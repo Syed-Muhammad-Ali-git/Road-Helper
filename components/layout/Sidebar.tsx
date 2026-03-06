@@ -64,11 +64,11 @@ export function Sidebar({ role }: SidebarProps) {
       )}
 
       <aside
-        className={`fixed inset-y-0 start-0 w-64 bg-dark-surface border-e border-dark-border z-[60] flex flex-col p-6 transition-transform duration-300 ${
+        className={`fixed inset-y-0 start-0 w-64 bg-dark-surface border-e border-dark-border z-[60] flex flex-col p-6 transition-all duration-300 transform lg:translate-x-0 ${
           isSidebarOpen
             ? "translate-x-0"
-            : "ltr:-translate-x-full rtl:translate-x-full"
-        } lg:translate-x-0`}
+            : "max-lg:ltr:-translate-x-full max-lg:rtl:translate-x-full"
+        }`}
       >
         <div className="flex items-center gap-2.5 mb-10 px-2 relative">
           <div
@@ -97,10 +97,10 @@ export function Sidebar({ role }: SidebarProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative ${
                   isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-dark-muted hover:text-white hover:bg-white/5"
+                    ? "bg-primary/10 text-primary shadow-[0_0_15px_rgba(255,45,45,0.1)]"
+                    : "text-dark-muted hover:text-white hover:bg-white/5 hover:translate-x-1 rtl:hover:-translate-x-1"
                 }`}
               >
                 <Icon

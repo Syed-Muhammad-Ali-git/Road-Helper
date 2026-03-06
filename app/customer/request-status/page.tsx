@@ -4,7 +4,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { requestOps, type HelpRequest } from "@/lib/firestore";
 import { useAuthStore } from "@/store/authStore";
 import Link from "next/link";
-import { MapPreview } from "@/components/map/MapPreview";
+import dynamic from "next/dynamic";
+const MapPreview = dynamic(
+  () => import("@/components/map/MapPreview").then((mod) => mod.MapPreview),
+  { ssr: false },
+);
 
 function StatusContent() {
   const router = useRouter();

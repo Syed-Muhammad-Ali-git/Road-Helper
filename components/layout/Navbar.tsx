@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useThemeStore } from "@/store/themeStore";
 import { useLangStore } from "@/store/langStore";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/lib/firebase/hooks/useTranslation";
 import { LANGUAGES } from "@/lib/i18n";
 import { useAuthStore } from "@/store/authStore";
 import { useUiStore } from "@/store/uiStore";
@@ -217,7 +217,7 @@ export function Navbar() {
               onClick={() => setMobileMenuOpen(false)}
               className="btn-primary w-full justify-center py-4 shadow-glow-primary"
             >
-              {user ? "Dashboard" : t("nav.register")}
+              {user ? "Dashboard" : t("auth.register")}
             </Link>
           </div>
         </div>

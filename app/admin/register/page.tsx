@@ -3,7 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/lib/firebase/hooks/useTranslation";
 import { ArrowLeft } from "lucide-react";
 
 export default function AdminRegisterPage() {

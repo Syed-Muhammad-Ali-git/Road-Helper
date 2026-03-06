@@ -174,9 +174,8 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Dark theme (default) */
-  html,
-  html.dark {
+  /* Default / Dark theme */
+  html {
     --bg: #080A0E;
     --surface: #0D1117;
     --card: #111720;
@@ -188,12 +187,16 @@
     --muted: #6B7A99;
     color-scheme: dark;
 
-    /* Compatibility variables for code using old names */
+    /* Compatibility variables */
     --dark-bg: var(--bg);
     --dark-surface: var(--surface);
     --dark-border: var(--border);
     --dark-muted: var(--muted);
     --dark-text: var(--text);
+  }
+
+  html.dark {
+    color-scheme: dark;
   }
 
   /* Light theme */

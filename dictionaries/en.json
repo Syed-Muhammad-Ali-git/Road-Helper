@@ -48,6 +48,7 @@
   },
   "dashboard": {
     "welcome": "Welcome back",
+    "subtitle": "Manage your active requests and view your history.",
     "requestHelp": "Request Help",
     "activeJob": "Active Job",
     "history": "History",

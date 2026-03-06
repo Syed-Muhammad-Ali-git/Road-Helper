@@ -3,18 +3,43 @@ import { useState, useEffect } from "react";
 import { Loader } from "@/components/ui/Loader";
 import { Navbar } from "@/components/layout/Navbar";
 import Link from "next/link";
-import { useTranslation } from "@/hooks/useTranslation";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { useTranslation } from "@/lib/firebase/hooks/useTranslation";
+import { useScrollReveal } from "@/lib/firebase/hooks/useScrollReveal";
 import { MapPin } from "lucide-react";
+import dynamic from "next/dynamic";
+const MapPreview = dynamic(
+  () => import("@/components/map/MapPreview").then((mod) => mod.MapPreview),
+  { ssr: false },
+);
 
 export default function HomePage() {
   const [showLoader, setShowLoader] = useState(false);
   const t = useTranslation();
+  const [currentPos, setCurrentPos] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const [isLocating, setIsLocating] = useState(true);
 
   useEffect(() => {
     if (!sessionStorage.getItem("rh-loaded")) {
       setShowLoader(true);
       sessionStorage.setItem("rh-loaded", "true");
+    }
+
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setCurrentPos({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
+          setIsLocating(false);
+        },
+        () => setIsLocating(false),
+      );
+    } else {
+      setIsLocating(false);
     }
   }, []);
 
@@ -86,38 +111,40 @@ export default function HomePage() {
               className="relative animate-slide-up"
               style={{ animationDelay: "0.2s" }}
             >
-              <div className="card glass aspect-square md:aspect-[4/3] relative overflow-hidden flex items-center justify-center p-6 border-dark-border">
-                {/* Fake map UI */}
-                <div
-                  className="absolute inset-0 opacity-40"
-                  style={{
-                    background:
-                      'url("https://www.transparenttextures.com/patterns/cubes.png")',
-                  }}
-                ></div>
+              <div className="card glass aspect-square md:aspect-[4/3] relative overflow-hidden flex items-center justify-center border-dark-border group">
+                <MapPreview
+                  customerLoc={
+                    currentPos
+                      ? { lat: currentPos.lat, lng: currentPos.lng }
+                      : undefined
+                  }
+                  zoom={12}
+                />
 
-                {/* Animated helper dot */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <div className="w-16 h-16 bg-primary/20 rounded-full animate-ping absolute -inset-4" />
-                  <div className="relative w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-glow-primary">
-                    🚗
-                  </div>
-                </div>
-
-                <div className="absolute bottom-6 left-6 right-6">
-                  <div className="card glass p-4 flex items-center justify-between">
-                    <div>
-                      <div className="text-sm font-semibold text-white mb-1 flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-primary animate-bounce" />
-                        Finding nearest helper...
-                      </div>
-                      <div className="text-xs text-dark-muted">
-                        Estimated arrival: 12 mins
+                {/* Overlay for finding state */}
+                {(isLocating || !currentPos) && (
+                  <div className="absolute inset-0 z-10 pointer-events-none flex flex-col items-center justify-center bg-dark-bg/20 backdrop-blur-[2px]">
+                    <div className="relative mb-4">
+                      <div className="w-24 h-24 bg-primary/20 rounded-full animate-ping absolute -inset-4" />
+                      <div className="relative w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-glow-primary text-2xl">
+                        🚗
                       </div>
                     </div>
-                    <div className="w-8 h-8 rounded-full border-[3px] border-primary border-t-transparent animate-spin" />
+                    <div className="card glass px-6 py-3 flex items-center gap-4 border-primary/20">
+                      <div>
+                        <div className="text-sm font-bold text-white mb-0.5 whitespace-nowrap">
+                          {currentPos
+                            ? "Locating nearest helper..."
+                            : "Accessing location..."}
+                        </div>
+                        <div className="text-[10px] text-dark-muted font-mono tracking-tighter uppercase">
+                          ETA: ~12 mins
+                        </div>
+                      </div>
+                      <div className="w-5 h-5 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>

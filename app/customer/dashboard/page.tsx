@@ -2,11 +2,16 @@
 
 import { motion } from "framer-motion";
 import { Skeleton } from "@mantine/core";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/lib/firebase/hooks/useTranslation";
 import { useAuthStore } from "@/store/authStore";
 import { useEffect, useState } from "react";
-import { HelpRequest, requestOps } from "@/lib/firestore";
+import {
+  requestOps,
+  type HelpRequest,
+  type UserProfile,
+} from "@/lib/firestore";
 import Link from "next/link";
+import { SubscriptionStatus } from "@/components/subscription/SubscriptionStatus";
 
 export default function CustomerDashboard() {
   const { user, profile, loading: authLoading } = useAuthStore();
@@ -43,7 +48,7 @@ export default function CustomerDashboard() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             {loading ? (
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <Skeleton
                   height={40}
                   width={300}
@@ -58,18 +63,22 @@ export default function CustomerDashboard() {
                 />
               </div>
             ) : (
-              <>
-                <h1 className="font-display text-3xl font-bold mb-2">
-                  {t("dashboard.welcome")},{" "}
-                  <span className="text-primary">
-                    {profile?.name || "Driver"}
-                  </span>{" "}
-                  👋
-                </h1>
-                <p className="text-dark-muted">
-                  Manage your active requests and view your history.
-                </p>
-              </>
+              <div className="animate-fade-up">
+                {/* Welcome Header */}
+                <div className="mb-8">
+                  <h1 className="font-display text-4xl md:text-5xl font-extrabold text-white mb-3 tracking-tight">
+                    {t("dashboard.welcome")},{" "}
+                    <span className="gradient-text">
+                      {profile?.name || "Member"}
+                    </span>
+                  </h1>
+                  <p className="text-dark-muted font-medium">
+                    {t("dashboard.subtitle")}
+                  </p>
+                </div>
+
+                {profile && <SubscriptionStatus profile={profile} />}
+              </div>
             )}
           </div>
           <Link

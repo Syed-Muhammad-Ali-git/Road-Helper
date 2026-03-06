@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuthStore } from "@/store/authStore";
 import { requestOps, type HelpRequest } from "@/lib/firestore";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/lib/firebase/hooks/useTranslation";
+import { SubscriptionStatus } from "@/components/subscription/SubscriptionStatus";
 
 export default function HelperDashboard() {
   const { user, profile } = useAuthStore();
@@ -33,7 +34,7 @@ export default function HelperDashboard() {
     <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-white bg-grid noise-overlay">
       <div className="max-w-5xl mx-auto space-y-8 animate-fade-in relative z-10">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
           <div>
             <h1 className="font-display text-3xl font-bold mb-2">
               {t("dashboard.welcome")},{" "}
@@ -54,6 +55,8 @@ export default function HelperDashboard() {
             </Link>
           </div>
         </div>
+
+        {profile && <SubscriptionStatus profile={profile} />}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

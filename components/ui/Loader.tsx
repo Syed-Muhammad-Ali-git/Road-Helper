@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useLangStore } from "@/store/langStore";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/lib/firebase/hooks/useTranslation";
 
 interface LoaderProps {
   onComplete?: () => void;

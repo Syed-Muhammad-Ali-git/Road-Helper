@@ -44,6 +44,7 @@
   },
   "dashboard": {
     "welcome": "Welcome back",
+    "subtitle": "Apne active requests aur history ko manage karein.",
     "requestHelp": "Madad Ki Darkhwast Karein",
     "activeJob": "Active Kaam",
     "history": "History",

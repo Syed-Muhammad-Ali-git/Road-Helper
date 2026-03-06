@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { authOps } from "@/lib/auth";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/lib/firebase/hooks/useTranslation";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
