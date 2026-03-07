@@ -1,16 +1,20 @@
 "use client";
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { useAuthStore } from "@/store/authStore";
 import { userOps } from "@/lib/firestore";
+import { useTranslation } from "@/lib/firebase/hooks/useTranslation";
 import Link from "next/link";
 
 export default function ProfilePage() {
   const { user, profile, setProfile } = useAuthStore();
+  const t = useTranslation();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
+  const [msgType, setMsgType] = useState<"success" | "error" | null>(null);
 
   useEffect(() => {
     if (profile) {
@@ -24,26 +28,34 @@ export default function ProfilePage() {
     if (!user) return;
     setLoading(true);
     setMsg("");
+    setMsgType(null);
     try {
       await userOps.update(user.uid, { name, phone });
       setProfile({ ...profile!, name, phone });
-      setMsg("Profile updated successfully!");
+      setMsg(t("profile.updatedSuccess"));
+      setMsgType("success");
     } catch (err) {
-      setMsg("Failed to update profile.");
+      setMsg(t("profile.updateFailed"));
+      setMsgType("error");
     }
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-white bg-grid noise-overlay">
-      <div className="max-w-2xl mx-auto space-y-6 animate-fade-in relative z-10">
+    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-[var(--text)] bg-grid noise-overlay">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="max-w-2xl mx-auto space-y-6 relative z-10"
+      >
         <div className="flex items-center justify-between pb-4 border-b border-dark-border">
-          <h1 className="font-display text-3xl font-bold">Helper Profile</h1>
+          <h1 className="font-display text-3xl font-bold">{t("profile.helperProfile")}</h1>
           <Link
             href="/helper/dashboard"
             className="btn-ghost px-4 py-2 text-sm"
           >
-            Dashboard
+            {t("nav.dashboard")}
           </Link>
         </div>
 
@@ -51,7 +63,7 @@ export default function ProfilePage() {
           <form onSubmit={handleSave} className="space-y-6">
             {msg && (
               <div
-                className={`p-4 rounded-xl text-sm font-semibold border ${msg.includes("success") ? "bg-success/10 border-success/20 text-success" : "bg-error/10 border-error/20 text-error"}`}
+                className={`p-4 rounded-xl text-sm font-semibold border ${msgType === "success" ? "bg-success/10 border-success/20 text-success" : "bg-error/10 border-error/20 text-error"}`}
               >
                 {msg}
               </div>
@@ -62,7 +74,7 @@ export default function ProfilePage() {
                 {name ? name.charAt(0) : "👨‍🔧"}
               </div>
               <div>
-                <h3 className="font-bold text-xl mb-1 text-white">{name}</h3>
+                <h3 className="font-bold text-xl mb-1 text-[var(--text)]">{name}</h3>
                 <div className="text-dark-muted font-mono text-sm">
                   Helper ID: {user?.uid.slice(0, 8)}
                 </div>
@@ -70,11 +82,11 @@ export default function ProfilePage() {
             </div>
 
             <div className="space-y-4">
-              <h2 className="section-label">Personal Information</h2>
+              <h2 className="section-label">{t("profile.personalInfo")}</h2>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-dark-muted px-1">
-                    Full Name
+                    {t("auth.fullName")}
                   </label>
                   <input
                     type="text"
@@ -85,7 +97,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-dark-muted px-1">
-                    Phone Number
+                    {t("auth.phoneNumber")}
                   </label>
                   <input
                     type="text"
@@ -96,7 +108,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="space-y-1.5 md:col-span-2">
                   <label className="text-xs font-medium text-dark-muted px-1">
-                    Email Address
+                    {t("auth.email")}
                   </label>
                   <input
                     type="email"
@@ -114,12 +126,12 @@ export default function ProfilePage() {
                 disabled={loading}
                 className="btn-primary w-full md:w-auto px-8"
               >
-                {loading ? "Saving..." : "Save Changes"}
+                {loading ? t("common.saving") : t("common.saveChanges")}
               </button>
             </div>
           </form>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

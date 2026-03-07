@@ -38,7 +38,7 @@ export default function CustomerDashboard() {
   const loading = authLoading || dataLoading;
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-white bg-grid noise-overlay">
+    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-[var(--text)] bg-grid noise-overlay">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -66,7 +66,7 @@ export default function CustomerDashboard() {
               <div className="animate-fade-up">
                 {/* Welcome Header */}
                 <div className="mb-8">
-                  <h1 className="font-display text-4xl md:text-5xl font-extrabold text-white mb-3 tracking-tight">
+                  <h1 className="font-display text-4xl md:text-5xl font-extrabold text-[var(--text)] mb-3 tracking-tight">
                     {t("dashboard.welcome")},{" "}
                     <span className="gradient-text">
                       {profile?.name || "Member"}
@@ -85,7 +85,7 @@ export default function CustomerDashboard() {
             href="/customer/profile"
             className="btn-ghost px-4 py-2 border border-dark-border hover:border-primary/50"
           >
-            Edit Profile
+            {t("dashboard.editProfile")}
           </Link>
         </div>
 
@@ -95,13 +95,13 @@ export default function CustomerDashboard() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <h2 className="section-label">Quick Actions</h2>
+          <h2 className="section-label">{t("dashboard.quickActions")}</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { id: "towing", label: "Towing", icon: "🚙" },
-              { id: "tire-change", label: "Flat Tire", icon: "🛞" },
-              { id: "fuel-delivery", label: "Out of Fuel", icon: "⛽" },
-              { id: "battery-jump", label: "Dead Battery", icon: "🔋" },
+              { id: "towing", labelKey: "requestHelp.towing" as const, icon: "🚙" },
+              { id: "tire-change", labelKey: "requestHelp.tireChange" as const, icon: "🛞" },
+              { id: "fuel-delivery", labelKey: "dashboard.outOfFuel" as const, icon: "⛽" },
+              { id: "battery-jump", labelKey: "dashboard.deadBattery" as const, icon: "🔋" },
             ].map((svc, i) => (
               <motion.div
                 key={svc.id}
@@ -116,7 +116,7 @@ export default function CustomerDashboard() {
                   <div className="w-16 h-16 rounded-full bg-dark-surface border border-dark-border flex items-center justify-center text-3xl mb-4 group-hover:shadow-glow-primary transition-all">
                     {svc.icon}
                   </div>
-                  <span className="font-semibold text-white">{svc.label}</span>
+                  <span className="font-semibold text-[var(--text)]">{t(svc.labelKey)}</span>
                 </Link>
               </motion.div>
             ))}
@@ -126,7 +126,7 @@ export default function CustomerDashboard() {
         <div className="grid md:grid-cols-3 gap-8">
           {/* Active Request Card */}
           <div className="md:col-span-2">
-            <h2 className="section-label mb-4">Current Status</h2>
+            <h2 className="section-label mb-4">{t("dashboard.currentStatus")}</h2>
             {loading ? (
               <Skeleton height={200} radius="xl" bg="rgba(255,255,255,0.05)" />
             ) : activeRequest ? (
@@ -138,11 +138,11 @@ export default function CustomerDashboard() {
                 <div className="absolute top-0 right-0 p-4 opacity-10 blur-[40px] bg-primary w-32 h-32" />
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h3 className="font-bold text-xl mb-1 capitalize text-white">
+                    <h3 className="font-bold text-xl mb-1 capitalize text-[var(--text)]">
                       {activeRequest.service.replace("-", " ")}
                     </h3>
                     <div className="text-sm text-dark-muted">
-                      Requested today
+                      {t("dashboard.requestedToday")}
                     </div>
                   </div>
                   <span
@@ -159,9 +159,9 @@ export default function CustomerDashboard() {
                     </div>
                     <div>
                       <div className="text-sm text-dark-muted font-medium">
-                        Assigned Helper
+                        {t("dashboard.assignedHelper")}
                       </div>
-                      <div className="font-bold text-white tracking-wide">
+                      <div className="font-bold text-[var(--text)] tracking-wide">
                         {activeRequest.helperName}
                       </div>
                     </div>
@@ -173,19 +173,18 @@ export default function CustomerDashboard() {
                     href={`/customer/request-status?id=${activeRequest.id}`}
                     className="btn-primary py-2.5 px-6 shadow-glow-primary"
                   >
-                    Track Live
+                    {t("dashboard.trackLive")}
                   </Link>
                 </div>
               </motion.div>
             ) : (
               <div className="card glass p-8 flex flex-col items-center justify-center border-dashed border-2 border-dark-border py-16 text-center">
                 <div className="text-4xl mb-4 opacity-50">🛤️</div>
-                <h3 className="font-bold text-lg mb-2 text-white">
-                  No Active Requests
+                <h3 className="font-bold text-lg mb-2 text-[var(--text)]">
+                  {t("dashboard.noActiveRequests")}
                 </h3>
                 <p className="text-dark-muted mb-6 max-w-sm">
-                  You're all safe right now! Use the quick actions above if you
-                  need roadside assistance.
+                  {t("dashboard.allSafeNow")}
                 </p>
               </div>
             )}
@@ -194,12 +193,12 @@ export default function CustomerDashboard() {
           {/* Recent History */}
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="section-label mb-0">Recent History</h2>
+              <h2 className="section-label mb-0">{t("dashboard.recentHistory")}</h2>
               <Link
                 href="/customer/history"
                 className="text-xs text-primary hover:text-primary-hover font-semibold"
               >
-                View All
+                {t("dashboard.viewAll")}
               </Link>
             </div>
 
@@ -225,7 +224,7 @@ export default function CustomerDashboard() {
                     className="card glass p-4 group hover:border-primary/30 transition-all"
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-bold capitalize text-white text-sm">
+                      <span className="font-bold capitalize text-[var(--text)] text-sm">
                         {req.service.replace("-", " ")}
                       </span>
                       <span className="text-xs font-semibold text-dark-muted">
@@ -248,7 +247,7 @@ export default function CustomerDashboard() {
                 ))
               ) : (
                 <div className="card glass p-6 text-center border-dashed text-dark-muted border-dark-border">
-                  No history found.
+                  {t("dashboard.noHistoryFound")}
                 </div>
               )}
             </div>

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
   collection,
   getDocs,
@@ -10,6 +11,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { HelpRequest, UserProfile } from "@/lib/firestore";
+import { useTranslation } from "@/lib/firebase/hooks/useTranslation";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 const MapPreview = dynamic(
@@ -19,6 +21,7 @@ const MapPreview = dynamic(
 import { onSnapshot } from "firebase/firestore";
 
 export default function AdminDashboard() {
+  const t = useTranslation();
   const [stats, setStats] = useState({
     users: 0,
     helpers: 0,
@@ -101,17 +104,22 @@ export default function AdminDashboard() {
     );
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-white bg-grid noise-overlay">
-      <div className="max-w-6xl mx-auto space-y-8 animate-fade-in relative z-10">
+    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-[var(--text)] bg-grid noise-overlay">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="max-w-6xl mx-auto space-y-8 relative z-10"
+      >
         <div className="flex items-center justify-between border-b border-dark-border pb-6">
           <div>
             <h1 className="font-display text-3xl font-bold mb-1">
-              Admin Dashboard
+              {t("admin.dashboardTitle")}
             </h1>
-            <p className="text-dark-muted">Platform overview and management.</p>
+            <p className="text-dark-muted">{t("admin.platformOverview")}</p>
           </div>
           <Link href="/" className="btn-ghost">
-            Log Out
+            {t("admin.logOut")}
           </Link>
         </div>
 
@@ -173,7 +181,7 @@ export default function AdminDashboard() {
         <div className="grid md:grid-cols-2 gap-8">
           {/* Recent Requests */}
           <div className="space-y-4">
-            <h2 className="section-label mb-2">Recent Requests</h2>
+            <h2 className="section-label mb-2">{t("admin.recentRequests")}</h2>
             <div className="card glass rounded-xl overflow-hidden border-dark-border">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
@@ -217,7 +225,7 @@ export default function AdminDashboard() {
                           colSpan={3}
                           className="p-4 text-center text-dark-muted"
                         >
-                          No requests found.
+                          {t("admin.noRequestsFound")}
                         </td>
                       </tr>
                     )}
@@ -229,7 +237,7 @@ export default function AdminDashboard() {
 
           {/* Recent Users */}
           <div className="space-y-4">
-            <h2 className="section-label mb-2">Recent Users</h2>
+            <h2 className="section-label mb-2">{t("admin.recentUsers")}</h2>
             <div className="card glass rounded-xl overflow-hidden border-dark-border">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
@@ -271,7 +279,7 @@ export default function AdminDashboard() {
                           colSpan={3}
                           className="p-4 text-center text-dark-muted"
                         >
-                          No users found.
+                          {t("admin.noUsersFound")}
                         </td>
                       </tr>
                     )}
@@ -281,7 +289,7 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

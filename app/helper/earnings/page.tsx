@@ -1,11 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { useAuthStore } from "@/store/authStore";
 import { requestOps, type HelpRequest } from "@/lib/firestore";
+import { useTranslation } from "@/lib/firebase/hooks/useTranslation";
 import Link from "next/link";
 
 export default function HelperEarnings() {
   const { user } = useAuthStore();
+  const t = useTranslation();
   const [data, setData] = useState<{
     total: number;
     thisMonth: number;
@@ -25,15 +28,20 @@ export default function HelperEarnings() {
     );
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-white bg-grid noise-overlay">
-      <div className="max-w-4xl mx-auto space-y-8 animate-fade-in relative z-10">
+    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-[var(--text)] bg-grid noise-overlay">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="max-w-4xl mx-auto space-y-8 relative z-10"
+      >
         <div className="flex items-center justify-between">
-          <h1 className="font-display text-3xl font-bold">Earnings Report</h1>
+          <h1 className="font-display text-3xl font-bold text-[var(--text)]">{t("dashboard.earningsReport")}</h1>
           <Link
             href="/helper/dashboard"
             className="btn-ghost px-4 py-2 text-sm"
           >
-            ← Back
+            ← {t("common.back")}
           </Link>
         </div>
 
@@ -41,9 +49,9 @@ export default function HelperEarnings() {
           <div className="card glass p-8 border-t-4 border-t-success relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-10 blur-[40px] bg-success w-32 h-32" />
             <div className="text-dark-muted font-bold text-sm uppercase tracking-wider mb-2">
-              Total Earnings
+              {t("dashboard.totalEarnings")}
             </div>
-            <div className="font-display text-5xl font-bold text-white">
+            <div className="font-display text-5xl font-bold text-[var(--text)]">
               Rs.{data.total}{" "}
               <span className="text-lg text-dark-muted font-body font-normal tracking-wide">
                 PKR
@@ -53,9 +61,9 @@ export default function HelperEarnings() {
           <div className="card glass p-8 border-t-4 border-t-primary relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-10 blur-[40px] bg-primary w-32 h-32" />
             <div className="text-dark-muted font-bold text-sm uppercase tracking-wider mb-2">
-              This Month
+              {t("dashboard.thisMonth")}
             </div>
-            <div className="font-display text-5xl font-bold text-white">
+            <div className="font-display text-5xl font-bold text-[var(--text)]">
               Rs.{data.thisMonth}
             </div>
           </div>
@@ -63,11 +71,11 @@ export default function HelperEarnings() {
 
         <div className="card glass p-8">
           <h2 className="section-label mb-6">
-            Recent Payouts / Completed Jobs
+            {t("dashboard.recentPayouts")}
           </h2>
           {data.history.length === 0 ? (
             <div className="text-center py-10 text-dark-muted border-dashed border-2 border-dark-border rounded-xl">
-              No completed jobs yet. Keep hustling!
+              {t("dashboard.noCompletedJobs")}
             </div>
           ) : (
             <div className="space-y-4">
@@ -87,7 +95,7 @@ export default function HelperEarnings() {
                         💰
                       </div>
                       <div>
-                        <div className="font-bold text-white capitalize">
+                        <div className="font-bold text-[var(--text)] capitalize">
                           {req.service.replace("-", " ")}
                         </div>
                         <div className="text-xs text-dark-muted">
@@ -102,7 +110,7 @@ export default function HelperEarnings() {
                         +Rs.{req.price}
                       </div>
                       <div className="text-xs text-dark-muted font-semibold">
-                        Paid
+                        {t("common.paid")}
                       </div>
                     </div>
                   </div>
@@ -110,7 +118,7 @@ export default function HelperEarnings() {
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

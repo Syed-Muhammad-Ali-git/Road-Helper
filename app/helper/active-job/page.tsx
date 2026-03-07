@@ -1,8 +1,10 @@
 "use client";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 import { requestOps, type HelpRequest } from "@/lib/firestore";
 import { useAuthStore } from "@/store/authStore";
+import { useTranslation } from "@/lib/firebase/hooks/useTranslation";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 const MapPreview = dynamic(
@@ -14,6 +16,7 @@ function ActiveJobContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const reqId = searchParams.get("id");
+  const t = useTranslation();
 
   const { user } = useAuthStore();
   const [req, setReq] = useState<HelpRequest | null>(null);
@@ -38,7 +41,7 @@ function ActiveJobContent() {
       </div>
     );
   if (!req)
-    return <div className="text-center py-20 text-white">Job not found.</div>;
+    return <div className="text-center py-20 text-[var(--text)]">{t("helper.jobNotFound")}</div>;
 
   const updateStatus = async (status: "en-route" | "arrived" | "completed") => {
     if (status === "completed") {
@@ -49,12 +52,16 @@ function ActiveJobContent() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 relative z-10 animate-fade-in">
-      {/* Action panel */}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 relative z-10"
+    >
       <div className="space-y-6">
         <div className="card glass p-8 border-t-4 border-t-secondary">
           <div className="flex justify-between items-start mb-6">
-            <h1 className="font-display text-3xl font-bold">Mission Control</h1>
+            <h1 className="font-display text-3xl font-bold text-[var(--text)]">{t("helper.missionControl")}</h1>
             <div
               className={`badge-warning px-3 py-1 text-xs font-bold capitalize`}
             >
@@ -66,9 +73,9 @@ function ActiveJobContent() {
             <div className="absolute top-0 right-0 p-4 opacity-5 blur-[20px] bg-white w-32 h-32" />
             <div>
               <div className="text-xs text-dark-muted font-semibold uppercase tracking-wider">
-                Customer
+                {t("dashboard.customer")}
               </div>
-              <div className="font-bold text-white text-xl">
+              <div className="font-bold text-[var(--text)] text-xl">
                 {req.customerName}
               </div>
               <a
@@ -154,14 +161,15 @@ function ActiveJobContent() {
           />
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 export default function ActiveJobPage() {
+  const t = useTranslation();
   return (
-    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-white bg-grid noise-overlay">
-      <Suspense fallback={<div className="text-center">Loading...</div>}>
+    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-[var(--text)] bg-grid noise-overlay">
+      <Suspense fallback={<div className="text-center py-20">{t("loader.loading")}</div>}>
         <ActiveJobContent />
       </Suspense>
     </div>

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
@@ -28,7 +29,7 @@ export default function RegisterPage() {
       // Redirect to login as requested by user
       router.push("/login");
     } catch (err: any) {
-      setError(err.message || "Failed to register");
+      setError(err?.message || t("auth.registerFailed"));
     }
   };
 
@@ -39,14 +40,19 @@ export default function RegisterPage() {
         role === "helper" ? "/helper/dashboard" : "/customer/dashboard",
       );
     } catch (err: any) {
-      setError(err.message || "Failed to login with Google");
+      setError(err?.message || t("auth.loginFailed"));
     }
   };
 
   return (
     <div className="min-h-screen flex bg-dark-bg text-[var(--text)] bg-grid noise-overlay">
       {/* Brand Panel - Synced with LoginPage */}
-      <div className="hidden lg:flex w-[40%] bg-dark-surface border-r border-dark-border flex-col justify-between p-12 relative overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, x: -24 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4 }}
+        className="hidden lg:flex w-[40%] bg-dark-surface border-r border-dark-border flex-col justify-between p-12 relative overflow-hidden"
+      >
         <div className="absolute top-0 left-0 w-full h-[300px] bg-gradient-brand opacity-10 blur-[100px]" />
 
         <div className="relative z-10 text-white">
@@ -89,10 +95,15 @@ export default function RegisterPage() {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Form Panel */}
-      <div className="flex-1 flex flex-col justify-center items-center p-[5%] relative z-10 overflow-y-auto">
+      <motion.div
+        initial={{ opacity: 0, x: 24 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="flex-1 flex flex-col justify-center items-center p-[5%] relative z-10 overflow-y-auto"
+      >
         <div className="absolute top-8 left-8">
           <Link
             href="/"
@@ -122,7 +133,7 @@ export default function RegisterPage() {
                 href="/admin/register"
                 className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs text-primary font-bold hover:bg-primary/20 transition-all mt-2"
               >
-                🛡️ Admin Portal
+                🛡️ {t("auth.adminPortal")}
               </Link>
             </div>
           </div>
@@ -159,7 +170,7 @@ export default function RegisterPage() {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-dark-bg px-2 text-dark-muted font-medium tracking-wider">
-                  Registration Details
+                  {t("auth.registrationDetails")}
                 </span>
               </div>
             </div>
@@ -259,7 +270,7 @@ export default function RegisterPage() {
             </form>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

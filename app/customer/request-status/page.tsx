@@ -151,7 +151,7 @@ function StatusContent() {
 
         {req.helperId ? (
           <div className="card glass p-6 border-l-4 border-l-secondary">
-            <h3 className="section-label mb-4">Assigned Professional</h3>
+            <h3 className="section-label mb-4">{t("requestStatus.assignedProfessional")}</h3>
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-full bg-gradient-brand flex items-center justify-center text-2xl shadow-glow-primary">
                 👨‍🔧
@@ -161,7 +161,7 @@ function StatusContent() {
                   {req.helperName}
                 </div>
                 <div className="text-dark-muted text-sm font-medium pt-1">
-                  Distance: <span className="text-[var(--text)]">Est. 5 miles</span>
+                  {t("requestStatus.distance")}: <span className="text-[var(--text)]">Est. 5 miles</span>
                 </div>
               </div>
             </div>

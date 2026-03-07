@@ -1,13 +1,16 @@
 "use client";
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { useAuthStore } from "@/store/authStore";
 import { requestOps, type HelpRequest } from "@/lib/firestore";
+import { useTranslation } from "@/lib/firebase/hooks/useTranslation";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function HelperRequestsBoard() {
   const { user, profile } = useAuthStore();
   const router = useRouter();
+  const t = useTranslation();
   const [requests, setRequests] = useState<HelpRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,19 +40,24 @@ export default function HelperRequestsBoard() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-white bg-grid noise-overlay">
-      <div className="max-w-4xl mx-auto space-y-8 animate-fade-in relative z-10">
+    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-[var(--text)] bg-grid noise-overlay">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="max-w-4xl mx-auto space-y-8 relative z-10"
+      >
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-display text-3xl font-bold mb-1">
-              Live Requests 📡
+              {t("helper.liveRequests")} 📡
             </h1>
             <p className="text-dark-muted text-sm">
-              Accept jobs matching your skills.
+              {t("helper.acceptJobsDesc")}
             </p>
           </div>
           <Link href="/helper/dashboard" className="btn-ghost text-sm">
-            ← Back
+            ← {t("common.back")}
           </Link>
         </div>
 
@@ -60,9 +68,9 @@ export default function HelperRequestsBoard() {
         ) : requests.length === 0 ? (
           <div className="card glass py-24 text-center border-dashed border-2 border-dark-border">
             <div className="text-4xl mb-4 opacity-50 radar-spin">📡</div>
-            <h3 className="font-bold mb-2">No pending requests right now</h3>
+            <h3 className="font-bold mb-2 text-[var(--text)]">{t("helper.noPendingRequests")}</h3>
             <p className="text-dark-muted max-w-sm mx-auto">
-              We are broadcasting our service. Return soon!
+              {t("helper.broadcasting")}
             </p>
           </div>
         ) : (
@@ -116,7 +124,7 @@ export default function HelperRequestsBoard() {
             ))}
           </div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

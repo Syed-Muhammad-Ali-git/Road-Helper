@@ -27,7 +27,10 @@
     "submit": "جمع کروائیں",
     "cancel": "منسوخ",
     "save": "محفوظ کریں",
+    "saveChanges": "تبدیلیاں محفوظ کریں",
+    "saving": "محفوظ ہو رہا ہے...",
     "goHome": "ہوم پر جائیں",
+    "paid": "ادا شدہ",
     "error": "کچھ غلط ہو گیا۔",
     "success": "کامیابی"
   },
@@ -60,7 +63,10 @@
     "loginWithGoogle": "گوگل کے ساتھ جاری رکھیں",
     "backToHome": "ہوم پر واپس",
     "accessDenied": "رسائی denied۔ صرف ایڈمن۔",
-    "loginFailed": "لاگ ان نہیں ہوا"
+    "loginFailed": "لاگ ان نہیں ہوا",
+    "registerFailed": "رجسٹر نہیں ہوا",
+    "registrationDetails": "رجسٹریشن کی تفصیلات",
+    "adminPortal": "ایڈمن پورٹل"
   },
   "admin": {
     "portal": "ایڈمن پورٹل",
@@ -69,7 +75,14 @@
     "adminEmail": "ایڈمن ای میل",
     "enterDashboard": "ایڈمن ڈیش بورڈ میں داخل ہوں",
     "registerHere": "یہاں رجسٹر کریں",
-    "newAdmin": "نئے ایڈمن؟"
+    "newAdmin": "نئے ایڈمن؟",
+    "platformOverview": "پلیٹ فارم کا جائزہ اور انتظام۔",
+    "recentRequests": "حالیہ درخواستیں",
+    "recentUsers": "حالیہ صارفین",
+    "dashboardTitle": "ایڈمن ڈیش بورڈ",
+    "logOut": "لاگ آؤٹ",
+    "noRequestsFound": "کوئی درخواست نہیں ملی۔",
+    "noUsersFound": "کوئی صارف نہیں ملا۔"
   },
   "forgotPassword": {
     "title": "پاس ورڈ بھول گئے؟",
@@ -103,10 +116,42 @@
     "accountSettings": "اکاؤنٹ سیٹنگز",
     "manageProfile": "پروفائل اور گاڑی منظم کریں",
     "totalEarnings": "کل آمدنی",
+    "thisMonth": "اس مہینے",
+    "recentPayouts": "حالیہ ادائیگیاں / مکمل نوکریاں",
+    "noCompletedJobs": "ابھی تک کوئی نوکری مکمل نہیں۔ جاری رکھیں!",
     "jobsDone": "نوکریاں مکمل",
     "rating": "ریٹنگ",
     "goToJobDashboard": "جاب ڈیش بورڈ پر جائیں",
-    "customer": "گاہک"
+    "customer": "گاہک",
+    "editProfile": "پروفائل میں ترمیم",
+    "quickActions": "فوری اقدامات",
+    "currentStatus": "موجودہ حیثیت",
+    "recentHistory": "حالیہ تاریخ",
+    "viewAll": "سب دیکھیں",
+    "assignedHelper": "مقررہ مددگار",
+    "trackLive": "براہِ راست ٹریک کریں",
+    "noActiveRequests": "کوئی فعال درخواست نہیں",
+    "allSafeNow": "آپ اب محفوظ ہیں! اگر سڑک مدد چاہیے تو اوپر فوری اقدامات استعمال کریں۔",
+    "noHistoryFound": "کوئی تاریخ نہیں ملی۔",
+    "requestedToday": "آج درخواست کی گئی",
+    "outOfFuel": "ایندھن ختم",
+    "deadBattery": "بیٹری ڈیڈ"
+  },
+  "profile": {
+    "yourProfile": "آپ کا پروفائل",
+    "helperProfile": "مددگار پروفائل",
+    "personalInfo": "ذاتی معلومات",
+    "vehicleDetails": "گاڑی کی تفصیلات",
+    "updatedSuccess": "پروفائل کامیابی سے اپ ڈیٹ ہو گیا!",
+    "updateFailed": "پروفائل اپ ڈیٹ نہیں ہو سکا۔"
+  },
+  "helper": {
+    "jobNotFound": "نوکری نہیں ملی۔",
+    "missionControl": "مشن کنٹرول",
+    "noPendingRequests": "اس وقت کوئی زیرِ التواء درخواست نہیں",
+    "liveRequests": "لائیو درخواستیں",
+    "acceptJobsDesc": "اپنی صلاحیتوں کے مطابق نوکریاں قبول کریں۔",
+    "broadcasting": "ہم اپنی سروس broadcast کر رہے ہیں۔ جلد واپس آئیں!"
   },
   "history": {
     "title": "درخواست کی تاریخ",
@@ -164,7 +209,9 @@
     "submitFeedback": "فیڈ بیک جمع کروائیں",
     "requestAgain": "دوبارہ درخواست کریں",
     "requestCancelled": "درخواست منسوخ ہو گئی",
-    "waitingForHelper": "مددگار کے قبول کرنے کا انتظار..."
+    "waitingForHelper": "مددگار کے قبول کرنے کا انتظار...",
+    "assignedProfessional": "مقررہ پیشہ ور",
+    "distance": "فاصلہ"
   },
   "status": {
     "pending": "زیر التواء",

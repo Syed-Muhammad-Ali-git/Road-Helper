@@ -27,7 +27,10 @@
     "submit": "Submit",
     "cancel": "Cancel",
     "save": "Save",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
     "goHome": "Go Home",
+    "paid": "Paid",
     "error": "Something went wrong.",
     "success": "Success"
   },
@@ -60,7 +63,10 @@
     "loginWithGoogle": "Continue with Google",
     "backToHome": "Back to Home",
     "accessDenied": "Access denied. Admin only.",
-    "loginFailed": "Failed to login"
+    "loginFailed": "Failed to login",
+    "registerFailed": "Failed to register",
+    "registrationDetails": "Registration Details",
+    "adminPortal": "Admin Portal"
   },
   "admin": {
     "portal": "Admin Portal",
@@ -69,7 +75,14 @@
     "adminEmail": "Admin Email",
     "enterDashboard": "Enter Admin Dashboard",
     "registerHere": "Register here",
-    "newAdmin": "New admin?"
+    "newAdmin": "New admin?",
+    "platformOverview": "Platform overview and management.",
+    "recentRequests": "Recent Requests",
+    "recentUsers": "Recent Users",
+    "dashboardTitle": "Admin Dashboard",
+    "logOut": "Log Out",
+    "noRequestsFound": "No requests found.",
+    "noUsersFound": "No users found."
   },
   "forgotPassword": {
     "title": "Forgot Password?",
@@ -103,10 +116,42 @@
     "accountSettings": "Account Settings",
     "manageProfile": "Manage profile & vehicle",
     "totalEarnings": "Total Earnings",
+    "thisMonth": "This Month",
+    "recentPayouts": "Recent Payouts / Completed Jobs",
+    "noCompletedJobs": "No completed jobs yet. Keep hustling!",
     "jobsDone": "Jobs Done",
     "rating": "Rating",
     "goToJobDashboard": "Go to Job Dashboard",
-    "customer": "Customer"
+    "customer": "Customer",
+    "editProfile": "Edit Profile",
+    "quickActions": "Quick Actions",
+    "currentStatus": "Current Status",
+    "recentHistory": "Recent History",
+    "viewAll": "View All",
+    "assignedHelper": "Assigned Helper",
+    "trackLive": "Track Live",
+    "noActiveRequests": "No Active Requests",
+    "allSafeNow": "You're all safe right now! Use the quick actions above if you need roadside assistance.",
+    "noHistoryFound": "No history found.",
+    "requestedToday": "Requested today",
+    "outOfFuel": "Out of Fuel",
+    "deadBattery": "Dead Battery"
+  },
+  "profile": {
+    "yourProfile": "Your Profile",
+    "helperProfile": "Helper Profile",
+    "personalInfo": "Personal Information",
+    "vehicleDetails": "Vehicle Details",
+    "updatedSuccess": "Profile updated successfully!",
+    "updateFailed": "Failed to update profile."
+  },
+  "helper": {
+    "jobNotFound": "Job not found.",
+    "missionControl": "Mission Control",
+    "noPendingRequests": "No pending requests right now",
+    "liveRequests": "Live Requests",
+    "acceptJobsDesc": "Accept jobs matching your skills.",
+    "broadcasting": "We are broadcasting our service. Return soon!"
   },
   "history": {
     "title": "Request History",
@@ -164,7 +209,9 @@
     "submitFeedback": "Submit Feedback",
     "requestAgain": "Request Again",
     "requestCancelled": "Request Cancelled",
-    "waitingForHelper": "Waiting for a helper to accept..."
+    "waitingForHelper": "Waiting for a helper to accept...",
+    "assignedProfessional": "Assigned Professional",
+    "distance": "Distance"
   },
   "status": {
     "pending": "Pending",
