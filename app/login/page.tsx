@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/firebase/hooks/useTranslation";
@@ -35,8 +36,8 @@ export default function LoginPage() {
       } else {
         router.push("/customer/dashboard");
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to login");
+    } catch (err: unknown) {
+      setError((err as Error)?.message || t("auth.loginFailed"));
     }
   };
 
@@ -46,15 +47,20 @@ export default function LoginPage() {
       router.push(
         activeRole === "helper" ? "/helper/dashboard" : "/customer/dashboard",
       );
-    } catch (err: any) {
-      setError(err.message || "Failed to login with Google");
+    } catch (err: unknown) {
+      setError((err as Error)?.message || t("auth.loginFailed"));
     }
   };
 
   return (
     <div className="min-h-screen flex bg-dark-bg text-[var(--text)] bg-grid noise-overlay">
       {/* Brand Panel */}
-      <div className="hidden lg:flex w-[40%] bg-dark-surface border-r border-dark-border flex-col justify-between p-12 relative overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, x: -24 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5 }}
+        className="hidden lg:flex w-[40%] bg-dark-surface border-r border-dark-border flex-col justify-between p-12 relative overflow-hidden"
+      >
         <div className="absolute top-0 left-0 w-full h-[300px] bg-gradient-brand opacity-10 blur-[100px]" />
 
         <div className="relative z-10 text-white">
@@ -97,10 +103,15 @@ export default function LoginPage() {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Form Panel */}
-      <div className="flex-1 flex flex-col justify-center items-center p-[5%] relative z-10">
+      <motion.div
+        initial={{ opacity: 0, x: 24 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="flex-1 flex flex-col justify-center items-center p-[5%] relative z-10"
+      >
         <div className="absolute top-8 left-8">
           <Link
             href="/"
@@ -244,7 +255,7 @@ export default function LoginPage() {
             </form>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
