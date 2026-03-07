@@ -22,12 +22,12 @@ export default function AdminLoginPage() {
       const result = await login(email, password);
       const role = result.profile?.role;
       if (role !== "admin") {
-        setError("Access denied. Admin only.");
+        setError(t("auth.accessDenied"));
         return;
       }
       router.push("/admin/dashboard");
     } catch (err: any) {
-      setError(err.message || "Failed to login");
+      setError(err?.message || t("auth.loginFailed"));
     }
   };
 
@@ -37,10 +37,10 @@ export default function AdminLoginPage() {
         <div className="absolute top-8 left-8">
           <Link
             href="/login"
-            className="flex items-center gap-2 text-dark-muted hover:text-white transition-colors text-sm font-medium"
+            className="flex items-center gap-2 text-dark-muted hover:text-[var(--text)] transition-colors text-sm font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to User Login
+            {t("admin.backToUserLogin")}
           </Link>
         </div>
 
@@ -49,11 +49,11 @@ export default function AdminLoginPage() {
             <div className="w-16 h-16 rounded-2xl bg-gradient-brand flex items-center justify-center text-3xl mx-auto mb-6 shadow-glow-primary">
               🔐
             </div>
-            <h2 className="font-display text-3xl font-bold mb-2 text-white">
-              Admin Portal
+            <h2 className="font-display text-3xl font-bold mb-2 text-[var(--text)]">
+              {t("admin.portal")}
             </h2>
             <p className="text-dark-muted">
-              Secure access for system administrators
+              {t("admin.secureAccess")}
             </p>
           </div>
 
@@ -66,28 +66,28 @@ export default function AdminLoginPage() {
 
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-dark-text-secondary px-1">
-                Admin Email
+                {t("admin.adminEmail")}
               </label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input-field text-white"
+                className="input-field text-[var(--text)]"
                 placeholder="admin@roadhelper.com"
               />
             </div>
 
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-dark-text-secondary px-1">
-                Password
+                {t("auth.password")}
               </label>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input-field text-white"
+                className="input-field text-[var(--text)]"
                 placeholder="••••••••"
               />
             </div>
@@ -100,18 +100,18 @@ export default function AdminLoginPage() {
               {loading ? (
                 <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
-                "Enter Admin Dashboard"
+                t("admin.enterDashboard")
               )}
             </button>
           </form>
 
           <p className="text-center mt-6 text-sm text-dark-muted">
-            New admin?{" "}
+            {t("admin.newAdmin")}{" "}
             <Link
               href="/admin/register"
               className="text-primary hover:underline"
             >
-              Register here
+              {t("admin.registerHere")}
             </Link>
           </p>
         </div>

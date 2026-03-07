@@ -31,7 +31,7 @@ export default function HelperDashboard() {
   }, [user]);
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-white bg-grid noise-overlay">
+    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-[var(--text)] bg-grid noise-overlay">
       <div className="max-w-5xl mx-auto space-y-8 animate-fade-in relative z-10">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
@@ -42,16 +42,16 @@ export default function HelperDashboard() {
               👋
             </h1>
             <p className="text-dark-muted">
-              Ready to save the day? See your stats and new requests.
+              {t("dashboard.readyToSave")}
             </p>
           </div>
           <div className="flex gap-3">
             <div className="px-4 py-2 bg-success/10 border border-success/30 text-success rounded-full text-sm font-bold flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              Online & Ready
+              {t("dashboard.onlineReady")}
             </div>
             <Link href="/helper/profile" className="btn-ghost px-4 py-2">
-              Profile
+              {t("dashboard.profile")}
             </Link>
           </div>
         </div>
@@ -62,23 +62,23 @@ export default function HelperDashboard() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="card glass p-6 border-dark-border">
             <div className="text-sm font-semibold text-dark-muted mb-2">
-              Total Earnings
+              {t("dashboard.totalEarnings")}
             </div>
-            <div className="font-display text-3xl font-bold text-white">
+            <div className="font-display text-3xl font-bold text-[var(--text)]">
               Rs.{stats.totalEarnings}
             </div>
           </div>
           <div className="card glass p-6 border-dark-border">
             <div className="text-sm font-semibold text-dark-muted mb-2">
-              Jobs Done
+              {t("dashboard.jobsDone")}
             </div>
-            <div className="font-display text-3xl font-bold text-white">
+            <div className="font-display text-3xl font-bold text-[var(--text)]">
               {stats.jobsCompleted}
             </div>
           </div>
           <div className="card glass p-6 border-dark-border">
             <div className="text-sm font-semibold text-dark-muted mb-2">
-              Rating
+              {t("dashboard.rating")}
             </div>
             <div className="font-display text-3xl font-bold text-accent flex items-center gap-1">
               {profile?.rating || 0} <span className="text-xl">★</span>
@@ -89,21 +89,21 @@ export default function HelperDashboard() {
             className="card glass p-6 border-primary/30 flex flex-col justify-center items-center group hover:bg-primary/10 transition-colors cursor-pointer bg-primary/5"
           >
             <div className="text-2xl mb-2">🚨</div>
-            <div className="font-bold text-white text-sm">Find Requests</div>
+            <div className="font-bold text-[var(--text)] text-sm">{t("dashboard.findRequests")}</div>
           </Link>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
           {/* Active Job Card */}
           <div className="md:col-span-2">
-            <h2 className="section-label mb-4">Active Mission</h2>
+            <h2 className="section-label mb-4">{t("dashboard.activeMission")}</h2>
             {activeJob ? (
               <div className="card glass p-6 border-l-4 border-l-secondary relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-10 blur-[40px] bg-secondary w-32 h-32" />
 
                 <div className="flex justify-between items-start mb-6">
                   <div>
-                    <h3 className="font-bold text-xl mb-1 capitalize text-white">
+                    <h3 className="font-bold text-xl mb-1 capitalize text-[var(--text)]">
                       {activeJob.service.replace("-", " ")}
                     </h3>
                     <div className="text-sm text-dark-muted flex items-center gap-1">
@@ -119,9 +119,9 @@ export default function HelperDashboard() {
 
                 <div className="bg-dark-surface p-4 rounded-xl border border-dark-border mb-6">
                   <div className="text-xs text-dark-muted font-semibold mb-1 uppercase tracking-wider">
-                    Customer
+                    {t("dashboard.customer")}
                   </div>
-                  <div className="font-bold text-lg text-white">
+                  <div className="font-bold text-lg text-[var(--text)]">
                     {activeJob.customerName}
                   </div>
                   <div className="text-sm text-primary font-mono mt-1">
@@ -137,22 +137,21 @@ export default function HelperDashboard() {
                       background: "linear-gradient(135deg, #FF6B35, #FFB347)",
                     }}
                   >
-                    Go to Job Dashboard →
+                    {t("dashboard.goToJobDashboard")} →
                   </Link>
                 </div>
               </div>
             ) : (
               <div className="card glass p-8 flex flex-col items-center justify-center border-dashed border-2 border-dark-border py-16 text-center">
                 <div className="text-4xl mb-4 opacity-50">☕</div>
-                <h3 className="font-bold text-lg mb-2 text-white">
-                  No Active Jobs
+                <h3 className="font-bold text-lg mb-2 text-[var(--text)]">
+                  {t("dashboard.noActiveJobs")}
                 </h3>
                 <p className="text-dark-muted mb-6 max-w-sm">
-                  Take a break, or head over to the Requests board to find
-                  someone in need.
+                  {t("dashboard.takeBreak")}
                 </p>
                 <Link href="/helper/requests" className="btn-ghost">
-                  View Requests board
+                  {t("dashboard.viewRequestsBoard")}
                 </Link>
               </div>
             )}
@@ -160,7 +159,7 @@ export default function HelperDashboard() {
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h2 className="section-label mb-4">My Dashboard</h2>
+            <h2 className="section-label mb-4">{t("dashboard.myDashboard")}</h2>
             <Link
               href="/helper/earnings"
               className="card glass p-4 flex items-center gap-4 hover:border-primary/50 transition-colors"
@@ -169,11 +168,11 @@ export default function HelperDashboard() {
                 💰
               </div>
               <div>
-                <div className="font-bold text-white text-sm">
-                  Earnings Report
+                <div className="font-bold text-[var(--text)] text-sm">
+                  {t("dashboard.earningsReport")}
                 </div>
                 <div className="text-xs text-dark-muted">
-                  View payouts and history
+                  {t("dashboard.viewPayouts")}
                 </div>
               </div>
             </Link>
@@ -185,11 +184,11 @@ export default function HelperDashboard() {
                 🛡️
               </div>
               <div>
-                <div className="font-bold text-white text-sm">
-                  Account Settings
+                <div className="font-bold text-[var(--text)] text-sm">
+                  {t("dashboard.accountSettings")}
                 </div>
                 <div className="text-xs text-dark-muted">
-                  Manage profile & vehicle
+                  {t("dashboard.manageProfile")}
                 </div>
               </div>
             </Link>

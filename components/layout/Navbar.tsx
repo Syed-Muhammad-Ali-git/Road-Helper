@@ -217,7 +217,7 @@ export function Navbar() {
               onClick={() => setMobileMenuOpen(false)}
               className="btn-primary w-full justify-center py-4 shadow-glow-primary"
             >
-              {user ? "Dashboard" : t("auth.register")}
+              {user ? t("nav.dashboard") : t("auth.register")}
             </Link>
           </div>
         </div>

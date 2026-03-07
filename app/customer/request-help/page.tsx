@@ -3,50 +3,23 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { requestOps, type ServiceType } from "@/lib/firestore";
+import { useTranslation } from "@/lib/firebase/hooks/useTranslation";
+import { Skeleton } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 
-const SERVICES: {
-  id: ServiceType;
-  label: string;
-  icon: string;
-  desc: string;
-}[] = [
-  {
-    id: "towing",
-    label: "Towing",
-    icon: "🚙",
-    desc: "Need your vehicle moved",
-  },
-  {
-    id: "tire-change",
-    label: "Flat Tire",
-    icon: "🛞",
-    desc: "Spare replacement",
-  },
-  {
-    id: "fuel-delivery",
-    label: "Fuel Delivery",
-    icon: "⛽",
-    desc: "Out of gas",
-  },
-  {
-    id: "battery-jump",
-    label: "Battery Jump",
-    icon: "🔋",
-    desc: "Dead battery",
-  },
-  {
-    id: "lockout",
-    label: "Lockout Help",
-    icon: "🔑",
-    desc: "Keys locked inside",
-  },
+const SERVICES: { id: ServiceType; labelKey: string; icon: string }[] = [
+  { id: "towing", labelKey: "requestHelp.towing", icon: "🚙" },
+  { id: "tire-change", labelKey: "requestHelp.tireChange", icon: "🛞" },
+  { id: "fuel-delivery", labelKey: "requestHelp.fuelDelivery", icon: "⛽" },
+  { id: "battery-jump", labelKey: "requestHelp.batteryJump", icon: "🔋" },
+  { id: "lockout", labelKey: "requestHelp.lockout", icon: "🔑" },
 ];
 
 function RequestHelpContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initType = searchParams.get("type") as ServiceType;
-
+  const t = useTranslation();
   const { user, profile } = useAuthStore();
 
   const [step, setStep] = useState(1);
@@ -59,15 +32,36 @@ function RequestHelpContent() {
   useEffect(() => {
     if (step === 2 && !location.lat) {
       setLocLoading(true);
-      // Fake location detect for demo
-      setTimeout(() => {
-        setLocation({
-          lat: 31.5204,
-          lng: 74.3587,
-          address: "Ferozepur Road, Lahore",
-        });
-        setLocLoading(false);
-      }, 1500);
+      if (typeof navigator !== "undefined" && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            setLocation({
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+              address: `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`,
+            });
+            setLocLoading(false);
+          },
+          () => {
+            setLocation({
+              lat: 31.5204,
+              lng: 74.3587,
+              address: "Ferozepur Road, Lahore",
+            });
+            setLocLoading(false);
+          },
+          { timeout: 10000 }
+        );
+      } else {
+        setTimeout(() => {
+          setLocation({
+            lat: 31.5204,
+            lng: 74.3587,
+            address: "Ferozepur Road, Lahore",
+          });
+          setLocLoading(false);
+        }, 1500);
+      }
     }
   }, [step, location.lat]);
 
@@ -83,9 +77,18 @@ function RequestHelpContent() {
         location,
         notes,
       });
+      notifications.show({
+        title: t("common.success"),
+        message: t("requestHelp.searching"),
+        color: "green",
+      });
       router.push(`/customer/request-status?id=${id}`);
     } catch (e) {
-      alert("Failed to request help");
+      notifications.show({
+        title: t("common.error"),
+        message: t("requestHelp.requestFailed"),
+        color: "red",
+      });
       setLoading(false);
     }
   };
@@ -93,11 +96,11 @@ function RequestHelpContent() {
   return (
     <div className="max-w-3xl mx-auto space-y-8 relative z-10 animate-fade-in">
       <div className="text-center mb-10">
-        <h1 className="font-display text-3xl font-bold mb-2">
-          Request Assistance
+        <h1 className="font-display text-3xl font-bold mb-2 text-[var(--text)]">
+          {t("requestHelp.pageTitle")}
         </h1>
         <p className="text-dark-muted">
-          Get a trusted professional to your location instantly.
+          {t("requestHelp.pageSubtitle")}
         </p>
       </div>
 
@@ -120,8 +123,8 @@ function RequestHelpContent() {
       <div className="card glass p-8">
         {step === 1 && (
           <div className="animate-fade-in">
-            <h2 className="text-xl font-bold mb-6">
-              1. What do you need help with?
+            <h2 className="text-xl font-bold mb-6 text-[var(--text)]">
+              {t("requestHelp.step1Title")}
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
               {SERVICES.map((s) => (
@@ -134,8 +137,8 @@ function RequestHelpContent() {
                   className={`text-left p-4 rounded-xl border transition-all ${service === s.id ? "bg-primary/10 border-primary shadow-glow-primary" : "bg-dark-surface border-dark-border hover:border-primary/50"}`}
                 >
                   <div className="text-3xl mb-3">{s.icon}</div>
-                  <div className="font-bold text-lg mb-1">{s.label}</div>
-                  <div className="text-sm text-dark-muted">{s.desc}</div>
+                  <div className="font-bold text-lg mb-1 text-[var(--text)]">{t(s.labelKey as "requestHelp.towing")}</div>
+                  <div className="text-sm text-dark-muted">{t(s.labelKey as "requestHelp.towing")}</div>
                 </button>
               ))}
             </div>
@@ -144,13 +147,14 @@ function RequestHelpContent() {
 
         {step === 2 && (
           <div className="animate-fade-in">
-            <h2 className="text-xl font-bold mb-6">
-              2. Where are you located?
+            <h2 className="text-xl font-bold mb-6 text-[var(--text)]">
+              {t("requestHelp.step2Title")}
             </h2>
             {locLoading ? (
               <div className="py-20 flex flex-col items-center justify-center text-dark-muted">
-                <div className="w-8 h-8 rounded-full border-[3px] border-primary border-t-transparent animate-spin mb-4" />
-                Detecting GPS Location...
+                <Skeleton height={48} radius="md" animate className="mb-4 w-12" />
+                <div className="w-8 h-8 rounded-full border-[3px] border-primary border-t-transparent animate-spin mb-2" />
+                {t("requestHelp.gpsDetecting")}
               </div>
             ) : (
               <div className="space-y-6">
@@ -163,7 +167,7 @@ function RequestHelpContent() {
 
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-dark-muted">
-                    Identified Address
+                    {t("requestHelp.identifiedAddress")}
                   </label>
                   <input
                     type="text"
@@ -172,28 +176,28 @@ function RequestHelpContent() {
                       setLocation({ ...location, address: e.target.value })
                     }
                     className="input-field"
-                    placeholder="Enter landmark or street address"
+                    placeholder={t("requestHelp.addressPlaceholder")}
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-dark-muted">
-                    Any details for the helper? (Optional)
+                    {t("requestHelp.optionalDetails")}
                   </label>
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     className="input-field min-h-[100px] resize-none"
-                    placeholder="E.g. I am parked near the gas station."
+                    placeholder={t("requestHelp.notesPlaceholder")}
                   />
                 </div>
 
                 <div className="flex justify-between pt-4">
                   <button onClick={() => setStep(1)} className="btn-ghost">
-                    Back
+                    {t("common.back")}
                   </button>
                   <button onClick={() => setStep(3)} className="btn-primary">
-                    Continue
+                    {t("common.continue")}
                   </button>
                 </div>
               </div>
@@ -203,22 +207,22 @@ function RequestHelpContent() {
 
         {step === 3 && (
           <div className="animate-fade-in">
-            <h2 className="text-xl font-bold mb-6">3. Confirm Request</h2>
+            <h2 className="text-xl font-bold mb-6 text-[var(--text)]">{t("requestHelp.step3Title")}</h2>
             <div className="bg-dark-surface rounded-xl p-6 border border-dark-border space-y-4 mb-8">
               <div className="flex items-center justify-between pb-4 border-b border-dark-border">
-                <span className="text-dark-muted">Service</span>
-                <span className="font-bold text-lg capitalize">
+                <span className="text-dark-muted">{t("requestHelp.service")}</span>
+                <span className="font-bold text-lg capitalize text-[var(--text)]">
                   {service.replace("-", " ")}
                 </span>
               </div>
               <div className="flex items-center justify-between pb-4 border-b border-dark-border">
-                <span className="text-dark-muted">Location</span>
-                <span className="font-semibold text-right max-w-[200px]">
+                <span className="text-dark-muted">{t("requestHelp.location")}</span>
+                <span className="font-semibold text-right max-w-[200px] text-[var(--text)]">
                   {location.address}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-dark-muted">Estimated Cost</span>
+                <span className="text-dark-muted">{t("requestHelp.estimatedCost")}</span>
                 <span className="font-bold text-xl text-primary">
                   $40 - $80
                 </span>
@@ -231,14 +235,14 @@ function RequestHelpContent() {
                 onClick={() => setStep(2)}
                 className="btn-ghost"
               >
-                Edit
+                {t("common.edit")}
               </button>
               <button
                 disabled={loading}
                 onClick={handleSubmit}
                 className="btn-primary px-10"
               >
-                {loading ? "Submitting..." : "Confirm Request"}
+                {loading ? t("requestHelp.submitting") : t("requestHelp.confirmRequest")}
               </button>
             </div>
           </div>
@@ -250,8 +254,8 @@ function RequestHelpContent() {
 
 export default function RequestHelpPage() {
   return (
-    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-white bg-grid noise-overlay">
-      <Suspense fallback={<div className="text-center">Loading...</div>}>
+    <div className="min-h-screen pt-24 pb-12 px-[5%] bg-dark-bg text-[var(--text)] bg-grid noise-overlay">
+      <Suspense fallback={<div className="flex justify-center py-20"><Skeleton height={60} width="80%" radius="md" animate /></div>}>
         <RequestHelpContent />
       </Suspense>
     </div>

@@ -22,12 +22,12 @@ export default function ForgotPasswordPage() {
       await authOps.resetPassword(email);
       setMessage({
         type: "success",
-        text: "Password reset link sent! Check your inbox.",
+        text: t("forgotPassword.resetLinkSent"),
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       setMessage({
         type: "error",
-        text: err.message || "Something went wrong.",
+        text: (err as Error)?.message || t("common.error"),
       });
     } finally {
       setLoading(false);
@@ -44,7 +44,7 @@ export default function ForgotPasswordPage() {
           >
             🚗
           </div>
-          <span className="font-display font-extrabold text-xl text-white">
+          <span className="font-display font-extrabold text-xl text-[var(--text)]">
             RoadHelper
           </span>
         </Link>
@@ -64,7 +64,7 @@ export default function ForgotPasswordPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label className="text-sm font-semibold text-dark-muted ml-1">
-                Email Address
+                {t("auth.email")}
               </label>
               <input
                 type="email"
@@ -93,16 +93,16 @@ export default function ForgotPasswordPage() {
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
-                "Send Reset Link"
+                t("forgotPassword.sendResetLink")
               )}
             </button>
 
             <div className="text-center pt-4">
               <Link
                 href="/login"
-                className="text-dark-muted hover:text-white transition-colors text-sm font-semibold"
+                className="text-dark-muted hover:text-[var(--text)] transition-colors text-sm font-semibold"
               >
-                ← Back to Login
+                ← {t("forgotPassword.backToLogin")}
               </Link>
             </div>
           </form>

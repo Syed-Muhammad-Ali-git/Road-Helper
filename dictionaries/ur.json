@@ -4,7 +4,9 @@
     "howItWorks": "یہ کیسے کام کرتا ہے",
     "about": "ہمارے بارے میں",
     "login": "لاگ ان کریں",
-    "getHelp": "مدد حاصل کریں"
+    "getHelp": "مدد حاصل کریں",
+    "dashboard": "ڈیش بورڈ",
+    "register": "رجسٹر کریں"
   },
   "hero": {
     "badge": "24/7 ہنگامی مدد — اب لائیو",
@@ -15,7 +17,19 @@
     "ctaSecondary": "ایمرجنسی کال"
   },
   "loader": {
-    "text": "آپ کا تجربہ تیار ہو رہا ہے..."
+    "text": "آپ کا تجربہ تیار ہو رہا ہے...",
+    "loading": "لوڈ ہو رہا ہے..."
+  },
+  "common": {
+    "back": "واپس",
+    "edit": "ترمیم",
+    "continue": "جاری رکھیں",
+    "submit": "جمع کروائیں",
+    "cancel": "منسوخ",
+    "save": "محفوظ کریں",
+    "goHome": "ہوم پر جائیں",
+    "error": "کچھ غلط ہو گیا۔",
+    "success": "کامیابی"
   },
   "auth": {
     "login": "لاگ ان کریں",
@@ -40,7 +54,29 @@
     "joinDescription": "فوری سڑک کی مدد حاصل کرنے کے لیے اکاؤنٹ بنائیں یا دوسروں کی مدد کر کے پیسے کمائیں۔",
     "fullName": "پورا نام",
     "phoneNumber": "فون نمبر",
-    "legalAgreement": "اکاؤنٹ بنا کر، آپ ہماری سروس کی شرائط اور رازداری کی پالیسی سے اتفاق کرتے ہیں۔"
+    "legalAgreement": "اکاؤنٹ بنا کر، آپ ہماری سروس کی شرائط اور رازداری کی پالیسی سے اتفاق کرتے ہیں۔",
+    "adminLogin": "ایڈمن لاگ ان",
+    "adminRegister": "ایڈمن رجسٹر",
+    "loginWithGoogle": "گوگل کے ساتھ جاری رکھیں",
+    "backToHome": "ہوم پر واپس",
+    "accessDenied": "رسائی denied۔ صرف ایڈمن۔",
+    "loginFailed": "لاگ ان نہیں ہوا"
+  },
+  "admin": {
+    "portal": "ایڈمن پورٹل",
+    "secureAccess": "سسٹم ایڈمنسٹریٹرز کے لیے محفوظ رسائی",
+    "backToUserLogin": "صارف لاگ ان پر واپس",
+    "adminEmail": "ایڈمن ای میل",
+    "enterDashboard": "ایڈمن ڈیش بورڈ میں داخل ہوں",
+    "registerHere": "یہاں رجسٹر کریں",
+    "newAdmin": "نئے ایڈمن؟"
+  },
+  "forgotPassword": {
+    "title": "پاس ورڈ بھول گئے؟",
+    "subtitle": "فکر نہ کریں! اپنا ای میل درج کریں، ہم آپ کو ری سیٹ لنک بھیجیں گے۔",
+    "sendResetLink": "ری سیٹ لنک بھیجیں",
+    "backToLogin": "لاگ ان پر واپس",
+    "resetLinkSent": "پاس ورڈ ری سیٹ لنک بھیج دیا! اپنا ان باکس چیک کریں۔"
   },
   "dashboard": {
     "welcome": "خوش آمدید",
@@ -49,7 +85,33 @@
     "activeJob": "فعال کام",
     "history": "تاریخ",
     "earnings": "آمدنی",
-    "profile": "پروفائل"
+    "profile": "پروفائل",
+    "availableJobs": "دستیاب نوکریاں",
+    "allRequests": "تمام درخواستیں",
+    "allUsers": "تمام صارفین",
+    "backToDashboard": "ڈیش بورڈ پر واپس",
+    "readyToSave": "دن بچانے کے لیے تیار؟ اپنے اعداد و شمار اور نئی درخواستیں دیکھیں۔",
+    "onlineReady": "آن لائن اور تیار",
+    "findRequests": "درخواستیں تلاش کریں",
+    "activeMission": "فعال مشن",
+    "noActiveJobs": "کوئی فعال نوکری نہیں",
+    "takeBreak": "آرام کریں، یا ضرورت مندوں کو تلاش کرنے کے لیے درخواستوں کے بورڈ پر جائیں۔",
+    "viewRequestsBoard": "درخواستوں کا بورڈ دیکھیں",
+    "myDashboard": "میرا ڈیش بورڈ",
+    "earningsReport": "آمدنی کی رپورٹ",
+    "viewPayouts": "ادائیگیاں اور تاریخ دیکھیں",
+    "accountSettings": "اکاؤنٹ سیٹنگز",
+    "manageProfile": "پروفائل اور گاڑی منظم کریں",
+    "totalEarnings": "کل آمدنی",
+    "jobsDone": "نوکریاں مکمل",
+    "rating": "ریٹنگ",
+    "goToJobDashboard": "جاب ڈیش بورڈ پر جائیں",
+    "customer": "گاہک"
+  },
+  "history": {
+    "title": "درخواست کی تاریخ",
+    "noHistoryYet": "ابھی تک کوئی تاریخ نہیں",
+    "noHistorySubtitle": "آپ کی مکمل یا منسوخ درخواستیں یہاں ظاہر ہوں گی۔"
   },
   "requestHelp": {
     "title": "آپ کو کس چیز کی ضرورت ہے؟",
@@ -62,7 +124,47 @@
     "yourLocation": "آپ کا مقام",
     "detecting": "آپ کا مقام معلوم کیا جا رہا ہے...",
     "confirm": "درخواست کی تصدیق کریں",
-    "searching": "قریبی مددگاروں کو تلاش کیا جا رہا ہے..."
+    "searching": "قریبی مددگاروں کو تلاش کیا جا رہا ہے...",
+    "pageTitle": "مدد کی درخواست",
+    "pageSubtitle": "اپنے مقام پر ایک قابل بھروسہ پیشہ ور حاصل کریں۔",
+    "step1Title": "1. آپ کو کس چیز کی مدد چاہیے؟",
+    "step2Title": "2. آپ کہاں ہیں؟",
+    "step3Title": "3. درخواست کی تصدیق کریں",
+    "identifiedAddress": "پہچانا گیا پتہ",
+    "addressPlaceholder": "لینڈ مارک یا سڑک کا پتہ درج کریں",
+    "optionalDetails": "مددگار کے لیے کوئی تفصیلات؟ (اختیاری)",
+    "notesPlaceholder": "مثال: میں پٹرول پمپ کے قریب کھڑا ہوں۔",
+    "service": "سروس",
+    "location": "مقام",
+    "estimatedCost": "اندازہ شدہ لاگت",
+    "confirmRequest": "درخواست کی تصدیق کریں",
+    "submitting": "جمع کروایا جا رہا ہے...",
+    "requestFailed": "مدد کی درخواست نہیں ہو سکی",
+    "gpsDetecting": "GPS لوکیشن معلوم ہو رہی ہے..."
+  },
+  "requestStatus": {
+    "title": "درخواست کی حیثیت",
+    "requestNotFound": "درخواست نہیں ملی۔",
+    "cancelConfirm": "اس درخواست کو منسوخ کریں؟",
+    "findingHelper": "مددگار تلاش ہو رہا ہے",
+    "searchingArea": "علاقہ تلاش ہو رہا ہے...",
+    "helperAccepted": "مددگار نے قبول کیا",
+    "preparingDispatch": "ڈسپیچ کی تیاری",
+    "onTheWay": "راستے میں",
+    "helperEnRoute": "مددگار راستے میں ہے",
+    "arrived": "پہنچ گئے",
+    "helperAtLocation": "مددگار آپ کے مقام پر ہے",
+    "jobComplete": "کام مکمل",
+    "paymentProcessed": "ادائیگی پروسیس ہو گئی",
+    "submitRating": "ریٹنگ جمع کروائیں",
+    "cancelRequest": "درخواست منسوخ کریں",
+    "rateExperience": "اپنے تجربے کی ریٹنگ دیں",
+    "howWasService": "{name} کی فراہم کردہ سروس کیسی تھی؟",
+    "leaveReview": "جائزہ لکھیں... (اختیاری)",
+    "submitFeedback": "فیڈ بیک جمع کروائیں",
+    "requestAgain": "دوبارہ درخواست کریں",
+    "requestCancelled": "درخواست منسوخ ہو گئی",
+    "waitingForHelper": "مددگار کے قبول کرنے کا انتظار..."
   },
   "status": {
     "pending": "زیر التواء",

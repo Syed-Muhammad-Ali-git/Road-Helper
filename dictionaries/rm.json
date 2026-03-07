@@ -4,7 +4,9 @@
     "howItWorks": "Kaise Kaam Karta Hai",
     "about": "Hamare Baare Mein",
     "login": "Log In Karein",
-    "getHelp": "Madad Haasil Karein"
+    "getHelp": "Madad Haasil Karein",
+    "dashboard": "Dashboard",
+    "register": "Register"
   },
   "hero": {
     "badge": "24/7 Hangami Madad — Abhi Live",
@@ -15,7 +17,19 @@
     "ctaSecondary": "Emergency Call"
   },
   "loader": {
-    "text": "Aapka tajarba tayyar ho raha hai..."
+    "text": "Aapka tajarba tayyar ho raha hai...",
+    "loading": "Load ho raha hai..."
+  },
+  "common": {
+    "back": "Wapas",
+    "edit": "Edit",
+    "continue": "Jari rakhein",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "goHome": "Home par jayein",
+    "error": "Kuch galat ho gaya.",
+    "success": "Kaamyaabi"
   },
   "auth": {
     "login": "Log In Karein",
@@ -40,7 +54,29 @@
     "joinDescription": "Fauri road madad haasil karne ke liye account banayein ya doosron ki madad kar ke paise kamayein.",
     "fullName": "Poora Naam",
     "phoneNumber": "Phone Number",
-    "legalAgreement": "Account bana kar, aap hamari Terms of Service aur Privacy Policy se ittefaq karte hain."
+    "legalAgreement": "Account bana kar, aap hamari Terms of Service aur Privacy Policy se ittefaq karte hain.",
+    "adminLogin": "Admin Login",
+    "adminRegister": "Admin Register",
+    "loginWithGoogle": "Google ke sath jari rakhein",
+    "backToHome": "Back to Home",
+    "accessDenied": "Access denied. Sirf admin.",
+    "loginFailed": "Login fail"
+  },
+  "admin": {
+    "portal": "Admin Portal",
+    "secureAccess": "System administrators ke liye secure access",
+    "backToUserLogin": "Back to User Login",
+    "adminEmail": "Admin Email",
+    "enterDashboard": "Admin Dashboard mein enter karein",
+    "registerHere": "Yahan register karein",
+    "newAdmin": "Naya admin?"
+  },
+  "forgotPassword": {
+    "title": "Password bhool gaye?",
+    "subtitle": "Fikar na karein! Apna email daalein, hum aapko reset link bhejenge.",
+    "sendResetLink": "Reset Link Bhejein",
+    "backToLogin": "Back to Login",
+    "resetLinkSent": "Password reset link bhej diya! Apna inbox check karein."
   },
   "dashboard": {
     "welcome": "Welcome back",
@@ -49,7 +85,33 @@
     "activeJob": "Active Kaam",
     "history": "History",
     "earnings": "Amdani",
-    "profile": "Profile"
+    "profile": "Profile",
+    "availableJobs": "Available Jobs",
+    "allRequests": "All Requests",
+    "allUsers": "All Users",
+    "backToDashboard": "Back to Dashboard",
+    "readyToSave": "Din bachane ke liye tayyar? Apne stats aur nayi requests dekhein.",
+    "onlineReady": "Online & Ready",
+    "findRequests": "Find Requests",
+    "activeMission": "Active Mission",
+    "noActiveJobs": "Koi active job nahi",
+    "takeBreak": "Aaram karein, ya Requests board par jayein kisi zarooratmand ko dhoondhne ke liye.",
+    "viewRequestsBoard": "View Requests board",
+    "myDashboard": "Mera Dashboard",
+    "earningsReport": "Earnings Report",
+    "viewPayouts": "Payouts aur history dekhein",
+    "accountSettings": "Account Settings",
+    "manageProfile": "Profile aur vehicle manage karein",
+    "totalEarnings": "Total Earnings",
+    "jobsDone": "Jobs Done",
+    "rating": "Rating",
+    "goToJobDashboard": "Job Dashboard par jayein",
+    "customer": "Customer"
+  },
+  "history": {
+    "title": "Request History",
+    "noHistoryYet": "Abhi tak koi history nahi",
+    "noHistorySubtitle": "Aapki completed ya cancelled requests yahan dikhegi."
   },
   "requestHelp": {
     "title": "Aapko kis cheez ki zaroorat hai?",
@@ -62,7 +124,47 @@
     "yourLocation": "Aapki Location",
     "detecting": "Aapki location dhoondi ja rahi hai...",
     "confirm": "Darkhwast Confirm Karein",
-    "searching": "Qareebi helpers ko dhoonda ja raha hai..."
+    "searching": "Qareebi helpers ko dhoonda ja raha hai...",
+    "pageTitle": "Request Assistance",
+    "pageSubtitle": "Apne location par trusted professional haasil karein.",
+    "step1Title": "1. Aapko kis cheez ki madad chahiye?",
+    "step2Title": "2. Aap kahan hain?",
+    "step3Title": "3. Confirm Request",
+    "identifiedAddress": "Identified Address",
+    "addressPlaceholder": "Landmark ya street address daalein",
+    "optionalDetails": "Helper ke liye koi details? (Optional)",
+    "notesPlaceholder": "E.g. Main petrol pump ke qareeb khada hoon.",
+    "service": "Service",
+    "location": "Location",
+    "estimatedCost": "Estimated Cost",
+    "confirmRequest": "Confirm Request",
+    "submitting": "Submitting...",
+    "requestFailed": "Madad ki darkhwast fail",
+    "gpsDetecting": "GPS location detect ho raha hai..."
+  },
+  "requestStatus": {
+    "title": "Request Status",
+    "requestNotFound": "Request nahi mili.",
+    "cancelConfirm": "Is request ko cancel karein?",
+    "findingHelper": "Finding Helper",
+    "searchingArea": "Searching area...",
+    "helperAccepted": "Helper Accepted",
+    "preparingDispatch": "Preparing to dispatch",
+    "onTheWay": "On the Way",
+    "helperEnRoute": "Helper is en route",
+    "arrived": "Arrived",
+    "helperAtLocation": "Helper is at your location",
+    "jobComplete": "Job Complete",
+    "paymentProcessed": "Payment processed",
+    "submitRating": "Submit Rating",
+    "cancelRequest": "Cancel Request",
+    "rateExperience": "Rate Your Experience",
+    "howWasService": "How was the service provided by {name}?",
+    "leaveReview": "Leave a review... (Optional)",
+    "submitFeedback": "Submit Feedback",
+    "requestAgain": "Request Again",
+    "requestCancelled": "Request Cancelled",
+    "waitingForHelper": "Waiting for a helper to accept..."
   },
   "status": {
     "pending": "Pending",

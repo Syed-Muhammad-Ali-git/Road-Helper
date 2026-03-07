@@ -4,7 +4,9 @@
     "howItWorks": "How It Works",
     "about": "About",
     "login": "Login",
-    "getHelp": "Get Help"
+    "getHelp": "Get Help",
+    "dashboard": "Dashboard",
+    "register": "Register"
   },
   "hero": {
     "badge": "24/7 Emergency Support — Live Now",
@@ -15,7 +17,19 @@
     "ctaSecondary": "Emergency Call"
   },
   "loader": {
-    "text": "Preparing your experience..."
+    "text": "Preparing your experience...",
+    "loading": "Loading..."
+  },
+  "common": {
+    "back": "Back",
+    "edit": "Edit",
+    "continue": "Continue",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "goHome": "Go Home",
+    "error": "Something went wrong.",
+    "success": "Success"
   },
   "auth": {
     "login": "Login",
@@ -44,7 +58,25 @@
     "adminLogin": "Admin Login",
     "adminRegister": "Admin Register",
     "loginWithGoogle": "Continue with Google",
-    "backToHome": "Back to Home"
+    "backToHome": "Back to Home",
+    "accessDenied": "Access denied. Admin only.",
+    "loginFailed": "Failed to login"
+  },
+  "admin": {
+    "portal": "Admin Portal",
+    "secureAccess": "Secure access for system administrators",
+    "backToUserLogin": "Back to User Login",
+    "adminEmail": "Admin Email",
+    "enterDashboard": "Enter Admin Dashboard",
+    "registerHere": "Register here",
+    "newAdmin": "New admin?"
+  },
+  "forgotPassword": {
+    "title": "Forgot Password?",
+    "subtitle": "No worries! Enter your email and we'll send you a reset link.",
+    "sendResetLink": "Send Reset Link",
+    "backToLogin": "Back to Login",
+    "resetLinkSent": "Password reset link sent! Check your inbox."
   },
   "dashboard": {
     "welcome": "Welcome back",
@@ -53,7 +85,33 @@
     "activeJob": "Active Job",
     "history": "History",
     "earnings": "Earnings",
-    "profile": "Profile"
+    "profile": "Profile",
+    "availableJobs": "Available Jobs",
+    "allRequests": "All Requests",
+    "allUsers": "All Users",
+    "backToDashboard": "Back to Dashboard",
+    "readyToSave": "Ready to save the day? See your stats and new requests.",
+    "onlineReady": "Online & Ready",
+    "findRequests": "Find Requests",
+    "activeMission": "Active Mission",
+    "noActiveJobs": "No Active Jobs",
+    "takeBreak": "Take a break, or head over to the Requests board to find someone in need.",
+    "viewRequestsBoard": "View Requests board",
+    "myDashboard": "My Dashboard",
+    "earningsReport": "Earnings Report",
+    "viewPayouts": "View payouts and history",
+    "accountSettings": "Account Settings",
+    "manageProfile": "Manage profile & vehicle",
+    "totalEarnings": "Total Earnings",
+    "jobsDone": "Jobs Done",
+    "rating": "Rating",
+    "goToJobDashboard": "Go to Job Dashboard",
+    "customer": "Customer"
+  },
+  "history": {
+    "title": "Request History",
+    "noHistoryYet": "No history yet",
+    "noHistorySubtitle": "Your completed or cancelled requests will appear here."
   },
   "requestHelp": {
     "title": "What do you need?",
@@ -66,7 +124,47 @@
     "yourLocation": "Your Location",
     "detecting": "Detecting your location...",
     "confirm": "Confirm Request",
-    "searching": "Finding helpers nearby..."
+    "searching": "Finding helpers nearby...",
+    "pageTitle": "Request Assistance",
+    "pageSubtitle": "Get a trusted professional to your location instantly.",
+    "step1Title": "1. What do you need help with?",
+    "step2Title": "2. Where are you located?",
+    "step3Title": "3. Confirm Request",
+    "identifiedAddress": "Identified Address",
+    "addressPlaceholder": "Enter landmark or street address",
+    "optionalDetails": "Any details for the helper? (Optional)",
+    "notesPlaceholder": "E.g. I am parked near the gas station.",
+    "service": "Service",
+    "location": "Location",
+    "estimatedCost": "Estimated Cost",
+    "confirmRequest": "Confirm Request",
+    "submitting": "Submitting...",
+    "requestFailed": "Failed to request help",
+    "gpsDetecting": "Detecting GPS Location..."
+  },
+  "requestStatus": {
+    "title": "Request Status",
+    "requestNotFound": "Request not found.",
+    "cancelConfirm": "Cancel this request?",
+    "findingHelper": "Finding Helper",
+    "searchingArea": "Searching area...",
+    "helperAccepted": "Helper Accepted",
+    "preparingDispatch": "Preparing to dispatch",
+    "onTheWay": "On the Way",
+    "helperEnRoute": "Helper is en route",
+    "arrived": "Arrived",
+    "helperAtLocation": "Helper is at your location",
+    "jobComplete": "Job Complete",
+    "paymentProcessed": "Payment processed",
+    "submitRating": "Submit Rating",
+    "cancelRequest": "Cancel Request",
+    "rateExperience": "Rate Your Experience",
+    "howWasService": "How was the service provided by {name}?",
+    "leaveReview": "Leave a review... (Optional)",
+    "submitFeedback": "Submit Feedback",
+    "requestAgain": "Request Again",
+    "requestCancelled": "Request Cancelled",
+    "waitingForHelper": "Waiting for a helper to accept..."
   },
   "status": {
     "pending": "Pending",

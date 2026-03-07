@@ -7,14 +7,14 @@ import {
   History,
   User,
   PlusCircle,
-  Settings,
-  LogOut,
   Wallet,
   AlertCircle,
   X,
+  LogOut,
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useUiStore } from "@/store/uiStore";
+import { useTranslation } from "@/lib/firebase/hooks/useTranslation";
 
 interface SidebarProps {
   role: "customer" | "helper" | "admin";
@@ -24,26 +24,27 @@ export function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname();
   const { logout } = useAuthStore();
   const { isSidebarOpen, closeSidebar } = useUiStore();
+  const t = useTranslation();
 
   const customerLinks = [
-    { name: "Dashboard", href: "/customer/dashboard", icon: LayoutDashboard },
-    { name: "Request Help", href: "/customer/request-help", icon: PlusCircle },
-    { name: "History", href: "/customer/history", icon: History },
-    { name: "Profile", href: "/customer/profile", icon: User },
+    { nameKey: "nav.dashboard", href: "/customer/dashboard", icon: LayoutDashboard },
+    { nameKey: "dashboard.requestHelp", href: "/customer/request-help", icon: PlusCircle },
+    { nameKey: "dashboard.history", href: "/customer/history", icon: History },
+    { nameKey: "dashboard.profile", href: "/customer/profile", icon: User },
   ];
 
   const helperLinks = [
-    { name: "Dashboard", href: "/helper/dashboard", icon: LayoutDashboard },
-    { name: "Available Jobs", href: "/helper/requests", icon: AlertCircle },
-    { name: "Earnings", href: "/helper/earnings", icon: Wallet },
-    { name: "Profile", href: "/helper/profile", icon: User },
+    { nameKey: "nav.dashboard", href: "/helper/dashboard", icon: LayoutDashboard },
+    { nameKey: "dashboard.availableJobs", href: "/helper/requests", icon: AlertCircle },
+    { nameKey: "dashboard.earnings", href: "/helper/earnings", icon: Wallet },
+    { nameKey: "dashboard.profile", href: "/helper/profile", icon: User },
   ];
 
   const adminLinks = [
-    { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-    { name: "All Requests", href: "/admin/requests", icon: AlertCircle },
-    { name: "All Users", href: "/admin/users", icon: User },
-    { name: "Earnings", href: "/admin/earnings", icon: Wallet },
+    { nameKey: "nav.dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+    { nameKey: "dashboard.allRequests", href: "/admin/requests", icon: AlertCircle },
+    { nameKey: "dashboard.allUsers", href: "/admin/users", icon: User },
+    { nameKey: "dashboard.earnings", href: "/admin/earnings", icon: Wallet },
   ];
 
   const links =
@@ -106,7 +107,7 @@ export function Sidebar({ role }: SidebarProps) {
                 <Icon
                   className={`w-5 h-5 ${isActive ? "text-primary" : "group-hover:text-white"}`}
                 />
-                <span className="font-medium text-sm">{link.name}</span>
+                <span className="font-medium text-sm">{t(link.nameKey as "nav.dashboard" | "dashboard.requestHelp" | "dashboard.history" | "dashboard.profile" | "dashboard.availableJobs" | "dashboard.earnings" | "dashboard.allRequests" | "dashboard.allUsers")}</span>
                 {isActive && (
                   <motion.div
                     layoutId="sidebar-active"
