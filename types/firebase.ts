@@ -18,7 +18,7 @@ export interface BaseUser {
 export interface CustomerProfile extends BaseUser {
   role: "customer";
   address?: string;
-  preferredLanguage?: "en" | "ur" | "roman";
+  preferredLanguage?: "en" | "ur" | "rm";
   totalRequests: number;
   completedRequests: number;
 }

@@ -12,17 +12,48 @@ type NestedPaths<T> = {
     : `${K}`;
 }[keyof T & (string | number)];
 
+function getNestedValue(obj: unknown, keyPath: string): unknown {
+  const keys = keyPath.split(".");
+  let val: unknown = obj;
+  for (const k of keys) {
+    if (val === undefined || val === null) return undefined;
+    val = (val as Record<string, unknown>)[k];
+  }
+  return val;
+}
+
 export function useTranslation() {
   const { lang } = useLangStore();
 
-  const t = (key: NestedPaths<Dictionary>) => {
+  const t = (
+    key: NestedPaths<Dictionary>,
+    params?: Record<string, string | number>
+  ): string => {
     const keys = key.split(".");
-    let val: any = (dictionaries as any)[lang];
+    let val: unknown = (dictionaries as Record<string, unknown>)[lang];
     for (const k of keys) {
-      if (val === undefined) return key;
-      val = val[k];
+      if (val === undefined || val === null) {
+        if (process.env.NODE_ENV === "development") {
+          console.warn("Missing translation", lang, key);
+        }
+        const fallback = getNestedValue(en, key);
+        const str = typeof fallback === "string" ? fallback : key;
+        if (!params) return str;
+        return str.replace(
+          /\{(\w+)\}/g,
+          (_, k) => (params[k] != null ? String(params[k]) : `{${k}}`)
+        );
+      }
+      val = (val as Record<string, unknown>)[k];
     }
-    return (val as unknown as string) || key;
+    let str = (typeof val === "string" ? val : key) as string;
+    if (params) {
+      str = str.replace(
+        /\{(\w+)\}/g,
+        (_, k) => (params[k] != null ? String(params[k]) : `{${k}}`)
+      );
+    }
+    return str || key;
   };
 
   return t;

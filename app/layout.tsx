@@ -42,7 +42,6 @@ export default function RootLayout({
 }) {
   return (
     <html
-      lang="en"
       className={`${syne.variable} ${dmSans.variable}`}
       suppressHydrationWarning
     >
